@@ -211,6 +211,8 @@ describe("swapr contract test suite", () => {
     })
   })
 
+  // TODO(psq): test that reducePosition does not accept a value > u100
+
   describe("Setting the fee", () => {
     before(async () => {
     })

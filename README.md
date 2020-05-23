@@ -8,17 +8,23 @@ The API has been reimagined, and hopefully simplified to its minima, withough im
 
 ## main contract API
 
-# `(add-to-position (x uint) (y uint))`
+### `(add-to-position (x uint) (y uint))`
+Add x amount of the X token, and y amount of Y token by transfering from the sender.  Currently does not check that the exchange rate makes sense, so could lead to losses
 
-# `(reduce-position (percent uint))`
+### `(reduce-position (percent uint))`
+Transfer back to the sender, up to 100% of what the sender owns.
 
-# `(swap-exact-x-for-y (x uint))`
+### `(swap-exact-x-for-y (x uint))`
+Send x of the X token, and gets back an amount of token Y based on current exchange rate, give or take slippage
 
-# `(swap-x-for-exact-y (y uint))`
+### `(swap-x-for-exact-y (y uint))`
+Send the amount of X token necessary to get back y of token Y at current exchange rate, give or take slippage
 
-# `(swap-exact-y-for-x (y uint))`
+### `(swap-exact-y-for-x (y uint))`
+Send y of the Y token, and gets back an amount of token X based on current exchange rate, give or take slippage
 
-# `(swap-y-for-exact-x (x uint))`
+### `(swap-y-for-exact-x (x uint))`
+Send the amount of Y token necessary to get back x of token X at current exchange rate, give or take slippage
 
 ## Wrapr contract
 Additionally, a contract to wrap STX (a la WETH) is also included so people could create pairs against STX.  Unfortunately, as of writing this, there is no way to add STX to an address in the testing framework, so only minimal testing is provided.
