@@ -94,7 +94,6 @@
         (is-ok (print (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer contract-address y)))
       )
       (begin
-        ;; (print "22222222")
         (if (is-eq (var-get total-balances) u0)
           (begin
             (increase-position tx-sender x)
@@ -107,11 +106,9 @@
         )
         (var-set x-balance (+ x (var-get x-balance)))
         (var-set y-balance (+ y (var-get y-balance)))
-        ;; (print "44444444")
         (ok true)
       )
       (begin
-        ;; (print "33333333")
         transfer-failed-err
       )
     )
@@ -123,13 +120,6 @@
   (let ((position (position-of tx-sender)) (balances (var-get total-balances)) (contract-address (as-contract tx-sender)) (sender tx-sender))
     (let ((withdrawal (/ (* position percent) u100)))
       (let ((remaing-position (- position withdrawal)) (withdrawal-x (/ (* withdrawal (var-get x-balance)) balances)) (withdrawal-y (/ (* withdrawal (var-get y-balance)) balances)))
-        (print withdrawal)
-        (print balances)
-        (print (var-get x-balance))
-        (print (var-get y-balance))
-        (print withdrawal-x)
-        (print withdrawal-y)
-
         (if
           (and
             (is-ok (print (as-contract (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer sender withdrawal-x))))
@@ -150,11 +140,6 @@
     )
   )
 )
-
-;; ;; get position for owner
-;; (define-read-only (get-position (owner principal))
-;;   1
-;; )
 
 ;; get overall balances for the pair
 (define-read-only (get-balances)

@@ -1,11 +1,24 @@
 # Swapr: trustless token exchange
 
-An exploration on how to implement an automated token exchange modeled after [Uniswap](https://uniswap.exchange)
+An exploration on how to implement an automated token exchange modeled after [Uniswap](https://uniswap.exchange) in Clarity for [Stacks 2.0](https://github.com/blockstack/stacks-blockchain)
 
 Of special interest, reading the [x-y-k paper](https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf) and [V2 whitepaper](https://uniswap.org/whitepaper.pdf) would provide some background on understanding how things work (some things have been simplified, notably the initial burning of 1000 times the minimum pool share to prevent attacks right after the first addition to the liquidity pool)
 
 The API has been reimagined, and hopefully simplified to its minima, withough impeding on proper functioning of the trustless exchange.
 
+## main contract API
+
+# `(add-to-position (x uint) (y uint))`
+
+# `(reduce-position (percent uint))`
+
+# `(swap-exact-x-for-y (x uint))`
+
+# `(swap-x-for-exact-y (y uint))`
+
+# `(swap-exact-y-for-x (y uint))`
+
+# `(swap-y-for-exact-x (x uint))`
 
 ## Wrapr contract
 Additionally, a contract to wrap STX (a la WETH) is also included so people could create pairs against STX.  Unfortunately, as of writing this, there is no way to add STX to an address in the testing framework, so only minimal testing is provided.
