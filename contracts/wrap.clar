@@ -7,7 +7,7 @@
 
 ;; Total number of tokens in existence.
 (define-read-only (get-total-supply)
-  (var-get total-supply)
+  (ok (var-get total-supply))
 )
 
 ;; transfer amount STX and return wrapped fungible token
@@ -50,6 +50,7 @@
 )
 
 ;; Transfers tokens to a specified principal.
+;; just a wrapper to satisfy the `<can-transfer-token>`
 (define-public (transfer (recipient principal) (amount uint))
   (ft-transfer? wrapped-token amount tx-sender recipient)
 )

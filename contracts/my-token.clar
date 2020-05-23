@@ -17,6 +17,15 @@
 
 ;; Fungible Token, modeled after ERC-20
 
+
+;; copied from clarity tutorial, just need a token that implements `transfer`
+;; so far, though, current <trait> implementation has not proved to be so helpful
+;; but hopefully traits can be leveraged better in the future
+;; primarily, the inability to store a trait (maybe warranted), or even a way to keep a hash
+;; of a trait so you can store data linked to a token would be needed
+;; so, without this, a new contract will need to be deployed per pair, making the
+;; exercise interesting, but somewhat lacking in practice
+
 (impl-trait 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.token-transfer-trait.can-transfer-tokens)
 
 (define-fungible-token fungible-token)
@@ -154,5 +163,5 @@
 
 ;; Initialize the contract
 (begin
-  (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 u20)
-  (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE u10))
+  (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 u2000000)
+  (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE u1000000))
