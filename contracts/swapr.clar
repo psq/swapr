@@ -13,6 +13,8 @@
 ;; (define-data-var y-contract principal 'SP138CBPVKYBQQ480EZXJQK89HCHY32XBQ0T4BCCD)
 (define-data-var x-balance uint u0)
 (define-data-var y-balance uint u0)
+(define-data-var fee-x-balance uint u0)
+(define-data-var fee-y-balance uint u0)
 (define-data-var total-balances uint u0)
 ;; (define-fungible-token position)
 (define-map positions
@@ -85,7 +87,7 @@
 
 ;; how much of each token to buy, unless this is the first addition
 ;; this will respect current ratio
-;; use 0 for x or y to get perfect ratio
+;; TODO(psq): use 0 for x or y to get perfect ratio based on current exchange rate
 (define-public (add-to-position (x uint) (y uint))
   (let ((contract-address (as-contract tx-sender)))
     (if
@@ -148,12 +150,35 @@
 )
 
 ;; exchange known x for whatever y based on liquidity, returns y
-(define-public (swap-exact-x-for-y (x uint))
-  (ok u0)
+(define-public (swap-exact-x-for-y (dx uint))
+  (let
+    (
+      (balances (var-get total-balances))
+      (contract-address (as-contract tx-sender))
+      (sender tx-sender)
+      (dy (/ (* u997 (* (var-get x-balance) dx)) (+ (* u100 (var-get x-balance)) (* u997 dx))))
+      (fee (/ (* u5 dx) u10000))
+    )
+    (print balances)
+    (print dx)
+    (print dy)
+
+    (var-set x-balance (+ dx (var-get x-balance)))
+    (var-set y-balance (+ dy (var-get y-balance)))
+    (var-set fee-x-balance (+ fee (var-get fee-x-balance)))
+
+    (ok u0)
+  )
+
+
 )
 
 ;; exchange whatever x for known y based on liquidity, returns x
 (define-public (swap-x-for-exact-y (y uint))
+  ;; calculate y
+  ;; transfer
+  ;; update current balances
+
   (ok u0)
 )
 
@@ -200,7 +225,23 @@
   )
 )
 
-
+(define-public (collect-fees)
+  (let ((fee-to-address (get address (map-get? fee-to ((key u0))))) (x (var-get fee-x-balance)) (y (var-get fee-y-balance)))
+    (if
+      (and
+        (is-some fee-to-address)
+        (is-ok (print (as-contract (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer (unwrap! fee-to-address transfer-failed-err) x))))
+        (is-ok (print (as-contract (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer (unwrap! fee-to-address transfer-failed-err) y))))
+      )
+      (begin
+        (var-set fee-x-balance u0)
+        (var-set fee-y-balance u0)
+        (ok (list x y))
+      )
+      transfer-failed-err
+    )
+  )
+)
 
 ;; init the tokens, restricted to contract owner, callable only once
 ;; (define-public (init (x <can-transfer-tokens>) (y <can-transfer-tokens>))

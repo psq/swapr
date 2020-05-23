@@ -1,4 +1,4 @@
-# Swapr: trustless token exchange
+# swapr: trustless token exchange
 
 An exploration on how to implement an automated token exchange modeled after [Uniswap](https://uniswap.exchange) in Clarity for [Stacks 2.0](https://github.com/blockstack/stacks-blockchain)
 
@@ -9,22 +9,28 @@ The API has been reimagined, and hopefully simplified to its minima, withough im
 ## main contract API
 
 ### `(add-to-position (x uint) (y uint))`
-Add x amount of the X token, and y amount of Y token by transfering from the sender.  Currently does not check that the exchange rate makes sense, so could lead to losses
+Add x amount of the X token, and y amount of Y token by transfering from the sender.  Currently does not check that the exchange rate makes sense, so could lead to losses.  Eventually, you'll be able to specify `u0` for either `x` or `y` and the contract will calculate the proper amount to send to match the current exchange rate.
 
 ### `(reduce-position (percent uint))`
 Transfer back to the sender, up to 100% of what the sender owns.
 
 ### `(swap-exact-x-for-y (x uint))`
 Send x of the X token, and gets back an amount of token Y based on current exchange rate, give or take slippage
+Returns `y`.
 
 ### `(swap-x-for-exact-y (y uint))`
 Send the amount of X token necessary to get back y of token Y at current exchange rate, give or take slippage
+Returns `x`.
 
 ### `(swap-exact-y-for-x (y uint))`
 Send y of the Y token, and gets back an amount of token X based on current exchange rate, give or take slippage
+Returns `x`.
 
 ### `(swap-y-for-exact-x (x uint))`
 Send the amount of Y token necessary to get back x of token X at current exchange rate, give or take slippage
+Returns `y`.
+
+See the contract for other available methods
 
 ## Wrapr contract
 Additionally, a contract to wrap STX (a la WETH) is also included so people could create pairs against STX.  Unfortunately, as of writing this, there is no way to add STX to an address in the testing framework, so only minimal testing is provided.

@@ -143,6 +143,7 @@ describe("swapr contract test suite", () => {
     })
   })
 
+  // TODO(psq): check token balances have been updated as well
   describe("alice contributes x: 20, y: 10", () => {
     before(async () => {
       assert(await swaprClient.addToPosition(20, 10, {sender: alice}), "addToPosition did not return true")
@@ -176,6 +177,7 @@ describe("swapr contract test suite", () => {
     })
   })
 
+  // TODO(psq): check token balances have been updated as well
   describe("alice reduces by 50%", () => {
     before(async () => {
       const result = await swaprClient.reducePosition(50, {sender: alice})
@@ -252,6 +254,9 @@ describe("swapr contract test suite", () => {
       const address = await swaprClient.getFeeTo()
       assert.equal(address, zoe)
     })
+
+    // TODO(psq): check collect-fees and the owner's balance
+
 
     it("non owner can not reset the address", async () => {
       try {
