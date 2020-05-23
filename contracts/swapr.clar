@@ -181,12 +181,12 @@
   (ok u0)
 )
 
-;; set the contract fee for swaps, restricted to contract owner
+;; activate the contract fee for swaps by setting the collection address, restricted to contract owner
 (define-public (set-fee-to-address (address principal))
   (begin
     (if (is-eq tx-sender contract-owner)
       (begin
-        (map-set fee-to (tuple (key u0)) (tuple (address address)))
+        (map-set fee-to ((key u0)) ((address address)))
         (ok true)
       )
       not-owner-err
@@ -194,6 +194,20 @@
   )
 )
 
+;; clear the contract fee for swaps by resetting the collection address
+(define-public (reset-fee-to-address)
+  (begin
+    (if (is-eq tx-sender contract-owner)
+      (begin
+        (map-delete fee-to ((key u0)))
+        (ok true)
+      )
+      not-owner-err
+    )
+  )
+)
+
+;; get the current address used to collect a fee
 (define-public (get-fee-to-address)
   (begin
     (ok (get address (map-get? fee-to ((key u0)))))

@@ -256,7 +256,7 @@ describe("swapr contract test suite", () => {
     before(async () => {
     })
 
-    it("before setting, should return none", async () => {
+    it("before setting, should return null", async () => {
       const address = await swaprClient.getFeeTo()
       assert.equal(address, null)
     })
@@ -264,7 +264,7 @@ describe("swapr contract test suite", () => {
     it("non owner can not set the address", async () => {
       try {
         const result = await swaprClient.setFeeTo(bob, {sender: bob})
-        assert(false, "not return")
+        assert(false, "should not return")
       } catch(e) {
         // console.log(e)
         if (e instanceof NotOwnerError) {
@@ -290,6 +290,37 @@ describe("swapr contract test suite", () => {
     it("should now return zoe", async () => {
       const address = await swaprClient.getFeeTo()
       assert.equal(address, zoe)
+    })
+
+    it("non owner can not reset the address", async () => {
+      try {
+        const result = await swaprClient.resetFeeTo({sender: bob})
+        assert(false, "should not return")
+      } catch(e) {
+        // console.log(e)
+        if (e instanceof NotOwnerError) {
+          assert(true)
+        } else {
+          assert(false, "did not throw NotOwnerError")
+        }
+      }
+    })
+
+    it("owner can reset the address", async () => {
+      try {
+        const result = await swaprClient.resetFeeTo({sender: zoe})
+        assert(result, "should return true")
+      } catch(e) {
+        // console.log(e)
+        assert(false, "should not throw")
+      }
+    })
+
+    // assumes tests are run sequentially, which chai should be doing
+    // running tests in parallel would require a reorg
+    it("should now return null", async () => {
+      const address = await swaprClient.getFeeTo()
+      assert.equal(address, null)
     })
   })
 
