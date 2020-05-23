@@ -33,3 +33,10 @@ export class ClarityParseError extends Error {
   }
 }
 
+export class TransferError extends Error {
+  constructor(message?: string) {
+    super(message)
+    Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
+  }
+}
+

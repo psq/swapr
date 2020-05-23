@@ -4,6 +4,7 @@ var chai = require('chai')
 chai.use(require('chai-string'))
 const assert = chai.assert
 
+import { WraprClient } from "../src/clients/wrapr-client"
 import { SwaprClient } from "../src/clients/swapr-client"
 import {
   NoLiquidityError,
@@ -16,7 +17,7 @@ describe("swapr contract test suite", () => {
   let myToken2Client: Client;
   let tokenTraitClient: Client;
   let swaprClient: Client;
-  let wrapClient: Client;
+  let wraprClient: Client;
   let provider: Provider;
 
   const addresses = [
@@ -35,7 +36,7 @@ describe("swapr contract test suite", () => {
     myToken1Client = new Client("SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token", "my-token", provider);
     myToken2Client = new Client("SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token", "my-token", provider);
     swaprClient = new SwaprClient(provider)
-    wrapClient = new Client("SP3MT6QYRJ51YDNEEHCKA0232QHQCWSW4N5S8M370.wrap", "wrap", provider)
+    wraprClient = new WraprClient(provider)
   });
 
   it("should have a valid syntax", async () => {
@@ -46,12 +47,19 @@ describe("swapr contract test suite", () => {
     await myToken2Client.checkContract();
     await myToken2Client.deployContract();
     await swaprClient.checkContract()
-    await wrapClient.checkContract()
+    await wraprClient.checkContract()
 
-    await wrapClient.deployContract();
+    await wraprClient.deployContract();
     await swaprClient.deployContract();
   });
 
+
+  describe("after deploying an instance of the contract, with no contributions", () => {
+    it("should return 0 balance for Alice", async () => {
+      const positionAlice = await swaprClient.positionOf(alice)
+      assert.equal(positionAlice, 0)
+    })
+  })
 
   describe("after deploying an instance of the contract, with no contributions", () => {
     it("should return 0 balance for Alice", async () => {
