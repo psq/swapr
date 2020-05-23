@@ -3,8 +3,10 @@
 
 ;; (define-constant x-cont <can-transfer-tokens>)
 
+(define-constant contract-owner 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR)
 (define-constant no-liquidity-err (err u1))
 (define-constant transfer-failed-err (err u2))
+(define-constant not-owner-err (err u2))
 
 
 ;; (define-data-var x-contract principal 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token)  ;; can't init to `none`, so...
@@ -182,10 +184,23 @@
 ;; set the contract fee for swaps, restricted to contract owner
 (define-public (set-fee-to-address (address principal))
   (begin
-    (map-set fee-to (tuple (key u0)) (tuple (address address)))
-    (ok u0)
+    (if (is-eq tx-sender contract-owner)
+      (begin
+        (map-set fee-to (tuple (key u0)) (tuple (address address)))
+        (ok true)
+      )
+      not-owner-err
+    )
   )
 )
+
+(define-public (get-fee-to-address)
+  (begin
+    (ok (get address (map-get? fee-to ((key u0)))))
+  )
+)
+
+
 
 ;; init the tokens, restricted to contract owner, callable only once
 ;; (define-public (init (x <can-transfer-tokens>) (y <can-transfer-tokens>))

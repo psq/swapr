@@ -1,13 +1,65 @@
 import { Client, Provider, Receipt, Result } from '@blockstack/clarity'
-import { NoLiquidityError } from '../errors'
+import {
+  ClarityParseError,
+  NoLiquidityError,
+  NotOwnerError,
+  NotOKErr,
+  NotSomeErr,
+} from '../errors'
 
-function unwrapXYList(list) {
-  const sub = list.substring(1, list.length - 1).replace(/[u\\(\\)]/g, '') // remove nesting parentheses and 'u's
-  const comps = sub.split(' ')
-  console.log("comps", comps)
+function parse(value: string) {
+  let index = 0
+  function sub() {
+    const keywords = []
+    let current = index
+    function saveKeyword() {
+      if (index - 1 > current) {
+        keywords.push(value.slice(current, index - 1))
+      }
+    }
+    while (index < value.length) {
+      const c = value[index++]
+      // console.log("c", c, index)
+      if (c === '(') {
+        keywords.push(sub())
+        current = index
+      } else if (c === ')') {
+        saveKeyword()
+        return keywords
+      } else if (c === ' ') {
+        saveKeyword()
+        current = index
+      }
+    }
+    saveKeyword()
+    return keywords
+  }
+  return sub()[0]
+}
+
+function unwrapXYList(tree: Array) {
+  // console.log("unwrapXYList", tree)
   return {
-    x: parseInt(comps[1]),
-    y: parseInt(comps[2]),
+    x: parseInt(tree[0].substring(1)),
+    y: parseInt(tree[1].substring(1)),
+  }
+}
+
+function unwrapSome(tree: Array) {
+  // console.log("unwrapSome", tree)
+  if (tree[0] === 'some') {
+    return tree[1]
+  } else {
+    throw NotSomeErr
+  }
+}
+
+function unwrapOK(tree) {
+  // console.log("unwrapOK", tree)
+  if (tree[0] === 'ok') {
+    return tree[1]
+  } else {
+    throw NotOKErr
   }
 }
 
@@ -26,11 +78,8 @@ export class SwaprClient extends Client {
     });
     await tx.sign(params.sender)
     const receipt = await this.submitTransaction(tx)
-    // console.log(receipt)
     // console.log(receipt.debugOutput)
     const result = Result.unwrap(receipt)
-
-    // console.log("result", result)
     return result.startsWith('Transaction executed and committed. Returned: true')
   }
 
@@ -40,17 +89,13 @@ export class SwaprClient extends Client {
     });
     await tx.sign(params.sender)
     const receipt = await this.submitTransaction(tx)
-    // console.log(receipt)
     // console.log("debugOutput", receipt.debugOutput)
     const result = Result.unwrap(receipt)
 
-    // console.log("result", result)
     if (result.startsWith('Transaction executed and committed. Returned: ')) {
-      const start_of_list = result.substring('Transaction executed and committed.'.length)  // keep a word so unwrapXYList will behave like it was with 'ok'
-      // console.log("start_of_list", start_of_list)
-      const extracted = start_of_list.substring(0, start_of_list.indexOf(')') + 1)
-      // console.log("extracted", extracted)
-      return unwrapXYList(extracted)
+      const start_of_list = result.substring('Transaction executed and committed. Returned: '.length)  // keep a word so unwrapXYList will behave like it was with 'ok'
+      const parsed = parse(start_of_list.substring(0, start_of_list.indexOf(')') + 1))
+      return unwrapXYList(parsed)
     }
   }
 
@@ -73,7 +118,7 @@ export class SwaprClient extends Client {
       },
     })
     const receipt = await this.submitQuery(query)
-    return unwrapXYList(Result.unwrap(receipt))
+    return unwrapXYList(unwrapOK(parse(Result.unwrap(receipt))))
   }
 
   async positions(): Promise<number> {
@@ -100,7 +145,7 @@ export class SwaprClient extends Client {
     if (result.startsWith('(err')) {
       throw new NoLiquidityError()
     } else {
-      return unwrapXYList(result)
+      return unwrapXYList(unwrapOK(parse(result)))
     }
   }
 
@@ -111,5 +156,39 @@ export class SwaprClient extends Client {
     })
     const res = await this.submitQuery(query)
     return Result.unwrapUInt(res)
+  }
+
+  async setFeeTo(address: string, params: { sender: string }): Promise<Receipt> {
+    const tx = this.createTransaction({
+      method: { name: "set-fee-to-address", args: [`'${address}`] }
+    });
+    await tx.sign(params.sender)
+    const receipt = await this.submitTransaction(tx)
+    // console.log("receipt", receipt)
+    // console.log("debugOutput", receipt.debugOutput)
+    if (receipt.success) {
+      const result = Result.unwrap(receipt)
+      // console.log("result", result)
+      if (result.startsWith('Transaction executed and committed. Returned: ')) {
+        const start = result.substring('Transaction executed and committed. Returned: '.length)
+        const extracted = start.substring(0, start.indexOf('\n'))
+        // console.log("extracted", `=${extracted}=`)
+        if (extracted === 'true') {
+          return true
+        }
+      }
+    }
+    throw new NotOwnerError()
+  }
+
+  async getFeeTo(): Promise<number> {
+    const query = this.createQuery({
+      atChaintip: true,
+      method: { name: "get-fee-to-address", args: [] }
+    })
+    const result = await this.submitQuery(query)
+    // console.log("getFeeTo", Result.unwrap(result))
+    const value = unwrapOK(parse(Result.unwrap(result)))
+    return value === 'none' ? null : unwrapSome(value)
   }
 }

@@ -5,10 +5,13 @@ chai.use(require('chai-string'))
 const assert = chai.assert
 
 import { SwaprClient } from "../src/clients/swapr-client"
-import { NoLiquidityError } from '../src/errors'
+import {
+  NoLiquidityError,
+  NotOwnerError,
+} from '../src/errors'
 
 
-describe("hello world contract test suite", () => {
+describe("swapr contract test suite", () => {
   let helloWorldClient: Client;
   let myToken1Client: Client;
   let myToken2Client: Client;
@@ -164,7 +167,7 @@ describe("hello world contract test suite", () => {
         assert.equal(balances.x, 10)
         assert.equal(balances.y, 5)
       } catch(e) {
-        console.log(e)
+        // console.log(e)
         assert(false, "should not throw")
       }
     })
@@ -181,7 +184,7 @@ describe("hello world contract test suite", () => {
     })
   })
 
-  describe(" alice contributes x: 20, y: 10", () => {
+  describe("alice contributes x: 20, y: 10", () => {
     before(async () => {
       assert(await swaprClient.addToPosition(20, 10, {sender: alice}), "addToPosition did not return true")
     })
@@ -197,7 +200,7 @@ describe("hello world contract test suite", () => {
         assert.equal(balances.x, 20)
         assert.equal(balances.y, 10)
       } catch(e) {
-        console.log(e)
+        // console.log(e)
         assert(false, "should not throw")
       }
     })
@@ -214,7 +217,7 @@ describe("hello world contract test suite", () => {
     })
   })
 
-  describe(" alice reduces by 50%", () => {
+  describe("alice reduces by 50%", () => {
     before(async () => {
       const result = await swaprClient.reducePosition(50, {sender: alice})
       assert.equal(result.x, 10)
@@ -232,7 +235,7 @@ describe("hello world contract test suite", () => {
         assert.equal(balances.x, 10)
         assert.equal(balances.y, 5)
       } catch(e) {
-        console.log(e)
+        // console.log(e)
         assert(false, "should not throw")
       }
     })
@@ -246,6 +249,47 @@ describe("hello world contract test suite", () => {
     it("should display the proper positions overall", async () => {
       const positions = await swaprClient.positions()
       assert.equal(positions, 20)
+    })
+  })
+
+  describe("Setting the fee", () => {
+    before(async () => {
+    })
+
+    it("before setting, should return none", async () => {
+      const address = await swaprClient.getFeeTo()
+      assert.equal(address, null)
+    })
+
+    it("non owner can not set the address", async () => {
+      try {
+        const result = await swaprClient.setFeeTo(bob, {sender: bob})
+        assert(false, "not return")
+      } catch(e) {
+        // console.log(e)
+        if (e instanceof NotOwnerError) {
+          assert(true)
+        } else {
+          assert(false, "did not throw NotOwnerError")
+        }
+      }
+    })
+
+    it("owner can set the address", async () => {
+      try {
+        const result = await swaprClient.setFeeTo(zoe, {sender: zoe})
+        assert(result, "should return true")
+      } catch(e) {
+        // console.log(e)
+        assert(false, "should not throw")
+      }
+    })
+
+    // assumes tests are run sequentially, which chai should be doing
+    // running tests in parallel would require a reorg
+    it("should now return zoe", async () => {
+      const address = await swaprClient.getFeeTo()
+      assert.equal(address, zoe)
     })
   })
 
