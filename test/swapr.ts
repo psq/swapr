@@ -6,9 +6,11 @@ const assert = chai.assert
 
 import { WraprClient } from "../src/clients/wrapr-client"
 import { SwaprClient } from "../src/clients/swapr-client"
+import { TokenClient } from "../src/clients/token-client"
 import {
   NoLiquidityError,
   NotOwnerError,
+  TransferError,
 } from '../src/errors'
 
 
@@ -31,10 +33,10 @@ describe("swapr contract test suite", () => {
 
 
   before(async () => {
-    provider = await ProviderRegistry.createProvider();
-    tokenTraitClient = new Client("SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.token-transfer-trait", "token-transfer-trait", provider);
-    myToken1Client = new Client("SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token", "my-token", provider);
-    myToken2Client = new Client("SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token", "my-token", provider);
+    provider = await ProviderRegistry.createProvider()
+    tokenTraitClient = new Client("SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.token-transfer-trait", "token-transfer-trait", provider)
+    myToken1Client = new TokenClient("SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1", provider)
+    myToken2Client = new TokenClient("SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH", provider)
     swaprClient = new SwaprClient(provider)
     wraprClient = new WraprClient(provider)
   });
@@ -60,18 +62,42 @@ describe("swapr contract test suite", () => {
     })
 
     it("with no STX, wrap should fail", async () => {
-      const totalSupply = await wraprClient.totalSupply(alice)
-      assert.equal(totalSupply, 0)
-    })
-
-    it("with no STX, unwrap should fail", async () => {
-      const totalSupply = await wraprClient.totalSupply(alice)
-      assert.equal(totalSupply, 0)
+      try {
+        const result = await wraprClient.wrap(10, {sender: alice})
+      } catch(e) {
+        console.log(e)
+        if (e instanceof TransferError) {
+          assert(true)
+        } else {
+          assert(false, "did not throw TransferError")
+        }
+      }
     })
 
     it("with no STX, transfer should fail", async () => {
-      const totalSupply = await wraprClient.totalSupply(alice)
-      assert.equal(totalSupply, 0)
+      try {
+        const result = await wraprClient.transfer(bob, 15, {sender: alice})
+      } catch(e) {
+        console.log(e)
+        if (e instanceof TransferError) {
+          assert(true)
+        } else {
+          assert(false, "did not throw TransferError")
+        }
+      }
+    })
+
+    it("with no STX, unwrap should fail", async () => {
+      try {
+        const result = await wraprClient.unwrap(10, {sender: alice})
+      } catch(e) {
+        console.log(e)
+        if (e instanceof TransferError) {
+          assert(true)
+        } else {
+          assert(false, "did not throw TransferError")
+        }
+      }
     })
 
   })
@@ -115,6 +141,13 @@ describe("swapr contract test suite", () => {
       assert(await swaprClient.addToPosition(10, 5, {sender: bob}), "addToPosition did not return true")
     })
 
+    it("bob's token balances should have changed", async () => {
+      const balance1 = await myToken1Client.balanceOf(bob)
+      const balance2 = await myToken2Client.balanceOf(bob)
+      assert.equal(balance1, 999990)
+      assert.equal(balance2, 999995)
+    })
+
     it("should return a balance of 10 for bob", async () => {
       const positionBob = await swaprClient.positionOf(bob)
       assert.equal(positionBob, 10)
@@ -147,6 +180,13 @@ describe("swapr contract test suite", () => {
   describe("alice contributes x: 20, y: 10", () => {
     before(async () => {
       assert(await swaprClient.addToPosition(20, 10, {sender: alice}), "addToPosition did not return true")
+    })
+
+    it("alice's token balances should have changed", async () => {
+      const balance1 = await myToken1Client.balanceOf(alice)
+      const balance2 = await myToken2Client.balanceOf(alice)
+      assert.equal(balance1, 1999980)
+      assert.equal(balance2, 1999990)
     })
 
     it("should return a balance of 20 for Alice", async () => {
@@ -183,6 +223,13 @@ describe("swapr contract test suite", () => {
       const result = await swaprClient.reducePosition(50, {sender: alice})
       assert.equal(result.x, 10)
       assert.equal(result.y, 5)
+    })
+
+    it("alice's token balances should have changed", async () => {
+      const balance1 = await myToken1Client.balanceOf(alice)
+      const balance2 = await myToken2Client.balanceOf(alice)
+      assert.equal(balance1, 1999990)
+      assert.equal(balance2, 1999995)
     })
 
     it("should return a balance of 20 for Alice", async () => {

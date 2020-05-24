@@ -60,10 +60,7 @@
 
 ;; Transfers tokens to a specified principal.
 (define-public (transfer (recipient principal) (amount uint))
-  (begin
-    (print "!!!!!!!")
-    (ft-transfer? fungible-token amount tx-sender recipient)
-  )
+  (ft-transfer? fungible-token amount tx-sender recipient)
 )
 
 ;; Decrease allowance of a specified spender.
