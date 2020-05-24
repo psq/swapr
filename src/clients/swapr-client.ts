@@ -50,6 +50,24 @@ export class SwaprClient extends Client {
     }
   }
 
+  async swapExactXforY(dx: number, params: { sender: string }): Promise<Receipt> {
+    const tx = this.createTransaction({
+      method: { name: "swap-exact-x-for-y", args: [`u${dx}`] }
+    });
+    await tx.sign(params.sender)
+    const receipt = await this.submitTransaction(tx)
+    console.log("debugOutput", receipt.debugOutput)
+    const result = Result.unwrap(receipt)
+
+    if (result.startsWith('Transaction executed and committed. Returned: ')) {
+      const start_of_list = result.substring('Transaction executed and committed. Returned: '.length)  // keep a word so unwrapXYList will behave like it was with 'ok'
+      const parsed = parse(start_of_list.substring(0, start_of_list.indexOf(')') + 1))
+      return unwrapXYList(parsed)  // TODO(psq): result is a list of dx dy
+    }
+  }
+
+
+
   async positionOf(owner: string): Promise<number> {
     const query = this.createQuery({
       method: {
@@ -155,14 +173,47 @@ export class SwaprClient extends Client {
     throw new NotOwnerError()
   }
 
+  async collectFees(params: { sender: string }): Promise<Receipt> {
+    const tx = this.createTransaction({
+      method: { name: "collect-fees", args: [] }
+    });
+    await tx.sign(params.sender)
+    const receipt = await this.submitTransaction(tx)
+    // console.log("receipt", receipt)
+    // console.log("debugOutput", receipt.debugOutput)
+    if (receipt.success) {
+      const result = Result.unwrap(receipt)
+      // console.log("result", result)
+      if (result.startsWith('Transaction executed and committed. Returned: ')) {
+        const start_of_list = result.substring('Transaction executed and committed. Returned: '.length)  // keep a word so unwrapXYList will behave like it was with 'ok'
+        const parsed = parse(start_of_list.substring(0, start_of_list.indexOf(')') + 1))
+        return unwrapXYList(parsed)  // TODO(psq): result is a list of dx dy
+      }
+    }
+    throw new NotOwnerError()
+  }
+
   async getFeeTo(): Promise<number> {
     const query = this.createQuery({
       atChaintip: true,
       method: { name: "get-fee-to-address", args: [] }
     })
     const result = await this.submitQuery(query)
-    console.log("getFeeTo", Result.unwrap(result))
+    // console.log("getFeeTo", Result.unwrap(result))
     const value = unwrapOK(parse(Result.unwrap(result)))
     return value === 'none' ? null : unwrapSome(value)
   }
+
+  async fees(): Promise<number> {
+    const query = this.createQuery({
+      method: {
+        name: 'get-fees',
+        args: [],
+      },
+    })
+    const receipt = await this.submitQuery(query)
+    return unwrapXYList(unwrapOK(parse(Result.unwrap(receipt))))
+  }
+
+
 }

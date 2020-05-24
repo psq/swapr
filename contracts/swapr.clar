@@ -6,7 +6,11 @@
 (define-constant contract-owner 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR)
 (define-constant no-liquidity-err (err u1))
 (define-constant transfer-failed-err (err u2))
-(define-constant not-owner-err (err u2))
+(define-constant not-owner-err (err u3))
+(define-constant no-fee-to-address-err (err u5))
+(define-constant e10-err (err u10))
+(define-constant e11-err (err u11))
+(define-constant e12-err (err u12))
 
 ;; (define-constant x-token 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token)
 
@@ -27,11 +31,11 @@
 
 ;; TOOD(psq): refactor by using optional var
 ;; only to store wether the contract should capture a 5 bp fee, and where to send the fee
-(define-map fee-to
-  ((key uint)) ;; only valid value is u0
-  ((address principal))
-)
-(define-data-var fee-to-add (optional principal) none)
+;; (define-map fee-to
+;;   ((key uint)) ;; only valid value is u0
+;;   ((address principal))
+;; )
+(define-data-var fee-to-address (optional principal) none)
 
 (define-private (position-of (owner principal))
   (default-to u0
@@ -165,19 +169,22 @@
       (balances (var-get total-balances))
       (contract-address (as-contract tx-sender))
       (sender tx-sender)
-      (dy (/ (* u997 (var-get x-balance) dx) (+ (* u100 (var-get x-balance)) (* u997 dx))))
-      (fee (/ (* u5 dx) u10000))
+      (dy (/ (* u997 (var-get y-balance) dx) (+ (* u1000 (var-get x-balance)) (* u997 dx)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
+      (fee (/ (* u5 dx) u10000)) ;; 5 bp
     )
     (print balances)
+    (print (var-get x-balance))
+    (print (var-get y-balance))
     (print dx)
     (print dy)
+    (print fee)
     (if (and
       (is-ok (print (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer contract-address dx)))
       (is-ok (print (as-contract (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer sender dy))))
       )
       (begin
-        (var-set x-balance (+ dx (var-get x-balance)))
-        (var-set y-balance (+ dy (var-get y-balance)))
+        (var-set x-balance (+ (var-get x-balance) dx))  ;; add dx
+        (var-set y-balance (- (var-get y-balance) dy))  ;; remove dy
         (var-set fee-x-balance (+ fee (var-get fee-x-balance)))
         (ok (list dx dy))
       )
@@ -211,7 +218,7 @@
   (begin
     (if (is-eq tx-sender contract-owner)
       (begin
-        (map-set fee-to ((key u0)) ((address address)))
+        (var-set fee-to-address (some address))
         (ok true)
       )
       not-owner-err
@@ -224,7 +231,7 @@
   (begin
     (if (is-eq tx-sender contract-owner)
       (begin
-        (map-delete fee-to ((key u0)))
+        (var-set fee-to-address none)
         (ok true)
       )
       not-owner-err
@@ -233,19 +240,28 @@
 )
 
 ;; get the current address used to collect a fee
-(define-public (get-fee-to-address)
+(define-read-only (get-fee-to-address)
+  (ok (var-get fee-to-address))
+)
+
+;; get the current address used to collect a fee
+(define-read-only (get-fees)
   (begin
-    (ok (get address (map-get? fee-to ((key u0)))))
+    (ok (list (var-get fee-x-balance) (var-get fee-y-balance)))
   )
 )
 
+;; drain the collected fees and send to the fee-to-address
 (define-public (collect-fees)
-  (let ((fee-to-address (get address (map-get? fee-to ((key u0))))) (x (var-get fee-x-balance)) (y (var-get fee-y-balance)))
+  (let ((address (unwrap! (var-get fee-to-address) no-fee-to-address-err)) (x (var-get fee-x-balance)) (y (var-get fee-y-balance)))
+    (print x)
+    (print y)
+    (print (and (> y u0) (is-ok (print (as-contract (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer address y))))))
+    (print address)
     (if
       (and
-        (is-some fee-to-address)
-        (is-ok (print (as-contract (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer (unwrap! fee-to-address transfer-failed-err) x))))
-        (is-ok (print (as-contract (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer (unwrap! fee-to-address transfer-failed-err) y))))
+        (or (is-eq x u0) (is-ok (print (as-contract (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer address x)))))
+        (or (is-eq y u0) (is-ok (print (as-contract (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer address y)))))
       )
       (begin
         (var-set fee-x-balance u0)

@@ -301,16 +301,98 @@ describe("swapr contract test suite", () => {
       const address = await swaprClient.getFeeTo()
       assert.equal(address, zoe)
     })
+  })
 
     // TODO(psq): check collect-fees and the owner's balance
+  describe("Clients exchanging tokens", () => {
+    before(async () => {
+      // add lots of liquidity
+      assert(await swaprClient.addToPosition(500000, 250000, {sender: bob}), "addToPosition did not return true")
+    })
 
+    it("should display the proper balances overall", async () => {
+      const balances = await swaprClient.balances()
+      assert.equal(balances.x, 500020)
+      assert.equal(balances.y, 250010)
+    })
 
+    describe("Alice exchanges 10000 of X", () => {
+      let original_balances
+      let alice_balances = {
+        x: 0,
+        y: 0,
+      }
+      let original_fees
+      let swap_result
+      const dx = 10000
+      const dy = 4887
+
+      before(async () => {
+        // add lots of liquidity
+        original_balances = await swaprClient.balances()
+        original_fees = await swaprClient.fees()
+        alice_balances.x = await myToken1Client.balanceOf(alice)
+        alice_balances.y = await myToken2Client.balanceOf(alice)
+        swap_result = await swaprClient.swapExactXforY(dx, {sender: alice})
+      })
+
+      it("Amount swapped should be correct", async () => {
+        assert.equal(swap_result.x, dx)
+        assert.equal(swap_result.y, dy)
+      })
+
+      it("Contract balances have been updated", async () => {
+        const balances = await swaprClient.balances()
+        assert.equal(balances.x, original_balances.x + dx)
+        assert.equal(balances.y, original_balances.y - dy)  // TODO(psq): actually should include the fee (254897)
+      })
+
+      it("Contract fees have been updated", async () => {
+        const balance = await swaprClient.fees()
+        assert.equal(balance.x, 5)
+        assert.equal(balance.y, 0)
+      })
+
+      it("Alice token balances have been updated", async () => {
+        const balance1 = await myToken1Client.balanceOf(alice)
+        const balance2 = await myToken2Client.balanceOf(alice)
+        assert.equal(balance1, alice_balances.x - dx)
+        assert.equal(balance2, alice_balances.y + dy)
+      })
+    })
+  })
+
+  describe("Collecting the fee", () => {
+    let original_fees
+    before(async () => {
+      original_fees = await swaprClient.fees()
+    })
+
+    it("should send fees to contract owner", async () => {
+      const fees = await swaprClient.collectFees({sender: alice}) // anyone can pay for sending the fees :)
+      assert.equal(fees.x, 5)
+      assert.equal(fees.y, 0)
+    })
+    it("contract owner should have received the fees", async () => {
+      const balance1 = await myToken1Client.balanceOf(zoe)
+      const balance2 = await myToken2Client.balanceOf(zoe)
+      assert.equal(balance1, original_fees.x)
+      assert.equal(balance2, original_fees.y)
+    })
+    it("fees are now 0", async () => {
+      const fees = await swaprClient.fees()
+      assert.equal(fees.x, 0)
+      assert.equal(fees.y, 0)
+    })
+  })
+
+  describe("Resetting the feeTo address", () => {
     it("non owner can not reset the address", async () => {
       try {
         const result = await swaprClient.resetFeeTo({sender: bob})
         assert(false, "should not return")
       } catch(e) {
-        // console.log(e)
+        console.log(e)
         if (e instanceof NotOwnerError) {
           assert(true)
         } else {
