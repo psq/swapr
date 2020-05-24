@@ -34,7 +34,7 @@ describe("swapr contract test suite", () => {
 
   before(async () => {
     provider = await ProviderRegistry.createProvider()
-    tokenTraitClient = new Client("SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.token-transfer-trait", "token-transfer-trait", provider)
+    tokenTraitClient = new Client("SP2TPZ623K5N2WYF1BWRMP5A93PSBWWADQGKJRJCS.token-transfer-trait", "token-transfer-trait", provider)
     myToken1Client = new TokenClient("SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1", provider)
     myToken2Client = new TokenClient("SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH", provider)
     swaprClient = new SwaprClient(provider)

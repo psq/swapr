@@ -26,7 +26,7 @@
 ;; so, without this, a new contract will need to be deployed per pair, making the
 ;; exercise interesting, but somewhat lacking in practice
 
-(impl-trait 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.token-transfer-trait.can-transfer-tokens)
+(impl-trait 'SP2TPZ623K5N2WYF1BWRMP5A93PSBWWADQGKJRJCS.token-transfer-trait.can-transfer-tokens)
 
 (define-fungible-token fungible-token)
 

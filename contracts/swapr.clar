@@ -1,22 +1,25 @@
-(use-trait can-transfer-tokens
-    'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.token-transfer-trait.can-transfer-tokens)
-
-;; (define-constant x-cont <can-transfer-tokens>)
+;; (use-trait can-transfer-tokens
+;;     'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token.can-transfer-tokens)
+;; (use-trait y-token
+;;     'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token.can-transfer-tokens)
 
 (define-constant contract-owner 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR)
 (define-constant no-liquidity-err (err u1))
 (define-constant transfer-failed-err (err u2))
 (define-constant not-owner-err (err u2))
 
+;; (define-constant x-token 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token)
 
-;; (define-data-var x-contract principal 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token)  ;; can't init to `none`, so...
-;; (define-data-var y-contract principal 'SP138CBPVKYBQQ480EZXJQK89HCHY32XBQ0T4BCCD)
+;; overall balance of x-token and y-token held by the contract
 (define-data-var x-balance uint u0)
 (define-data-var y-balance uint u0)
+
+;; fees collected so far, that have not been withdrawn (saves gas while doing exchanges)
 (define-data-var fee-x-balance uint u0)
 (define-data-var fee-y-balance uint u0)
+
+;; balances help by all the clients holding positions, this is equal to the sum of all the balances held in positions by each client
 (define-data-var total-balances uint u0)
-;; (define-fungible-token position)
 (define-map positions
   ((owner principal))
   ((balance uint))
@@ -84,6 +87,10 @@
   )
 )
 
+;; get overall balances for the pair
+(define-read-only (get-balances)
+  (ok (list (var-get x-balance) (var-get y-balance)))
+)
 
 ;; x: 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token
 ;; y: 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token
@@ -147,13 +154,12 @@
   )
 )
 
-;; get overall balances for the pair
-(define-read-only (get-balances)
-  (ok (list (var-get x-balance) (var-get y-balance)))
-)
-
 ;; exchange known x for whatever y based on liquidity, returns y
 (define-public (swap-exact-x-for-y (dx uint))
+  ;; calculate y
+  ;; calculate fee on x
+  ;; transfer
+  ;; update balances
   (let
     (
       (balances (var-get total-balances))
@@ -165,22 +171,27 @@
     (print balances)
     (print dx)
     (print dy)
-
-    (var-set x-balance (+ dx (var-get x-balance)))
-    (var-set y-balance (+ dy (var-get y-balance)))
-    (var-set fee-x-balance (+ fee (var-get fee-x-balance)))
-
-    (ok u0)
+    (if (and
+      (is-ok (print (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer contract-address dx)))
+      (is-ok (print (as-contract (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer sender dy))))
+      )
+      (begin
+        (var-set x-balance (+ dx (var-get x-balance)))
+        (var-set y-balance (+ dy (var-get y-balance)))
+        (var-set fee-x-balance (+ fee (var-get fee-x-balance)))
+        (ok (list dx dy))
+      )
+      transfer-failed-err
+    )
   )
-
-
 )
 
 ;; exchange whatever x for known y based on liquidity, returns x
 (define-public (swap-x-for-exact-y (y uint))
-  ;; calculate y
+  ;; calculate x
+  ;; calculate fee on x
   ;; transfer
-  ;; update current balances
+  ;; update balances
 
   (ok u0)
 )
