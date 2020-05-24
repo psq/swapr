@@ -65,7 +65,7 @@ describe("swapr contract test suite", () => {
       try {
         const result = await wraprClient.wrap(10, {sender: alice})
       } catch(e) {
-        console.log(e)
+        // console.log(e)
         if (e instanceof TransferError) {
           assert(true)
         } else {
@@ -78,7 +78,7 @@ describe("swapr contract test suite", () => {
       try {
         const result = await wraprClient.transfer(bob, 15, {sender: alice})
       } catch(e) {
-        console.log(e)
+        // console.log(e)
         if (e instanceof TransferError) {
           assert(true)
         } else {
@@ -91,7 +91,7 @@ describe("swapr contract test suite", () => {
       try {
         const result = await wraprClient.unwrap(10, {sender: alice})
       } catch(e) {
-        console.log(e)
+        // console.log(e)
         if (e instanceof TransferError) {
           assert(true)
         } else {
@@ -392,7 +392,7 @@ describe("swapr contract test suite", () => {
         const result = await swaprClient.resetFeeTo({sender: bob})
         assert(false, "should not return")
       } catch(e) {
-        console.log(e)
+        // console.log(e)
         if (e instanceof NotOwnerError) {
           assert(true)
         } else {

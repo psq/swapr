@@ -53,7 +53,7 @@ export class WraprClient extends Client {
     });
     await tx.sign(params.sender)
     const receipt = await this.submitTransaction(tx)
-    console.log(receipt)
+    // console.log(receipt)
     if (receipt.success) {
       // console.log("debugOutput", receipt.debugOutput)
       const result = Result.unwrap(receipt)
