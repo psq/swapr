@@ -21,11 +21,14 @@
   ((owner principal))
   ((balance uint))
 )
+
+;; TOOD(psq): refactor by using optional var
 ;; only to store wether the contract should capture a 5 bp fee, and where to send the fee
 (define-map fee-to
   ((key uint)) ;; only valid value is u0
   ((address principal))
 )
+(define-data-var fee-to-add (optional principal) none)
 
 (define-private (position-of (owner principal))
   (default-to u0
@@ -156,7 +159,7 @@
       (balances (var-get total-balances))
       (contract-address (as-contract tx-sender))
       (sender tx-sender)
-      (dy (/ (* u997 (* (var-get x-balance) dx)) (+ (* u100 (var-get x-balance)) (* u997 dx))))
+      (dy (/ (* u997 (var-get x-balance) dx) (+ (* u100 (var-get x-balance)) (* u997 dx))))
       (fee (/ (* u5 dx) u10000))
     )
     (print balances)
