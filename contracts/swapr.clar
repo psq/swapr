@@ -7,12 +7,11 @@
 (define-constant no-liquidity-err (err u1))
 (define-constant transfer-failed-err (err u2))
 (define-constant not-owner-err (err u3))
-(define-constant no-fee-to-address-err (err u5))
+(define-constant no-fee-to-address-err (err u4))
+;; for future use, or debug
 (define-constant e10-err (err u10))
 (define-constant e11-err (err u11))
 (define-constant e12-err (err u12))
-
-;; (define-constant x-token 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token)
 
 ;; overall balance of x-token and y-token held by the contract
 (define-data-var x-balance uint u0)
@@ -29,14 +28,11 @@
   ((balance uint))
 )
 
-;; TOOD(psq): refactor by using optional var
-;; only to store wether the contract should capture a 5 bp fee, and where to send the fee
-;; (define-map fee-to
-;;   ((key uint)) ;; only valid value is u0
-;;   ((address principal))
-;; )
+;; when set, enables the fee, and provides whene to send the fee when calling collect-fees
 (define-data-var fee-to-address (optional principal) none)
 
+
+;; wrappers to get an owner's position
 (define-private (position-of (owner principal))
   (default-to u0
     (get balance
@@ -45,14 +41,17 @@
   )
 )
 
+;; get the number of shares of the pool for owner
 (define-read-only (get-position-of (owner principal))
   (ok (position-of owner))
 )
 
+;; get the total number of shares in the pool
 (define-read-only (get-positions)
   (ok (var-get total-balances))
 )
 
+;; get the balances owner provided as liquidity, plus fees based on current exchange rate
 (define-read-only (get-balances-of (owner principal))
   (let ((x (var-get x-balance)) (y (var-get y-balance)) (balance (var-get total-balances)) (share (position-of owner)))
     (if (> balance u0)
@@ -96,12 +95,13 @@
   (ok (list (var-get x-balance) (var-get y-balance)))
 )
 
-;; x: 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token
-;; y: 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token
+;; since we can't use a constant to refer to contract address, here what x and y are
+;; (define-constant x-token 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token)
+;; (define-constant y-token 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token)
 
 ;; how much of each token to buy, unless this is the first addition
-;; this will respect current ratio
-;; TODO(psq): use 0 for x or y to get perfect ratio based on current exchange rate
+;; TODO(psq): use 0 for x or y to get perfect ratio based on current exchange rate, otherwise this will upset the balance
+;; although that would be an opportunity to arbitrage that out for someone
 (define-public (add-to-position (x uint) (y uint))
   (let ((contract-address (as-contract tx-sender)))
     (if
@@ -131,7 +131,8 @@
   )
 )
 
-;; to close, use 100
+;; reduce the amount of liquidity the sender provides to the pool
+;; to close, use u100
 (define-public (reduce-position (percent uint))
   (let ((position (position-of tx-sender)) (balances (var-get total-balances)) (contract-address (as-contract tx-sender)) (sender tx-sender))
     (let ((withdrawal (/ (* position percent) u100)))
@@ -158,21 +159,19 @@
   )
 )
 
-;; exchange known x for whatever y based on liquidity, returns y
+;; exchange known dx of x-token for whatever dy of y-token based on current liquidity, returns (dx dy)
 (define-public (swap-exact-x-for-y (dx uint))
-  ;; calculate y
-  ;; calculate fee on x
+  ;; calculate dy
+  ;; calculate fee on dx
   ;; transfer
   ;; update balances
   (let
     (
-      (balances (var-get total-balances))
       (contract-address (as-contract tx-sender))
       (sender tx-sender)
       (dy (/ (* u997 (var-get y-balance) dx) (+ (* u1000 (var-get x-balance)) (* u997 dx)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
       (fee (/ (* u5 dx) u10000)) ;; 5 bp
     )
-    (print balances)
     (print (var-get x-balance))
     (print (var-get y-balance))
     (print dx)
@@ -193,8 +192,8 @@
   )
 )
 
-;; exchange whatever x for known y based on liquidity, returns x
-(define-public (swap-x-for-exact-y (y uint))
+;; exchange whatever dx of x-token for known dy of y-token based on liquidity, returns (dx dy)
+(define-public (swap-x-for-exact-y (dy uint))
   ;; calculate x
   ;; calculate fee on x
   ;; transfer
@@ -203,13 +202,13 @@
   (ok u0)
 )
 
-;; exchange known y for whatever x based on liquidity, returns x
-(define-public (swap-exact-y-for-x (y uint))
+;; exchange known dy for whatever dx based on liquidity, returns (dx dy)
+(define-public (swap-exact-y-for-x (dy uint))
   (ok u0)
 )
 
-;; exchange whatever y for known x based on liquidity, returns y
-(define-public (swap-y-for-exact-x (x uint))
+;; exchange whatever dy for known dx based on liquidity, returns (dx dy)
+(define-public (swap-y-for-exact-x (dx uint))
   (ok u0)
 )
 
@@ -256,7 +255,6 @@
   (let ((address (unwrap! (var-get fee-to-address) no-fee-to-address-err)) (x (var-get fee-x-balance)) (y (var-get fee-y-balance)))
     (print x)
     (print y)
-    (print (and (> y u0) (is-ok (print (as-contract (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer address y))))))
     (print address)
     (if
       (and
@@ -272,17 +270,3 @@
     )
   )
 )
-
-;; init the tokens, restricted to contract owner, callable only once
-;; (define-public (init (x <can-transfer-tokens>) (y <can-transfer-tokens>))
-;;   (ok u0)
-;; )
-
-;; (init 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token)
-
-;; (define-public (init (x <can-transfer-tokens>))
-;;   (ok u0)
-;; )
-
-;; ;; (init 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token)
-;; (init 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token)
