@@ -36,7 +36,7 @@ export class WraprClient extends Client {
   async unwrap(amount: number, params: { sender: string }): Promise<Receipt> {
     const tx = this.createTransaction({
       method: { name: "unwrap", args: [`u${amount}`] }
-    });
+    })
     await tx.sign(params.sender)
     const receipt = await this.submitTransaction(tx)
     if (receipt.success) {
@@ -50,7 +50,7 @@ export class WraprClient extends Client {
   async transfer(recipient: string, amount: number, params: { sender: string }): Promise<Receipt> {
     const tx = this.createTransaction({
       method: { name: "transfer", args: [`'${recipient}`, `u${amount}`] }
-    });
+    })
     await tx.sign(params.sender)
     const receipt = await this.submitTransaction(tx)
     // console.log(receipt)
@@ -72,6 +72,5 @@ export class WraprClient extends Client {
     const receipt = await this.submitQuery(query)
     return Result.unwrapUInt(receipt)
   }
-
 
 }

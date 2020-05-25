@@ -102,11 +102,9 @@
 ;; Transfers tokens to a specified principal, performed by a spender
 (define-public (transfer-from (owner principal) (recipient principal) (amount uint))
   (let ((allowance (allowance-of tx-sender owner)))
-    (print "0000")
     (print amount)
     (print allowance)
     (print (or (> amount allowance) (<= amount u0)))
-    (print "1111")
 
     (if (or (> amount allowance) (<= amount u0))
       (err false)
@@ -142,8 +140,7 @@
 
 (define-public (balance-of (owner principal))
   (begin
-      (print owner)
-      (ok (ft-get-balance fungible-token owner))
+    (ok (ft-get-balance fungible-token owner))
   )
 )
 ;; Mint new tokens.

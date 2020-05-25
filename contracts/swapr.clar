@@ -172,6 +172,7 @@
       (dy (/ (* u997 (var-get y-balance) dx) (+ (* u1000 (var-get x-balance)) (* u997 dx)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
       (fee (/ (* u5 dx) u10000)) ;; 5 bp
     )
+    (print contract-address)
     (print (var-get x-balance))
     (print (var-get y-balance))
     (print dx)
@@ -224,8 +225,8 @@
     (print dy)
     (print fee)
     (if (and
-      (is-ok (print (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer contract-address dx)))
-      (is-ok (print (as-contract (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer sender dy))))
+      (is-ok (print (as-contract (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer sender dx))))
+      (is-ok (print (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer contract-address dy)))
       )
       (begin
         (var-set x-balance (- (var-get x-balance) dx))  ;; remove dx
@@ -286,19 +287,22 @@
 
 ;; drain the collected fees and send to the fee-to-address
 (define-public (collect-fees)
-  (let ((address (unwrap! (var-get fee-to-address) no-fee-to-address-err)) (x (var-get fee-x-balance)) (y (var-get fee-y-balance)))
-    (print x)
-    (print y)
+  (let ((address (unwrap! (var-get fee-to-address) no-fee-to-address-err)) (fee-x (var-get fee-x-balance)) (fee-y (var-get fee-y-balance)))
+    (print fee-x)
+    (print fee-y)
+    (print (as-contract tx-sender))
+    (print (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token balance-of (as-contract tx-sender)))
+    (print (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token balance-of (as-contract tx-sender)))
     (print address)
     (if
       (and
-        (or (is-eq x u0) (is-ok (print (as-contract (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer address x)))))
-        (or (is-eq y u0) (is-ok (print (as-contract (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer address y)))))
+        (or (is-eq fee-x u0) (is-ok (print (as-contract (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer address fee-x)))))
+        (or (is-eq fee-y u0) (is-ok (print (as-contract (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer address fee-y)))))
       )
       (begin
         (var-set fee-x-balance u0)
         (var-set fee-y-balance u0)
-        (ok (list x y))
+        (ok (list fee-x fee-y))
       )
       transfer-failed-err
     )

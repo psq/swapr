@@ -16,13 +16,13 @@ export class TokenClient extends Client {
       `${principal}.my-token`,
       'my-token',
       provider
-    );
+    )
   }
 
   async transfer(recipient: string, amount: number, params: { sender: string }): Promise<Receipt> {
     const tx = this.createTransaction({
       method: { name: "transfer", args: [`'${recipient}`, `u${amount}`] }
-    });
+    })
     await tx.sign(params.sender)
     const receipt = await this.submitTransaction(tx)
     if (receipt.success) {
