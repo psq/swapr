@@ -628,6 +628,9 @@ describe("swapr contract test suite", () => {
     })
   })
 
+  // TODO(psq): check the shares of Alice and Bob now that they've collected some trading fees
+  // might want to get back to initial exchange ratio first to better see the difference
+
   after(async () => {
     await provider.close()
   })
