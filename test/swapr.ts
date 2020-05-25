@@ -452,7 +452,7 @@ describe("swapr contract test suite", () => {
 
     })
 
-    describe("Alice exchanges X for 25000 of Y", () => {
+    describe("Alice exchanges some X for 25000 of Y", () => {
       let original_balances
       let alice_balances = {
         x: 0,
@@ -505,7 +505,58 @@ describe("swapr contract test suite", () => {
 
     })
 
+    describe("Bob exchanges some Y for 75000 of X", () => {
+      let original_balances
+      let bob_balances = {
+        x: 0,
+        y: 0,
+      }
+      let original_fees
+      let swap_result
+      const dx = 75000
+      const dy = 40509
 
+      before(async () => {
+        // add lots of liquidity
+        original_balances = await swaprClient.balances()
+        original_fees = await swaprClient.fees()
+        bob_balances.x = await x_token_client.balanceOf(bob)
+        bob_balances.y = await y_token_client.balanceOf(bob)
+        swap_result = await swaprClient.swapYforExactX(dx, {sender: bob})
+      })
+
+      it("Amount swapped should be correct", async () => {
+        assert.equal(swap_result.x, dx)
+        assert.equal(swap_result.y, dy)
+      })
+
+      it("Contract balances have been updated", async () => {
+        const balances = await swaprClient.balances()
+        assert.equal(balances.x, original_balances.x - dx)
+        assert.equal(balances.y, original_balances.y + dy)
+      })
+
+      it("Contract fees have been updated", async () => {
+        const balance = await swaprClient.fees()
+        assert.equal(balance.x, 29)  // leftover from Alice
+        assert.equal(balance.y, 30)
+      })
+
+      it("Bob token balances have been updated", async () => {
+        const balance1 = await x_token_client.balanceOf(bob)
+        const balance2 = await y_token_client.balanceOf(bob)
+        assert.equal(balance1, bob_balances.x + dx)
+        assert.equal(balance2, bob_balances.y - dy)
+      })
+
+      it("contract balances should be updated", async () => {
+        const x_balance = await x_token_client.balanceOf(swapr_contract)
+        const y_balance = await y_token_client.balanceOf(swapr_contract)
+        assert.equal(x_balance, 471653 + 49253 - dx)
+        assert.equal(y_balance, 265123 - 25000 + dy)
+      })
+
+    })
 
   })
 
@@ -519,7 +570,7 @@ describe("swapr contract test suite", () => {
     it("should send fees to contract owner", async () => {
       const fees = await swaprClient.collectFees({sender: alice}) // anyone can pay for sending the fees :)
       assert.equal(fees.x, 29)
-      assert.equal(fees.y, 10)
+      assert.equal(fees.y, 30)
     })
 
     it("contract owner should have received the fees", async () => {
@@ -538,8 +589,8 @@ describe("swapr contract test suite", () => {
     it("contract balances should be updated", async () => {
       const x_balance = await x_token_client.balanceOf(swapr_contract)
       const y_balance = await y_token_client.balanceOf(swapr_contract)
-      assert.equal(x_balance, 500020 + 10000 - 38367 + 49253 - 5 - 24)
-      assert.equal(y_balance, 250010 - 4887 + 20000 - 25000 - 10)
+      assert.equal(x_balance, 500020 + 10000 - 38367 + 49253 - 75000 - 5 - 24)
+      assert.equal(y_balance, 250010 - 4887 + 20000 - 25000 + 40509 - 10 - 20)
     })
 
   })

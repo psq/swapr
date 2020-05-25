@@ -271,7 +271,39 @@
 
 ;; exchange whatever dy for known dx based on liquidity, returns (dx dy)
 (define-public (swap-y-for-exact-x (dx uint))
-  (ok u0)
+  ;; calculate dy
+  ;; calculate fee on dy
+  ;; transfer
+  ;; update balances
+  (let
+    (
+      (contract-address (as-contract tx-sender))
+      (sender tx-sender)
+      (dy (/ (* u1000 (var-get y-balance) dx) (* u997 (- (var-get x-balance) dx)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
+      (fee (/ (* (var-get y-balance) dx) (* u1994 (- (var-get x-balance) dx)))) ;; 5 bp
+    )
+    (print contract-address)
+    (print (var-get x-balance))
+    (print (var-get y-balance))
+    (print dx)
+    (print dy)
+    (print fee)
+    (if (and
+      (is-ok (print (as-contract (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer sender dx))))
+      (is-ok (print (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer contract-address dy)))
+      )
+      (begin
+        (var-set x-balance (- (var-get x-balance) dx))  ;; add dx
+        (var-set y-balance (+ (var-get y-balance) dy))  ;; remove dy
+        (if (is-some (var-get fee-to-address))  ;; only collect fee when fee-to-address is set
+          (var-set fee-y-balance (+ fee (var-get fee-y-balance)))
+          false  ;; why is the else `expr` required
+        )
+        (ok (list dx dy))
+      )
+      transfer-failed-err
+    )
+  )
 )
 
 ;; activate the contract fee for swaps by setting the collection address, restricted to contract owner
