@@ -43,7 +43,7 @@ Additionally, a contract to wrap STX (a la WETH) is also included so people coul
 ```
 git clone https://github.com/blockstack/stacks-blockchain.git
 cd stacks-blockchain
-cargo testnet mocknet --config=./testnet/stacks-node/Stacks.toml
+cargo testnet start --config=./testnet/stacks-node/Stacks.toml
 ```
 
 ### generate keys
@@ -77,7 +77,7 @@ amount = 1000000
 address = "SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR"
 amount = 1000000
 ```
-by using the addresses generated in `kyes-*.json`, not the above which are the ones from the unit tests, you need the private keys :)
+by using the addresses generated in `keys-*.json`, not the above which are the ones from the unit tests, you need the private keys :)
 
 ### Verify the balances by using
 Verify the balances with
