@@ -62,7 +62,23 @@ export class SwaprClient extends Client {
     if (result.startsWith('Transaction executed and committed. Returned: ')) {
       const start_of_list = result.substring('Transaction executed and committed. Returned: '.length)  // keep a word so unwrapXYList will behave like it was with 'ok'
       const parsed = parse(start_of_list.substring(0, start_of_list.indexOf(')') + 1))
-      return unwrapXYList(parsed)  // TODO(psq): result is a list of dx dy
+      return unwrapXYList(parsed)
+    }
+  }
+
+  async swapXforExactY(dy: number, params: { sender: string }): Promise<Receipt> {
+    const tx = this.createTransaction({
+      method: { name: "swap-x-for-exact-y", args: [`u${dy}`] }
+    })
+    await tx.sign(params.sender)
+    const receipt = await this.submitTransaction(tx)
+    console.log("debugOutput", receipt.debugOutput)
+    const result = Result.unwrap(receipt)
+
+    if (result.startsWith('Transaction executed and committed. Returned: ')) {
+      const start_of_list = result.substring('Transaction executed and committed. Returned: '.length)  // keep a word so unwrapXYList will behave like it was with 'ok'
+      const parsed = parse(start_of_list.substring(0, start_of_list.indexOf(')') + 1))
+      return unwrapXYList(parsed)
     }
   }
 
@@ -78,7 +94,23 @@ export class SwaprClient extends Client {
     if (result.startsWith('Transaction executed and committed. Returned: ')) {
       const start_of_list = result.substring('Transaction executed and committed. Returned: '.length)  // keep a word so unwrapXYList will behave like it was with 'ok'
       const parsed = parse(start_of_list.substring(0, start_of_list.indexOf(')') + 1))
-      return unwrapXYList(parsed)  // TODO(psq): result is a list of dx dy
+      return unwrapXYList(parsed)
+    }
+  }
+
+  async swapYforExactX(dx: number, params: { sender: string }): Promise<Receipt> {
+    const tx = this.createTransaction({
+      method: { name: "swap-y-for-exact-x", args: [`u${dx}`] }
+    })
+    await tx.sign(params.sender)
+    const receipt = await this.submitTransaction(tx)
+    console.log("debugOutput", receipt.debugOutput)
+    const result = Result.unwrap(receipt)
+
+    if (result.startsWith('Transaction executed and committed. Returned: ')) {
+      const start_of_list = result.substring('Transaction executed and committed. Returned: '.length)  // keep a word so unwrapXYList will behave like it was with 'ok'
+      const parsed = parse(start_of_list.substring(0, start_of_list.indexOf(')') + 1))
+      return unwrapXYList(parsed)
     }
   }
 
@@ -201,7 +233,7 @@ export class SwaprClient extends Client {
       if (result.startsWith('Transaction executed and committed. Returned: ')) {
         const start_of_list = result.substring('Transaction executed and committed. Returned: '.length)  // keep a word so unwrapXYList will behave like it was with 'ok'
         const parsed = parse(start_of_list.substring(0, start_of_list.indexOf(')') + 1))
-        return unwrapXYList(parsed)  // TODO(psq): result is a list of dx dy
+        return unwrapXYList(parsed)
       }
     }
     throw new NotOwnerError()

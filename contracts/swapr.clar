@@ -198,12 +198,39 @@
 
 ;; exchange whatever dx of x-token for known dy of y-token based on liquidity, returns (dx dy)
 (define-public (swap-x-for-exact-y (dy uint))
-  ;; calculate x
-  ;; calculate fee on x
+  ;; calculate dx
+  ;; calculate fee on dx
   ;; transfer
   ;; update balances
-
-  (ok u0)
+  (let
+    (
+      (contract-address (as-contract tx-sender))
+      (sender tx-sender)
+      (dx (/ (* u1000 (var-get x-balance) dy) (* u997 (- (var-get y-balance) dy)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
+      (fee (/ (* (var-get x-balance) dy) (* u1994 (- (var-get y-balance) dy)))) ;; 5 bp
+    )
+    (print contract-address)
+    (print (var-get x-balance))
+    (print (var-get y-balance))
+    (print dx)
+    (print dy)
+    (print fee)
+    (if (and
+      (is-ok (print (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer contract-address dx)))
+      (is-ok (print (as-contract (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer sender dy))))
+      )
+      (begin
+        (var-set x-balance (+ (var-get x-balance) dx))  ;; add dx
+        (var-set y-balance (- (var-get y-balance) dy))  ;; remove dy
+        (if (is-some (var-get fee-to-address))  ;; only collect fee when fee-to-address is set
+          (var-set fee-x-balance (+ fee (var-get fee-x-balance)))
+          false  ;; why is the else `expr` required
+        )
+        (ok (list dx dy))
+      )
+      transfer-failed-err
+    )
+  )
 )
 
 ;; exchange known dy for whatever dx based on liquidity, returns (dx dy)
