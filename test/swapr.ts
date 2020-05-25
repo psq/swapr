@@ -373,7 +373,7 @@ describe("swapr contract test suite", () => {
 
       it("Contract balances have been updated", async () => {
         const balances = await swaprClient.balances()
-        assert.equal(balances.x, original_balances.x + dx)
+        assert.equal(balances.x, original_balances.x + dx - 5)
         assert.equal(balances.y, original_balances.y - dy)
       })
 
@@ -427,7 +427,7 @@ describe("swapr contract test suite", () => {
       it("Contract balances have been updated", async () => {
         const balances = await swaprClient.balances()
         assert.equal(balances.x, original_balances.x - dx)
-        assert.equal(balances.y, original_balances.y + dy)
+        assert.equal(balances.y, original_balances.y + dy - 10)
       })
 
       it("Contract fees have been updated", async () => {
@@ -460,7 +460,7 @@ describe("swapr contract test suite", () => {
       }
       let original_fees
       let swap_result
-      const dx = 49253
+      const dx = 49254
       const dy = 25000
 
       before(async () => {
@@ -479,7 +479,7 @@ describe("swapr contract test suite", () => {
 
       it("Contract balances have been updated", async () => {
         const balances = await swaprClient.balances()
-        assert.equal(balances.x, original_balances.x + dx)
+        assert.equal(balances.x, original_balances.x + dx - 24)
         assert.equal(balances.y, original_balances.y - dy)
       })
 
@@ -514,7 +514,7 @@ describe("swapr contract test suite", () => {
       let original_fees
       let swap_result
       const dx = 75000
-      const dy = 40509
+      const dy = 40510
 
       before(async () => {
         // add lots of liquidity
@@ -533,7 +533,7 @@ describe("swapr contract test suite", () => {
       it("Contract balances have been updated", async () => {
         const balances = await swaprClient.balances()
         assert.equal(balances.x, original_balances.x - dx)
-        assert.equal(balances.y, original_balances.y + dy)
+        assert.equal(balances.y, original_balances.y + dy - 20)
       })
 
       it("Contract fees have been updated", async () => {
@@ -552,7 +552,7 @@ describe("swapr contract test suite", () => {
       it("contract balances should be updated", async () => {
         const x_balance = await x_token_client.balanceOf(swapr_contract)
         const y_balance = await y_token_client.balanceOf(swapr_contract)
-        assert.equal(x_balance, 471653 + 49253 - dx)
+        assert.equal(x_balance, 471653 + 49254 - dx)
         assert.equal(y_balance, 265123 - 25000 + dy)
       })
 
@@ -589,8 +589,8 @@ describe("swapr contract test suite", () => {
     it("contract balances should be updated", async () => {
       const x_balance = await x_token_client.balanceOf(swapr_contract)
       const y_balance = await y_token_client.balanceOf(swapr_contract)
-      assert.equal(x_balance, 500020 + 10000 - 38367 + 49253 - 75000 - 5 - 24)
-      assert.equal(y_balance, 250010 - 4887 + 20000 - 25000 + 40509 - 10 - 20)
+      assert.equal(x_balance, 500020 + 10000 - 38367 + 49254 - 75000 - 5 - 24)
+      assert.equal(y_balance, 250010 - 4887 + 20000 - 25000 + 40510 - 10 - 20)
     })
 
   })

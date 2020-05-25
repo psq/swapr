@@ -183,11 +183,13 @@
       (is-ok (print (as-contract (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer sender dy))))
       )
       (begin
-        (var-set x-balance (+ (var-get x-balance) dx))  ;; add dx
         (var-set y-balance (- (var-get y-balance) dy))  ;; remove dy
         (if (is-some (var-get fee-to-address))  ;; only collect fee when fee-to-address is set
-          (var-set fee-x-balance (+ fee (var-get fee-x-balance)))
-          false  ;; why is the else `expr` required
+          (begin
+            (var-set x-balance (- (+ (var-get x-balance) dx) fee))  ;; add dx - fee
+            (var-set fee-x-balance (+ fee (var-get fee-x-balance)))
+          )
+          (var-set x-balance (+ (var-get x-balance) dx))  ;; add dx
         )
         (ok (list dx dy))
       )
@@ -220,11 +222,13 @@
       (is-ok (print (as-contract (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer sender dy))))
       )
       (begin
-        (var-set x-balance (+ (var-get x-balance) dx))  ;; add dx
         (var-set y-balance (- (var-get y-balance) dy))  ;; remove dy
         (if (is-some (var-get fee-to-address))  ;; only collect fee when fee-to-address is set
-          (var-set fee-x-balance (+ fee (var-get fee-x-balance)))
-          false  ;; why is the else `expr` required
+          (begin
+            (var-set x-balance (- (+ (var-get x-balance) dx) fee))  ;; add dx - fee
+            (var-set fee-x-balance (+ fee (var-get fee-x-balance)))
+          )
+          (var-set x-balance (+ (var-get x-balance) dx))  ;; add dx
         )
         (ok (list dx dy))
       )
@@ -257,10 +261,12 @@
       )
       (begin
         (var-set x-balance (- (var-get x-balance) dx))  ;; remove dx
-        (var-set y-balance (+ (var-get y-balance) dy))  ;; add dy
         (if (is-some (var-get fee-to-address))  ;; only collect fee when fee-to-address is set
-          (var-set fee-y-balance (+ fee (var-get fee-y-balance)))
-          false
+          (begin
+            (var-set fee-y-balance (+ fee (var-get fee-y-balance)))
+            (var-set y-balance (- (+ (var-get y-balance) dy) fee))  ;; add dy - fee
+          )
+          (var-set y-balance (+ (var-get y-balance) dy))  ;; add dy
         )
         (ok (list dx dy))
       )
@@ -293,11 +299,13 @@
       (is-ok (print (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer contract-address dy)))
       )
       (begin
-        (var-set x-balance (- (var-get x-balance) dx))  ;; add dx
-        (var-set y-balance (+ (var-get y-balance) dy))  ;; remove dy
+        (var-set x-balance (- (var-get x-balance) dx))  ;; remove dx
         (if (is-some (var-get fee-to-address))  ;; only collect fee when fee-to-address is set
-          (var-set fee-y-balance (+ fee (var-get fee-y-balance)))
-          false  ;; why is the else `expr` required
+          (begin
+            (var-set y-balance (- (+ (var-get y-balance) dy) fee))  ;; add dy - fee
+            (var-set fee-y-balance (+ fee (var-get fee-y-balance)))
+          )
+          (var-set y-balance (+ (var-get y-balance) dy))  ;; add dy
         )
         (ok (list dx dy))
       )
