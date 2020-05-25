@@ -11,7 +11,9 @@
     "node": ">=10"
   },
   "scripts": {
-    "test": "mocha",
+    "test": "mocha 'test/unit/*.ts'",
+    "wrapr": "mocha 'test/integration/wrapr.ts'",
+    "swapr": "mocha 'test/integration/swapr.ts'",
     "test:watch": "mocha --watch"
   },
   "devDependencies": {

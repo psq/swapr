@@ -35,6 +35,79 @@ See the contract for other available methods
 ## Wrapr contract
 Additionally, a contract to wrap STX (a la WETH) is also included so people could create pairs against STX.  Unfortunately, as of writing this, there is no way to add STX to an address in the testing framework, so only minimal testing is provided.
 
+
+## setup with mocknet
+
+### setup mocknet with lastest from master
+
+```
+git clone https://github.com/blockstack/stacks-blockchain.git
+cd stacks-blockchain
+cargo testnet mocknet --config=./testnet/stacks-node/Stacks.toml
+```
+
+### generate keys
+
+```
+cargo run --bin blockstack-cli generate-sk --testnet > keys-alice.json
+cargo run --bin blockstack-cli generate-sk --testnet > keys-bob.json
+cargo run --bin blockstack-cli generate-sk --testnet > keys-zoe.json
+```
+
+Then move the keys to the swapr folder
+
+
+### setup STX balances
+
+Under `[burnchain]`, add
+
+```
+# alice
+[[mstx_balance]]
+address = "SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7"
+amount = 1000000
+
+# bob
+[[mstx_balance]]
+address = "S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE"
+amount = 1000000
+
+# zoe
+[[mstx_balance]]
+address = "SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR"
+amount = 1000000
+```
+by using the addresses generated in `kyes-*.json`, not the above which are the ones from the unit tests, you need the private keys :)
+
+### Verify the balances by using
+Verify the balances with
+
+- [http://127.0.0.1:20443/v2/accounts/SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7](http://127.0.0.1:20443/v2/accounts/SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7)
+
+again, using the proper addresses
+
+### Runing the unit tests
+
+```
+npm test
+```
+
+### Runing the `wrapr` tests
+
+```
+npm wrapr
+```
+
+### Runing the `swapr` tests
+
+```
+npm swapr
+```
+
+
+
+
+
 ## Further thoughts
 Solidity does not make it easy to implement `sqrt`, although the "egyptian" method seems fine, however not having loops in Clarity makes it impractical to implement, so the contract uses the old method, but if the x pair is a lot less valuable than the y pair, rounding issues may occur.  Rahter, I would hope `sqrt` can be added as a prinitive to Clarity (see section 3.4 of the V2 whitepaper)
 

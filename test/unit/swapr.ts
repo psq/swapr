@@ -4,14 +4,14 @@ var chai = require('chai')
 chai.use(require('chai-string'))
 const assert = chai.assert
 
-import { WraprClient } from "../src/clients/wrapr-client"
-import { SwaprClient } from "../src/clients/swapr-client"
-import { TokenClient } from "../src/clients/token-client"
+import { WraprClient } from "../../src/clients/wrapr-client"
+import { SwaprClient } from "../../src/clients/swapr-client"
+import { TokenClient } from "../../src/clients/token-client"
 import {
   NoLiquidityError,
   NotOwnerError,
   TransferError,
-} from '../src/errors'
+} from '../../src/errors'
 
 
 describe("swapr contract test suite", () => {
