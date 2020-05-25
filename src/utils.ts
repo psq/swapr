@@ -53,3 +53,7 @@ export function unwrapOK(tree) {
     throw NotOKErr
   }
 }
+
+export function replaceKey(body: string, original: string, replacement: string) {
+  return body.replace(original, replacement)
+}

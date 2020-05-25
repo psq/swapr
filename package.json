@@ -23,11 +23,13 @@
     "chai": "^4.2.0",
     "@types/chai": "^4.1.7",
     "mocha": "^6.1.4",
+    "chai-string": "^1.5.0",
     "@types/mocha": "^5.2.7"
   },
   "dependencies": {
     "@blockstack/clarity": "^0.1.16",
     "@blockstack/clarity-native-bin": "^0.1.16",
-    "chai-string": "^1.5.0"
+    "@blockstack/stacks-transactions": "^0.4.4",
+    "bn.js": "^5.1.2"
   }
 }

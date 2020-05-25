@@ -52,6 +52,7 @@ cargo testnet start --config=./testnet/stacks-node/Stacks.toml
 cargo run --bin blockstack-cli generate-sk --testnet > keys-alice.json
 cargo run --bin blockstack-cli generate-sk --testnet > keys-bob.json
 cargo run --bin blockstack-cli generate-sk --testnet > keys-zoe.json
+...  # TODO(psq): add the contracts as well
 ```
 
 Then move the keys to the swapr folder
