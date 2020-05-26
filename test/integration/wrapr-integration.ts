@@ -5,7 +5,16 @@ import {
   makeContractCall,
   TransactionVersion,
   FungibleConditionCode,
+
+  serializeCV,
+  deserializeCV,
+  standardPrincipalCV,
   uintCV,
+
+  BooleanCV,
+  PrincipalCV,
+  UIntCV,
+
   ChainID,
   makeStandardSTXPostCondition,
   makeContractSTXPostCondition,
@@ -39,15 +48,15 @@ describe("wrapr contract tests", async () => {
     console.log("deploy trait")
     console.log("deploy wrapr")
 
-    fee = new BigNum(2000)
+    fee = new BigNum(2087)
 
     const transaction_deploy_trait = await makeSmartContractDeploy({
       contractName: contract_trait_name,
       codeBody: contract_trait_body,
-      fee,
       senderKey: keys_contracts.secretKey,
-      nonce: new BigNum(0),
       network,
+      fee,
+      // nonce: new BigNum(0),
     })
     console.log(await broadcastTransaction(transaction_deploy_trait, network))
     await wait(10000)
@@ -55,13 +64,14 @@ describe("wrapr contract tests", async () => {
     const transaction_deploy_wrapr = await makeSmartContractDeploy({
       contractName: contract_wrapr_name,
       codeBody: contract_wrapr_body,
-      fee,
       senderKey: keys_contracts.secretKey,
-      nonce: new BigNum(1),
       network,
+      // optional
+      fee,
+      // nonce: new BigNum(1),
     })
     console.log(await broadcastTransaction(transaction_deploy_wrapr, network))
-    await wait(10000)
+    await wait(15000)
 
     fee = new BigNum(256);
 
@@ -70,9 +80,7 @@ describe("wrapr contract tests", async () => {
       contractName: contract_wrapr_name,
       functionName: "wrap",
       functionArgs: [uintCV(100000)],
-      fee,
       senderKey: keys_alice.secretKey,
-      nonce: new BigNum(0),
       network,
       postConditions: [
         makeStandardSTXPostCondition(
@@ -83,8 +91,87 @@ describe("wrapr contract tests", async () => {
         // makeStandardFungiblePostCondition(
         // ),
       ],
-    });
-    console.log(await broadcastTransaction(transaction_wrap, network));
+      fee,
+      // nonce: new BigNum(0),
+    })
+    console.log(await broadcastTransaction(transaction_wrap, network))
+    await wait(15000)
+
+
+
+    const function_name = "get-total-supply"
+
+    const body = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: `{"sender":"${keys_alice.stacksAddress}","arguments":[]}`,
+    }
+    console.log("request.body", body)
+
+    const response = await fetch(
+      network.coreApiUrl +
+        `/v2/contracts/call-read/${keys_contracts.stacksAddress}/${contract_wrapr_name}/${function_name}`,
+      body,
+    )
+    console.log(response.status)
+    if (response.status === 200) {
+      const result = await response.json()
+      if (result.okay) {
+        console.log(result)
+        const result_value = deserializeCV(
+          Buffer.from(result.result.substr(2), "hex")
+        )
+        const result_data = result_value as UIntCV
+        console.log("result_data.value", result_data.value)
+        console.log("result_data.value.value.toString()", result_data.value.value.toString())
+      } else {
+        console.log(result)
+      }
+    } else {
+      console.log("not 200 response", response)
+      console.log("not 200 response", JSON.stringify(response, null, 2))
+    }
+
+
+    const function_name2 = "balance-of"
+
+    const owner = serializeCV(standardPrincipalCV(keys_alice.stacksAddress))
+
+    const body2 = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: `{"sender":"${keys_alice.stacksAddress}","arguments":["0x${owner.toString("hex")}"]}`,
+    }
+    console.log("request.body", body2)
+
+    const response2 = await fetch(
+      network.coreApiUrl +
+        `/v2/contracts/call-read/${keys_contracts.stacksAddress}/${contract_wrapr_name}/${function_name2}`,
+      body2,
+    )
+    console.log(response2.status)
+    if (response2.status === 200) {
+      const result = await response2.json()
+      if (result.okay) {
+        console.log(result)
+        const result_value = deserializeCV(
+          Buffer.from(result.result.substr(2), "hex")
+        )
+        const result_data = result_value as UIntCV
+        console.log(result_data.value)
+        console.log(result_data.value.value.toString())
+      } else {
+        console.log(result)
+      }
+    } else {
+      console.log("not 200 response", response2)
+      console.log("not 200 response", JSON.stringify(await response2.json(), null, 2))
+    }
+
 
 
 

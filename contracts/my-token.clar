@@ -138,7 +138,7 @@
   )
 )
 
-(define-public (balance-of (owner principal))
+(define-read-only (balance-of (owner principal))
   (begin
     (ok (ft-get-balance fungible-token owner))
   )

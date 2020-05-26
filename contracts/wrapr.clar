@@ -10,6 +10,13 @@
   (ok (var-get total-supply))
 )
 
+;; get the token balance of owner
+(define-read-only (balance-of (owner principal))
+  (begin
+    (ok (ft-get-balance wrapped-token owner))
+  )
+)
+
 ;; transfer amount STX and return wrapped fungible token
 ;; mints new token
 (define-public (wrap (amount uint))
@@ -21,9 +28,15 @@
       )
       (begin
         (var-set total-supply (+ (var-get total-supply) amount))
+        (print amount)
+        (print (var-get total-supply))
         (ok true)
       )
-      (err false)
+      (begin
+        (print u10)
+        (err false)
+        ;; (err u10)
+      )
     )
   )
 )

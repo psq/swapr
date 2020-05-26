@@ -58,7 +58,7 @@ describe("swapr contract test suite", () => {
   })
 
   describe("after deploying an instance of the wrapr contract, with no contributions", () => {
-    it("should total supply should be 0", async () => {
+    it("total supply should be 0", async () => {
       const totalSupply = await wraprClient.totalSupply(alice)
       assert.equal(totalSupply, 0)
     })
@@ -68,6 +68,11 @@ describe("swapr contract test suite", () => {
       const y_balance = await y_token_client.balanceOf(swapr_contract)
       assert.equal(x_balance, 0)
       assert.equal(y_balance, 0)
+    })
+
+    it("Alice wrapr balance should be 0", async () => {
+      const balance = await wraprClient.balanceOf(alice)
+      assert.equal(balance, 0)
     })
 
     it("with no STX, wrap should fail", async () => {

@@ -62,6 +62,18 @@ export class WraprClient extends Client {
     throw new TransferError()
   }
 
+  async balanceOf(owner: string): Promise<number> {
+    const query = this.createQuery({
+      method: {
+        name: 'balance-of',
+        args: [`'${owner}`],
+      },
+    })
+    const receipt = await this.submitQuery(query)
+    console.log("receipt", receipt)
+    return Result.unwrapUInt(receipt)
+  }
+
   async totalSupply(): Promise<number> {
     const query = this.createQuery({
       method: {
@@ -70,6 +82,7 @@ export class WraprClient extends Client {
       },
     })
     const receipt = await this.submitQuery(query)
+    console.log("receipt", receipt)
     return Result.unwrapUInt(receipt)
   }
 
