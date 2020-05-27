@@ -2,7 +2,7 @@ export function wait(ms: number) {
   return new Promise((accept) => setTimeout(accept, ms))
 }
 
-export async function waitForTX(base_url: sting, tx_id: string, max_wait: number) {
+export async function waitForTX(base_url: string, tx_id: string, max_wait: number) {
   const options = {
     method: "GET",
     headers: {
@@ -21,7 +21,12 @@ export async function waitForTX(base_url: sting, tx_id: string, max_wait: number
       // console.log(response)
 
       if (response.ok) {
-        return response.json()
+        const json = await response.json()
+        if (json.tx_status === 'success') {
+          return json
+        } else {
+          throw new Error(`transaction ${unwrapped_tx_id} failed: ${json.tx_status}`)
+        }
       } else if (response.status === 404) {
         console.log("waiting", wait_count)
         await wait(500)
@@ -30,6 +35,7 @@ export async function waitForTX(base_url: sting, tx_id: string, max_wait: number
         throw new Error(`Request failed with ${response.status} ${response.statusText}`)
       }
     }
+    throw new Error(`did not return a value after ${max_Wait}`)
   } catch (e) {
     throw e
   }

@@ -43,7 +43,7 @@ import {
 // const STACKS_API_URL = 'http://localhost:20443'
 const STACKS_API_URL = 'http://localhost:3999'
 
-describe("wrapr contract tests", async () => {
+describe("wrapr scenario", async () => {
   const keys_alice = JSON.parse(fs.readFileSync('./keys-alice.json').toString())
   const keys_bob = JSON.parse(fs.readFileSync('./keys-bob.json').toString())
   const keys_contracts = JSON.parse(fs.readFileSync('./keys-contracts.json').toString())
@@ -55,10 +55,11 @@ describe("wrapr contract tests", async () => {
   const stacksClient = new StacksClient(network)
 
   before(async () => {
-
     await traitTXClient.deployContract()
     await wraprTXClient.deployContract()
+  })
 
+  it("scenario #1", async () => {
     const tx_wrap = await wraprTXClient.wrap(keys_alice, 100000)
     console.log("tx_wrap", JSON.stringify(tx_wrap, null, 2))
 
@@ -97,18 +98,6 @@ describe("wrapr contract tests", async () => {
 
     const balance_wrapr_stx = await stacksClient.STXBalance(keys_contracts)
     console.log("balance_wrapr STX", balance_wrapr_stx.toString())
-
-  })
-
-
-  it("should wrap STX", async () => {
-  })
-
-  it("should tranfer wrapr token", async () => {
-
-  })
-
-  it("should unwrap STX", async () => {
   })
 
 })

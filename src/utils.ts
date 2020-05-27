@@ -55,5 +55,6 @@ export function unwrapOK(tree) {
 }
 
 export function replaceKey(body: string, original: string, replacement: string) {
-  return body.replace(original, replacement)
+  const regexp = new RegExp(original, 'g')  // limited to principal and contract names with . and - should work
+  return body.replace(regexp, replacement)
 }

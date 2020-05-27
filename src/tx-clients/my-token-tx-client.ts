@@ -28,22 +28,20 @@ import {
 } from '../tx-utils'
 import { replaceKey } from '../utils'
 
-export class SwaprTXClient {
-  constructor(token1, token2, keys, network) {
+
+
+export class MyTokenTXClient {
+  constructor(contract_name, keys, network) {
     this.keys = keys
     this.network = network
-    this.token1 = token1
-    this.token2 = token2
-    this.contract_name = `swapr-${token1}-${token2}`
+    this.contract_name = contract_name
   }
 
   async deployContract() {
-    const fee = new BigNum(13681)
-    const contract_swapr_body = replaceKey(replaceKey(fs.readFileSync('./contracts/swapr.clar').toString(), 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token', `${this.keys.stacksAddress}.${this.token1}`), 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token', `${this.keys.stacksAddress}.${this.token2}`)
+    const fee = new BigNum(5380)
+    const contract_swapr_body = replaceKey(fs.readFileSync('./contracts/my-token.clar').toString(), 'SP2TPZ623K5N2WYF1BWRMP5A93PSBWWADQGKJRJCS', this.keys.stacksAddress)
 
-    console.log("contract_swapr_body", this.token1, this.token2, contract_swapr_body)
-
-    console.log("deploying swapr contract")
+    console.log(`deploying ${this.contract_name} contract`)
     const transaction_deploy_trait = await makeSmartContractDeploy({
       contractName: this.contract_name,
       codeBody: contract_swapr_body,
