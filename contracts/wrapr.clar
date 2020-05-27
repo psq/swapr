@@ -30,7 +30,8 @@
         (var-set total-supply (+ (var-get total-supply) amount))
         (print amount)
         (print (var-get total-supply))
-        (ok true)
+        (ok (list amount (var-get total-supply)))
+        ;; (ok true)
       )
       (begin
         (print u10)
@@ -44,14 +45,16 @@
 ;; unwraps wrapped STX token
 ;; burns unwrapped token (well, can't burn yet, so will forever increase, good thing there is no limit)
 (define-public (unwrap (amount uint))
-  (let ((contract-address (as-contract tx-sender)))
+  (let ((caller tx-sender) (contract-address (as-contract tx-sender)))
+    (print contract-address)
+    (print amount)
     (if
       (and
         (<= amount (var-get total-supply))
         ;; this is where burn would be more appropriate, as trying to reuse tokens or mint
         ;; would make the code more complex for little benefit
-        (is-ok (ft-transfer? wrapped-token amount tx-sender contract-address))
-        (is-ok (stx-transfer? amount contract-address tx-sender))
+        (is-ok (ft-transfer? wrapped-token amount caller contract-address))
+        (is-ok (as-contract (stx-transfer? amount contract-address caller)))
       )
       (begin
         (var-set total-supply (- (var-get total-supply) amount))
@@ -65,6 +68,11 @@
 ;; Transfers tokens to a specified principal.
 ;; just a wrapper to satisfy the `<can-transfer-token>`
 (define-public (transfer (recipient principal) (amount uint))
-  (ft-transfer? wrapped-token amount tx-sender recipient)
+  (begin
+    (print tx-sender)
+    (print recipient)
+    (print amount)
+    (ft-transfer? wrapped-token amount tx-sender recipient)
+  )
 )
 
