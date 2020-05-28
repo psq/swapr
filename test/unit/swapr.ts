@@ -1,6 +1,6 @@
 import { Client, Provider, ProviderRegistry, Result } from "@blockstack/clarity"
 
-var chai = require('chai')
+const chai = require('chai')
 chai.use(require('chai-string'))
 const assert = chai.assert
 
