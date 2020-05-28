@@ -6,7 +6,24 @@ Of special interest, reading the [x-y-k paper](https://github.com/runtimeverific
 
 The API has been reimagined, and hopefully simplified to its minima, withough impeding on proper functioning of the trustless exchange.
 
-## main contract API
+So that you can also exchange STX with other tokens, a separate contract, `wrapr`, is also included, and can be used on its own.
+
+
+## Wrapr contract API
+
+You can find the contract [here](contracts/wrapr.clar)
+
+### `(wrap (amount uint))`
+### `(unwrap (amount uint))`
+### `(transfer (recipient principal) (amount uint))`
+### `(get-total-supply)`  read-only
+### `(balance-of (owner principal))` read-only
+
+
+## Swapr contract API
+
+You can find the contract [here](contracts/swapr.clar)
+
 
 ### `(add-to-position (x uint) (y uint))`
 Add x amount of the X token, and y amount of Y token by transfering from the sender.  Currently does not check that the exchange rate makes sense, so could lead to losses.  Eventually, you'll be able to specify `u0` for either `x` or `y` and the contract will calculate the proper amount to send to match the current exchange rate.
