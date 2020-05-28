@@ -327,7 +327,8 @@
   )
 )
 
-;; clear the contract fee for swaps by resetting the collection address
+;; clear the contract fee addres
+;; TODO(psq): if there are any collected fees, prevent this from happening, as the fees can no longer be colllect with `collect-fees`
 (define-public (reset-fee-to-address)
   (begin
     (if (is-eq tx-sender contract-owner)
@@ -345,14 +346,14 @@
   (ok (var-get fee-to-address))
 )
 
-;; get the current address used to collect a fee
+;; get the amount of fees charged on x-token and y-token exchanges that have not been collected yet
 (define-read-only (get-fees)
   (begin
     (ok (list (var-get fee-x-balance) (var-get fee-y-balance)))
   )
 )
 
-;; drain the collected fees and send to the fee-to-address
+;; send the collected fees the fee-to-address
 (define-public (collect-fees)
   (let ((address (unwrap! (var-get fee-to-address) no-fee-to-address-err)) (fee-x (var-get fee-x-balance)) (fee-y (var-get fee-y-balance)))
     (print fee-x)

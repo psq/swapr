@@ -6,24 +6,36 @@ Of special interest, reading the [x-y-k paper](https://github.com/runtimeverific
 
 The API has been reimagined, and hopefully simplified to its minima, withough impeding on proper functioning of the trustless exchange.
 
-So that you can also exchange STX with other tokens, a separate contract, `wrapr`, is also included, and can be used on its own.
+So that you can also exchange STX with other tokens, a separate contract, `wrapr`, is also included, and can be used on its own.  This contract will allow you to wrap STX into a fungible token, in a fashion similar to what `WETH` provides in the `ETH` world.
 
 
 ## Wrapr contract API
 
-You can find the contract [here](contracts/wrapr.clar)
+You can find the contract [here](contracts/wrapr.clar).
 
 ### `(wrap (amount uint))`
-### `(unwrap (amount uint))`
-### `(transfer (recipient principal) (amount uint))`
-### `(get-total-supply)`  read-only
-### `(balance-of (owner principal))` read-only
+Wrap `amount` of STX from sender into a fungible-token and transfer that token back to sender
 
+### `(unwrap (amount uint))`
+Unwraps the STX tokens held for the sender, and sends back `amount` of STX if below the amount held by sender
+
+### `(transfer (recipient principal) (amount uint))`
+Transfer `amount` of `wrapr` token to `recipient`
+
+### `(get-total-supply)`  read-only
+Get the total amount of STX currently wrapped by all
+
+### `(balance-of (owner principal))` read-only
+Get the balance of `wrapr` owned by `principal`
+
+## Wrapr contract notes
+Unfortunately, as of writing this, there is no way to add STX to an address in the testing framework, so only minimal testing is provided.
+
+However, there is a scenario that shows how to use `wrapr` on a real node (testnet/mocknet for now) under test/integration
 
 ## Swapr contract API
 
-You can find the contract [here](contracts/swapr.clar)
-
+You can find the contract [here](contracts/swapr.clar).
 
 ### `(add-to-position (x uint) (y uint))`
 Add x amount of the X token, and y amount of Y token by transfering from the sender.  Currently does not check that the exchange rate makes sense, so could lead to losses.  Eventually, you'll be able to specify `u0` for either `x` or `y` and the contract will calculate the proper amount to send to match the current exchange rate.
@@ -47,12 +59,33 @@ Returns `x`.
 Send the amount of Y token necessary to get back x of token X at current exchange rate, give or take slippage
 Returns `y`.
 
-See the contract for other available methods
+### `(get-position-of (owner principal))`  read-only
+Get the X and Y token positions for `owner`
 
-## Wrapr contract
-Additionally, a contract to wrap STX (a la WETH) is also included so people could create pairs against STX.  Unfortunately, as of writing this, there is no way to add STX to an address in the testing framework, so only minimal testing is provided.
+### `(get-positions)`  read-only
+Get the X and Y token for the contract, the sums of positions owned by all liquidity providers
 
-However, there is a scenario that shows how to use `wrapr` on a real node (testnet/mocknet for now) under test/integration
+### `(get-balances-of (owner principal))`  read-only
+Get the share of the pool owned by `owner`
+
+### `(get-balances)`  read-only
+Get the total of shares of the pool collectively owned by all liquidity providers
+
+### `(set-fee-to-address (address principal))`
+When set, the contract will collect a 5 basis point (bp) fee to benefit the contract operator.  `none` by default.
+
+### `(reset-fee-to-address)`
+Clear the contract fee addres
+
+### `(get-fee-to-address)`  read-only
+Get the current address used to collect a fee, if set
+
+### `(get-fees)`  read-only
+Get the amount of fees charged on x-token and y-token exchanges that have not been collected yet
+
+### `(collect-fees)`
+Send the collected fees the fee-to-address
+
 
 ## setup with mocknet
 
