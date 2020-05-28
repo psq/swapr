@@ -35,6 +35,7 @@ See the contract for other available methods
 ## Wrapr contract
 Additionally, a contract to wrap STX (a la WETH) is also included so people could create pairs against STX.  Unfortunately, as of writing this, there is no way to add STX to an address in the testing framework, so only minimal testing is provided.
 
+However, there is a scenario that shows how to use `wrapr` on a real node (testnet/mocknet for now) under test/integration
 
 ## setup with mocknet
 
@@ -93,21 +94,20 @@ again, using the proper addresses
 npm test
 ```
 
-### Runing the `wrapr` tests
+### Runing the `wrapr` integration tests using `@blockstack/stacks-transactions`
 
 ```
 npm wrapr
 ```
 
-### Runing the `swapr` tests
+### Runing the `swapr` integration tests using `@blockstack/stacks-transactions`
 
 ```
 npm swapr
 ```
 
 ## setup with sidecar
-TBD
-
+TBD, but definitely needed to run the integration tests
 
 
 
@@ -117,3 +117,5 @@ Solidity does not make it easy to implement `sqrt`, although the "egyptian" meth
 The current design of the Clarity traits makes it quite impractical to implement exchanging multiple pairs with single contracts, so a contract will need to be custom written (easy to automate) and deployed for each pair.
 
 I disagree with the formula showed in section 3.3.2 of the x-y-k paper (the `+ 1` should not be there), so unless someone can explain why it is there, I'm using my own formula, which re-calculated several times.  The modeling I did in a spreadsheet was clearly showing that with small numbers, the formula would be way off using the one from the x-y-k paper...  Story to be continued.
+
+Some web app would be nice, and should be next step
