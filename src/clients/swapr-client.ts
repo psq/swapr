@@ -164,15 +164,6 @@ export class SwaprClient extends Client {
     }
   }
 
-  async totalSupply(): Promise<number> {
-    const query = this.createQuery({
-      atChaintip: true,
-      method: { name: "get-total-supply", args: [] }
-    })
-    const res = await this.submitQuery(query)
-    return Result.unwrapUInt(res)
-  }
-
   async setFeeTo(address: string, params: { sender: string }): Promise<Receipt> {
     const tx = this.createTransaction({
       method: { name: "set-fee-to-address", args: [`'${address}`] }

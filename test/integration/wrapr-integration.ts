@@ -60,13 +60,13 @@ describe("wrapr scenario", async () => {
   })
 
   it("scenario #1", async () => {
-    const tx_wrap = await wraprTXClient.wrap(keys_alice, 100000)
+    const tx_wrap = await wraprTXClient.wrap(100000, { keys_sender: keys_alice })
     console.log("tx_wrap", JSON.stringify(tx_wrap, null, 2))
 
     const total_supply0 = await wraprTXClient.totalSupply({ keys_sender: keys_alice })
     console.log("total_supply", total_supply0.toString())
 
-    const tx_unwrap_alice = await wraprTXClient.unwrap(keys_alice, 20000)
+    const tx_unwrap_alice = await wraprTXClient.unwrap(20000, { keys_sender: keys_alice })
     console.log("tx_unwrap_alice", JSON.stringify(tx_unwrap_alice, null, 2))
 
     const total_supply1 = await wraprTXClient.totalSupply({ keys_sender: keys_alice })
@@ -81,7 +81,7 @@ describe("wrapr scenario", async () => {
     const tx_tranfer = await wraprTXClient.transfer(keys_alice, keys_bob, 50000)
     console.log("tx_tranfer", JSON.stringify(tx_tranfer, null, 2))
 
-    const tx_unwrap_bob = await wraprTXClient.unwrap(keys_bob, 20000)
+    const tx_unwrap_bob = await wraprTXClient.unwrap(20000, { keys_sender: keys_bob })
     console.log("tx_unwrap_bob", JSON.stringify(tx_unwrap_bob, null, 2))
 
     const balance_alice1_token = await wraprTXClient.balanceOf(keys_alice, { keys_sender: keys_alice })

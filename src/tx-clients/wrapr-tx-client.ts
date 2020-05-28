@@ -57,19 +57,19 @@ export class WraprTXClient {
     return tx
   }
 
-  async wrap(keys_sender, amount: number) {
-    console.log("wrap", keys_sender.stacksAddress, amount)
-    const fee = new BigNum(256);
+  async wrap( amount: number, params: { keys_sender: any }) {
+    console.log("wrap", params.keys_sender.stacksAddress, amount)
+    const fee = new BigNum(256)
     const transaction = await makeContractCall({
       contractAddress: this.keys.stacksAddress,
       contractName: this.contract_name,
       functionName: "wrap",
       functionArgs: [uintCV(amount)],
-      senderKey: keys_sender.secretKey,
+      senderKey: params.keys_sender.secretKey,
       network: this.network,
       postConditions: [
         makeStandardSTXPostCondition(
-          keys_sender.stacksAddress,
+          params.keys_sender.stacksAddress,
           FungibleConditionCode.Equal,
           new BigNum(amount)
         ),
@@ -84,15 +84,15 @@ export class WraprTXClient {
     return tx
   }
 
-  async unwrap(keys_sender, amount: number) {
-    console.log("unwrap", keys_sender.stacksAddress, amount)
-    const fee = new BigNum(256);
+  async unwrap(amount: number, params: { keys_sender: any }) {
+    console.log("unwrap", params.keys_sender.stacksAddress, amount)
+    const fee = new BigNum(256)
     const transaction = await makeContractCall({
       contractAddress: this.keys.stacksAddress,
       contractName: this.contract_name,
       functionName: "unwrap",
       functionArgs: [uintCV(amount)],
-      senderKey: keys_sender.secretKey,
+      senderKey: params.keys_sender.secretKey,
       network: this.network,
       postConditionMode: PostConditionMode.Allow,
       postConditions: [
@@ -112,15 +112,15 @@ export class WraprTXClient {
     return tx
   }
 
-  async transfer(keys_sender, key_recipient, amount: number) {
-    console.log("transfer", keys_sender.stacksAddress, key_recipient.stacksAddress, amount)
-    const fee = new BigNum(256);
+  async transfer(key_recipient, amount: number, params: { keys_sender: any }) {
+    console.log("transfer", keys_sender.stacksAddress, params.key_recipient.stacksAddress, amount)
+    const fee = new BigNum(256)
     const transaction = await makeContractCall({
       contractAddress: this.keys.stacksAddress,
       contractName: this.contract_name,
       functionName: "transfer",
       functionArgs: [standardPrincipalCV(key_recipient.stacksAddress), uintCV(amount)],
-      senderKey: keys_sender.secretKey,
+      senderKey: params.keys_sender.secretKey,
       network: this.network,
       postConditionMode: PostConditionMode.Allow,
       postConditions: [
@@ -170,6 +170,7 @@ export class WraprTXClient {
     }
   }
 
+  // read only
   async balanceOf(keys_owner, params: { keys_sender: any }) {
     console.log("balanceOf with sender", keys_owner.stacksAddress, params.keys_sender.stacksAddress)
     const function_name = "balance-of"
