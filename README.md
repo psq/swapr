@@ -10,7 +10,7 @@ The API has been reimagined, and hopefully simplified to its minima, withough im
 
 So that you can also exchange STX with other tokens, a separate contract, `wrapr`, is also included, and can be used on its own.  This contract will allow you to wrap STX into a fungible token, in a fashion similar to what `WETH` provides in the `ETH` world.
 
-__Important note:__ to run the integration tests, you need my custome version of Sidecar, see [instructions](https://github.com/psq/swapr#setup-with-sidecar) below.  This versions exposes the returned value from the transaction, which the current of version of Sidecar does not.
+__Important note:__ to run the integration tests, you need my custom version of Sidecar, see [instructions](https://github.com/psq/swapr#setup-with-sidecar) below.  This versions exposes the returned value from the transaction, which the current of version of Sidecar does not.
 
 ## Wrapr contract API
 
@@ -200,13 +200,23 @@ The test deploys 2 instances of the my-token contract to implement `token1` and 
 Check that balances match what is expected as contract calls are made.
 
 ## Setup with sidecar
-* Clone my custome version of [Sidecar repo](https://github.com/psq/stacks-blockchain-sidecar)
-* Switch to the `feature/raw_result` branch *don't miss this step*
+* Clone my custom version of [Sidecar repo](https://github.com/psq/stacks-blockchain-sidecar)
+* Switch to the `feature/raw_result` branch __don't miss this step__
 * Install the dependencies
 * As of this writing, the `dev:integrated` task will not work, so remove `npm run generate:schemas &&` from likne 8 of package.json
 * Then start Sidecar with
 ```
 npm run dev:integrated
+```
+
+or when using my feature branch, you can run `devenv:build` once:
+
+```
+npm run devenv:build
+```
+then run Sidecar with:
+```
+npm run dev:integrated:run
 ```
 
 ### Funding addresses with STX
