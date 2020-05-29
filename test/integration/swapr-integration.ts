@@ -87,50 +87,35 @@ describe("swapr scenario", async () => {
 
   it("scenario #1", async () => {
     const tx_wrap_alice = await wraprTXClient.wrap(800000, { keys_sender: keys_alice })
-    // console.log("tx_wrap_alice", JSON.stringify(tx_wrap_alice, null, 2))
     const tx_wrap_bob = await wraprTXClient.wrap(800000, { keys_sender: keys_bob })
-    // console.log("tx_wrap_bob", JSON.stringify(tx_wrap_bob, null, 2))
     const tx_wrap_zoe = await wraprTXClient.wrap(500000, { keys_sender: keys_zoe })
-    // console.log("tx_wrap_zoe", JSON.stringify(tx_wrap_zoe, null, 2))
 
     // check individual balances
     const balance_alice_wrapr_0 = await wraprTXClient.balanceOf(keys_alice, { keys_sender: keys_alice })
-    // console.log("balance_alice_wrapr_0", balance_alice_wrapr_0.toString())
     const balance_bob_wrapr_0 = await wraprTXClient.balanceOf(keys_bob, { keys_sender: keys_bob })
-    // console.log("balance_bob_wrapr_0", balance_bob_wrapr_0.toString())
     const balance_zoe_wrapr_0 = await wraprTXClient.balanceOf(keys_zoe, { keys_sender: keys_zoe })
-    // console.log("balance_zoe_wrapr_0", balance_zoe_wrapr_0.toString())
     assert.equal(balance_alice_wrapr_0.toString(), '800000')
     assert.equal(balance_bob_wrapr_0.toString(), '800000')
     assert.equal(balance_zoe_wrapr_0.toString(), '500000')
 
 
     const balance_alice_token1_0 = await token1TXClient.balanceOf(keys_alice, { keys_sender: keys_alice })
-    // console.log("balance_alice_token1_0", balance_alice_token1_0.toString())
     const balance_bob_token1_0 = await token1TXClient.balanceOf(keys_bob, { keys_sender: keys_bob })
-    // console.log("balance_bob_token1_0", balance_bob_token1_0.toString())
     const balance_zoe_token1_0 = await token1TXClient.balanceOf(keys_zoe, { keys_sender: keys_zoe })
-    // console.log("balance_zoe_token1_0", balance_zoe_token1_0.toString())
     assert.equal(balance_alice_token1_0.toString(), '2000000')
     assert.equal(balance_bob_token1_0.toString(), '1000000')
     assert.equal(balance_zoe_token1_0.toString(), '0')
 
     const balance_alice_token2_0 = await token2TXClient.balanceOf(keys_alice, { keys_sender: keys_alice })
-    // console.log("balance_alice_token2_0", balance_alice_token2_0.toString())
     const balance_bob_token2_0 = await token2TXClient.balanceOf(keys_bob, { keys_sender: keys_bob })
-    // console.log("balance_bob_token2_0", balance_bob_token2_0.toString())
     const balance_zoe_token2_0 = await token2TXClient.balanceOf(keys_zoe, { keys_sender: keys_zoe })
-    // console.log("balance_zoe_token2_0", balance_zoe_token2_0.toString())
     assert.equal(balance_alice_token2_0.toString(), '2000000')
     assert.equal(balance_bob_token2_0.toString(), '1000000')
     assert.equal(balance_zoe_token2_0.toString(), '0')
 
     const balance_alice_stx_0 = await stacksClient.STXBalance(keys_alice)
-    // console.log("balance_alice STX", balance_alice_stx_0.toString())
     const balance_bob_stx_0 = await stacksClient.STXBalance(keys_bob)
-    // console.log("balance_bob STX", balance_bob_stx_0.toString())
     const balance_zoe_stx_0 = await stacksClient.STXBalance(keys_zoe)
-    // console.log("balance_zoe STX", balance_zoe_stx_0.toString())
     assert.equal(balance_alice_stx_0.toString(), '199744')
     assert.equal(balance_bob_stx_0.toString(), '199744')
     assert.equal(balance_zoe_stx_0.toString(), '499744')
@@ -145,39 +130,30 @@ describe("swapr scenario", async () => {
 
     // alice funds wrapr-token1
     const tx_add_alice_0 = await swaprWraprToken1TXClient.addToPosition(500000, 1000000, { keys_sender: keys_alice })
-    // console.log("tx_add_alice_0", JSON.stringify(tx_add_alice_0, null, 2))  // TODO(psq): no point in logging anything as the rx result is not available yet
 
     // bob funds token1-token2
     const tx_add_bob_0 = await swaprToken1Token2TXClient.addToPosition(500000, 200000, { keys_sender: keys_bob })
-    // console.log("tx_add_bob_0", JSON.stringify(tx_add_bob_0, null, 2))  // TODO(psq): no point in logging anything as the rx result is not available yet
 
     // alice funds token1-token2
     const tx_add_alice_1 = await swaprToken1Token2TXClient.addToPosition(1000000, 400000, { keys_sender: keys_alice })
-    // console.log("tx_add_alice_1", JSON.stringify(tx_add_alice_1, null, 2))  // TODO(psq): no point in logging anything as the rx result is not available yet
 
     // check pool balances
     const wrapr_token1_balances_0 = await swaprWraprToken1TXClient.balances({ keys_sender: keys_alice })
-    // console.log("wrapr_token1_balances_0", wrapr_token1_balances_0[0].toString(), wrapr_token1_balances_0[1].toString())
     const token1_token2_balances_0 = await swaprToken1Token2TXClient.balances({ keys_sender: keys_alice })
-    // console.log("token1_token2_balances_0", token1_token2_balances_0[0].toString(), token1_token2_balances_0[1].toString())
     assert.equal(wrapr_token1_balances_0[0].toString(), '500000')
     assert.equal(wrapr_token1_balances_0[1].toString(), '1000000')
     assert.equal(token1_token2_balances_0[0].toString(), '1500000')
     assert.equal(token1_token2_balances_0[1].toString(), '600000')
 
     const wrapr_token1_alice_balances_0 = await swaprWraprToken1TXClient.balancesOf(keys_alice, { keys_sender: keys_alice })
-    // console.log("wrapr_token1_alice_balances_0", wrapr_token1_alice_balances_0[0].toString(), wrapr_token1_alice_balances_0[1].toString())
     const wrapr_token1_bob_balances_0 = await swaprWraprToken1TXClient.balancesOf(keys_bob, { keys_sender: keys_bob })
-    // console.log("wrapr_token1_bob_balances_0", wrapr_token1_bob_balances_0[0].toString(), wrapr_token1_bob_balances_0[1].toString())
     assert.equal(wrapr_token1_alice_balances_0[0].toString(), '500000')
     assert.equal(wrapr_token1_alice_balances_0[1].toString(), '1000000')
     assert.equal(wrapr_token1_bob_balances_0[0].toString(), '0')
     assert.equal(wrapr_token1_bob_balances_0[1].toString(), '0')
 
     const token1_token2_alice_balances_0 = await swaprToken1Token2TXClient.balancesOf(keys_alice, { keys_sender: keys_alice })
-    // console.log("token1_token2_alice_balances_0", token1_token2_alice_balances_0[0].toString(), token1_token2_alice_balances_0[1].toString())
     const token1_token2_bob_balances_0 = await swaprToken1Token2TXClient.balancesOf(keys_bob, { keys_sender: keys_bob })
-    // console.log("token1_token2_bob_balances_0", token1_token2_bob_balances_0[0].toString(), token1_token2_bob_balances_0[1].toString())
     assert.equal(token1_token2_alice_balances_0[0].toString(), '1000000')
     assert.equal(token1_token2_alice_balances_0[1].toString(), '400000')
     assert.equal(token1_token2_bob_balances_0[0].toString(), '500000')
@@ -226,58 +202,43 @@ describe("swapr scenario", async () => {
 
     // check individual balances
     const balance_alice_wrapr_1 = await wraprTXClient.balanceOf(keys_alice, { keys_sender: keys_alice })
-    // console.log("balance_alice_wrapr_1", balance_alice_wrapr_1.toString())
     const balance_bob_wrapr_1 = await wraprTXClient.balanceOf(keys_bob, { keys_sender: keys_bob })
-    // console.log("balance_bob_wrapr_1", balance_bob_wrapr_1.toString())
     const balance_zoe_wrapr_1 = await wraprTXClient.balanceOf(keys_zoe, { keys_sender: keys_zoe })
-    // console.log("balance_zoe_wrapr_1", balance_zoe_wrapr_1.toString())
     assert.equal(balance_alice_wrapr_1.toString(), '300000')
     assert.equal(balance_bob_wrapr_1.toString(), '784490')
     assert.equal(balance_zoe_wrapr_1.toString(), '471900')  // 471899?
 
     const balance_alice_token1_1 = await token1TXClient.balanceOf(keys_alice, { keys_sender: keys_alice })
-    // console.log("balance_alice_token1_1", balance_alice_token1_1.toString())
     const balance_bob_token1_1 = await token1TXClient.balanceOf(keys_bob, { keys_sender: keys_bob })
-    // console.log("balance_bob_token1_1", balance_bob_token1_1.toString())
     const balance_zoe_token1_1 = await token1TXClient.balanceOf(keys_zoe, { keys_sender: keys_zoe })
-    // console.log("balance_zoe_token1_1", balance_zoe_token1_1.toString())
     assert.equal(balance_alice_token1_1.toString(), '59827')
     assert.equal(balance_bob_token1_1.toString(), '530000')
     assert.equal(balance_zoe_token1_1.toString(), '0')
 
     const balance_alice_token2_1 = await token2TXClient.balanceOf(keys_alice, { keys_sender: keys_alice })
-    // console.log("balance_alice_token2_1", balance_alice_token2_1.toString())
     const balance_bob_token2_1 = await token2TXClient.balanceOf(keys_bob, { keys_sender: keys_bob })
-    // console.log("balance_bob_token2_1", balance_bob_token2_1.toString())
     const balance_zoe_token2_1 = await token2TXClient.balanceOf(keys_zoe, { keys_sender: keys_zoe })
-    // console.log("balance_zoe_token2_1", balance_zoe_token2_1.toString())
     assert.equal(balance_alice_token2_1.toString(), '1575000')
     assert.equal(balance_bob_token2_1.toString(), '800000')
     assert.equal(balance_zoe_token2_1.toString(), '20909')
 
     // check pool balances
     const wrapr_token1_balances_1 = await swaprWraprToken1TXClient.balances({ keys_sender: keys_alice })
-    // console.log("wrapr_token1_balances_1", wrapr_token1_balances_1[0].toString(), wrapr_token1_balances_1[1].toString())
     const token1_token2_balances_1 = await swaprToken1Token2TXClient.balances({ keys_sender: keys_alice })
-    // console.log("token1_token2_balances_1", token1_token2_balances_1[0].toString(), token1_token2_balances_1[1].toString())
     assert.equal(wrapr_token1_balances_1[0].toString(), '543589')
     assert.equal(wrapr_token1_balances_1[1].toString(), '920000')
     assert.equal(token1_token2_balances_1[0].toString(), '1490148')
     assert.equal(token1_token2_balances_1[1].toString(), '604079')
 
     const wrapr_token1_alice_balances_1 = await swaprWraprToken1TXClient.balancesOf(keys_alice, { keys_sender: keys_alice })
-    // console.log("wrapr_token1_alice_balances_1", wrapr_token1_alice_balances_1[0].toString(), wrapr_token1_alice_balances_1[1].toString())
     const wrapr_token1_bob_balances_1 = await swaprWraprToken1TXClient.balancesOf(keys_bob, { keys_sender: keys_bob })
-    // console.log("wrapr_token1_bob_balances_1", wrapr_token1_bob_balances_1[0].toString(), wrapr_token1_bob_balances_1[1].toString())
     assert.equal(wrapr_token1_alice_balances_1[0].toString(), '543589')
     assert.equal(wrapr_token1_alice_balances_1[1].toString(), '920000')
     assert.equal(wrapr_token1_bob_balances_1[0].toString(), '0')
     assert.equal(wrapr_token1_bob_balances_1[1].toString(), '0')
 
     const token1_token2_alice_balances_1 = await swaprToken1Token2TXClient.balancesOf(keys_alice, { keys_sender: keys_alice })
-    // console.log("token1_token2_alice_balances_1", token1_token2_alice_balances_1[0].toString(), token1_token2_alice_balances_1[1].toString())
     const token1_token2_bob_balances_1 = await swaprToken1Token2TXClient.balancesOf(keys_bob, { keys_sender: keys_bob })
-    // console.log("token1_token2_bob_balances_1", token1_token2_bob_balances_1[0].toString(), token1_token2_bob_balances_1[1].toString())
     assert.equal(token1_token2_alice_balances_1[0].toString(), '993432')
     assert.equal(token1_token2_alice_balances_1[1].toString(), '402719')
     assert.equal(token1_token2_bob_balances_1[0].toString(), '496716')
@@ -285,9 +246,7 @@ describe("swapr scenario", async () => {
 
     // check pool operator collected fees
     const token1_token2_fees_0 = await swaprToken1Token2TXClient.fees({ keys_sender: keys_zoe })
-    // console.log("token1_token2_fees_0", token1_token2_fees_0[0].toString(), token1_token2_fees_0[1].toString())
     const swapr_token1_fees_0 = await swaprWraprToken1TXClient.fees({ keys_sender: keys_zoe })
-    // console.log("swapr_token1_fees_0", swapr_token1_fees_0[0].toString(), swapr_token1_fees_0[1].toString())
     assert.equal(token1_token2_fees_0[0].toString(), '25')
     assert.equal(token1_token2_fees_0[1].toString(), '12')
     assert.equal(swapr_token1_fees_0[0].toString(), '21')
