@@ -1,4 +1,3 @@
-
 (impl-trait 'SP2TPZ623K5N2WYF1BWRMP5A93PSBWWADQGKJRJCS.token-transfer-trait.can-transfer-tokens)
 
 (define-data-var total-supply uint u0)

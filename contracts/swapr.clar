@@ -2,6 +2,7 @@
 ;;     'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token.can-transfer-tokens)
 ;; (use-trait y-token
 ;;     'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token.can-transfer-tokens)
+;; TODO(psq): traits still have some issues, so will enable later.  One of the issue was fixed on 5/28, but there may be others, so try the fix when available in new builds
 
 (define-constant contract-owner 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR)
 (define-constant no-liquidity-err (err u1))

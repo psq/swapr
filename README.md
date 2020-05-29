@@ -4,7 +4,7 @@ An exploration on how to implement an automated token exchange modeled after [Un
 
 Of special interest, reading the [x-y-k paper](https://github.com/runtimeverification/verified-smart-contracts/blob/uniswap/uniswap/x-y-k.pdf) and [V2 whitepaper](https://uniswap.org/whitepaper.pdf) would provide some background on understanding how things work (some things have been simplified, notably the initial burning of 1000 times the minimum pool share to prevent attacks right after the first addition to the liquidity pool).
 
-Basically, when doing an exchange, the contract will maintain the invariant `(amount of tokenx) * (amount of tokeny) = k`, or for short `x * y = k`, so when exchanging `dx` for `dy`, you need to also have `(x + dx) * (y - dy) = k`.  Of course if dx is close to x, the total liquidity available, the exchange rate will not be favorable.  Liquidity providers earn a small fee (25 to 30 basis point whether the operator takes a cut of 5 basis point or not).
+Basically, when doing an exchange, the contract will maintain the invariant `(amount of tokenx) * (amount of tokeny) = k`, or for short `x * y = k`, so when exchanging `dx` for `dy`, you need to also have `(x + dx) * (y - dy) = k`.  Of course if dx is close to x, the total liquidity available, the exchange rate will not be favorable.  Liquidity providers earn a small fee (25 to 30 basis points whether the operator takes a cut of 5 basis points or not).
 
 The API has been reimagined, and hopefully simplified to its minima, withough impeding on proper functioning of the trustless exchange.
 
@@ -19,7 +19,7 @@ You can find the contract [here](contracts/wrapr.clar).
 Wrap `amount` of STX from sender into a fungible-token (called "wrapr token") and transfer that token amount back to sender
 
 #### `(unwrap (amount uint))`
-Unwraps the STX tokens held for the sender in the wrapr token, and sends back `amount` of STX if below the amount held by sender
+Unwrap the STX tokens held for the sender in the wrapr token, and sends back `amount` of STX if below the amount held by sender
 
 #### `(transfer (recipient principal) (amount uint))`
 Transfer `amount` of `wrapr` token to `recipient`
@@ -43,22 +43,26 @@ You can find the contract [here](contracts/swapr.clar).
 Add x amount of the X token, and y amount of Y token by transfering from the sender.  Currently does not check that the exchange rate makes sense, so could lead to losses.  Eventually, you'll be able to specify `u0` for either `x` or `y` and the contract will calculate the proper amount to send to match the current exchange rate.
 
 #### `(reduce-position (percent uint))`
-Transfer back to the sender, up to 100% of what the sender owns.
+Transfer back proportional amount of token X and token Y to the sender based on the sender's share of the pool, up to 100% of what the sender owns.
 
 #### `(swap-exact-x-for-y (dx uint))`
 Send x of the X token, and gets back an amount of token Y based on current exchange rate, give or take slippage
+
 Returns `dy`.
 
 #### `(swap-x-for-exact-y (dy uint))`
 Send the amount of X token necessary to get back y of token Y at current exchange rate, give or take slippage
+
 Returns `dx`.
 
 #### `(swap-exact-y-for-x (dy uint))`
 Send y of the Y token, and gets back an amount of token X based on current exchange rate, give or take slippage
+
 Returns `dx`.
 
 #### `(swap-y-for-exact-x (dx uint))`
 Send the amount of Y token necessary to get back x of token X at current exchange rate, give or take slippage
+
 Returns `dy`.
 
 #### `(get-position-of (owner principal))`  read-only
@@ -105,7 +109,7 @@ cargo testnet start --config=./testnet/stacks-node/Stacks.toml
 cargo run --bin blockstack-cli generate-sk --testnet > keys-alice.json
 cargo run --bin blockstack-cli generate-sk --testnet > keys-bob.json
 cargo run --bin blockstack-cli generate-sk --testnet > keys-zoe.json
-...  # TODO(psq): add the contracts as well
+cargo run --bin blockstack-cli generate-sk --testnet > keys-contracts.json
 ```
 
 Then move the keys to the swapr folder
@@ -211,16 +215,19 @@ Note: you need to restart Sidecar each time you want to run the integration test
 
 
 ## Further thoughts
-Solidity does not make it easy to implement `sqrt`, although the "egyptian" method seems fine, however not having loops in Clarity makes it impractical to implement, so the contract uses the old method, but if the x pair is a lot less valuable than the y pair, rounding issues may occur.  Rahter, I would hope `sqrt` can be added as a prinitive to Clarity (see section 3.4 of the V2 whitepaper), at least the `isqrt` variant:
+Solidity does not make it easy to implement `sqrt`, although the "egyptian" method seems fine, however not having loops in Clarity makes it impractical to implement, so the contract uses the old method, but if the x pair is a lot less valuable than the y pair, rounding issues may occur.  Rather, I would hope `sqrt` can be added as a prinitive to Clarity (see section 3.4 of the V2 whitepaper), at least the `isqrt` variant:
 ```
 the integer square root (isqrt) of a positive integer n is the positive integer m which is the greatest integer less than or equal to the square root of n
 ```
 From the [Wikipedia](https://en.wikipedia.org/wiki/Integer_square_root) definition.
 
-The current design of the Clarity traits makes it quite impractical to implement exchanging multiple pairs with single contracts, so a contract will need to be custom written (easy to automate) and deployed for each pair.  However, there is ongoing work to make traits more usable.  However, to be able to use a single contract for all pairs, there would be a need to keep some reference to a trait so data can be stored.  The current implementation forbids to store any references to traits so that you can't call them later on (a valid concern), but maybe being able to keep a hash of a trait would make sense, so that hash can be used as a key into a map to store a pair's data.
+The current design of the Clarity traits makes it quite impractical to implement exchanging multiple pairs with a single contract, so a contract will need to be custom written (easy to automate) and deployed for each pair.  There is ongoing work to make traits more usable.  However, to be able to use a single contract for all pairs, there would be a need to keep some reference to a trait so data can be stored and retrieved.  The current implementation forbids to store any references to traits so that you can't call them later on (a valid concern), but maybe being able to keep a hash of a trait would make sense, so that hash can be used as a key into a map to store a pair's data.
 
-I disagree with the formula showed in section 3.3.2 of the x-y-k paper (the `+ 1` should not be there), so unless someone can explain why it is there, I'm using my own formula, which re-calculated several times.  The modeling I did in a spreadsheet was clearly showing that with small numbers, the formula would be way off using the one from the x-y-k paper...  Story to be continued.
+I disagree with the formula showed in section 3.3.2 of the x-y-k paper (the `+ 1` should not be there), so I'm using my own formula, which I re-calculated several times.  The modeling I did in a spreadsheet was clearly showing that with small numbers, the formula would be way off using the one from the x-y-k paper...  Story to be continued.
 
 The client codes feels very repetitive (whether for `clarity-js-sdk`, for `@blockstack/stacks-transactions`), and there is probably an opportunity to generate the client code from the contract itself, as the patterns used are pretty similar and only depend on the paramter/returnt type.
 
 Some web app would be nice, and should be next step.
+
+And finally, whether this contract ends up being valuable or not will depend on whether a healthy token ecosystem develops on Stacks 2.0 and there is a need to exchange tokens in a trustless manner.
+
