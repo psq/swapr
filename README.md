@@ -13,23 +13,23 @@ So that you can also exchange STX with other tokens, a separate contract, `wrapr
 
 You can find the contract [here](contracts/wrapr.clar).
 
-### `(wrap (amount uint))`
-Wrap `amount` of STX from sender into a fungible-token and transfer that token back to sender
+#### `(wrap (amount uint))`
+Wrap `amount` of STX from sender into a fungible-token (called "wrapr token") and transfer that token amount back to sender
 
-### `(unwrap (amount uint))`
-Unwraps the STX tokens held for the sender, and sends back `amount` of STX if below the amount held by sender
+#### `(unwrap (amount uint))`
+Unwraps the STX tokens held for the sender in the wrapr token, and sends back `amount` of STX if below the amount held by sender
 
-### `(transfer (recipient principal) (amount uint))`
+#### `(transfer (recipient principal) (amount uint))`
 Transfer `amount` of `wrapr` token to `recipient`
 
-### `(get-total-supply)`  read-only
+#### `(get-total-supply)`  read-only
 Get the total amount of STX currently wrapped by all
 
-### `(balance-of (owner principal))` read-only
-Get the balance of `wrapr` owned by `principal`
+#### `(balance-of (owner principal))` read-only
+Get the balance of `wrapr` owned by `owner`
 
 ## Wrapr contract notes
-Unfortunately, as of writing this, there is no way to add STX to an address in the testing framework, so only minimal testing is provided.
+Unfortunately, as of writing this, there is no way to add STX to an address in the testing framework used for unit testing, so only minimal testing is provided as part of the swapr unit tests
 
 However, there is a scenario that shows how to use `wrapr` on a real node (testnet/mocknet for now) under test/integration
 
@@ -37,53 +37,53 @@ However, there is a scenario that shows how to use `wrapr` on a real node (testn
 
 You can find the contract [here](contracts/swapr.clar).
 
-### `(add-to-position (x uint) (y uint))`
+#### `(add-to-position (x uint) (y uint))`
 Add x amount of the X token, and y amount of Y token by transfering from the sender.  Currently does not check that the exchange rate makes sense, so could lead to losses.  Eventually, you'll be able to specify `u0` for either `x` or `y` and the contract will calculate the proper amount to send to match the current exchange rate.
 
-### `(reduce-position (percent uint))`
+#### `(reduce-position (percent uint))`
 Transfer back to the sender, up to 100% of what the sender owns.
 
-### `(swap-exact-x-for-y (x uint))`
+#### `(swap-exact-x-for-y (dx uint))`
 Send x of the X token, and gets back an amount of token Y based on current exchange rate, give or take slippage
-Returns `y`.
+Returns `dy`.
 
-### `(swap-x-for-exact-y (y uint))`
+#### `(swap-x-for-exact-y (dy uint))`
 Send the amount of X token necessary to get back y of token Y at current exchange rate, give or take slippage
-Returns `x`.
+Returns `dx`.
 
-### `(swap-exact-y-for-x (y uint))`
+#### `(swap-exact-y-for-x (dy uint))`
 Send y of the Y token, and gets back an amount of token X based on current exchange rate, give or take slippage
-Returns `x`.
+Returns `dx`.
 
-### `(swap-y-for-exact-x (x uint))`
+#### `(swap-y-for-exact-x (dx uint))`
 Send the amount of Y token necessary to get back x of token X at current exchange rate, give or take slippage
-Returns `y`.
+Returns `dy`.
 
-### `(get-position-of (owner principal))`  read-only
+#### `(get-position-of (owner principal))`  read-only
 Get the X and Y token positions for `owner`
 
-### `(get-positions)`  read-only
+#### `(get-positions)`  read-only
 Get the X and Y token for the contract, the sums of positions owned by all liquidity providers
 
-### `(get-balances-of (owner principal))`  read-only
+#### `(get-balances-of (owner principal))`  read-only
 Get the share of the pool owned by `owner`
 
-### `(get-balances)`  read-only
+#### `(get-balances)`  read-only
 Get the total of shares of the pool collectively owned by all liquidity providers
 
-### `(set-fee-to-address (address principal))`
+#### `(set-fee-to-address (address principal))`
 When set, the contract will collect a 5 basis point (bp) fee to benefit the contract operator.  `none` by default.
 
-### `(reset-fee-to-address)`
+#### `(reset-fee-to-address)`
 Clear the contract fee addres
 
-### `(get-fee-to-address)`  read-only
+#### `(get-fee-to-address)`  read-only
 Get the current address used to collect a fee, if set
 
-### `(get-fees)`  read-only
+#### `(get-fees)`  read-only
 Get the amount of fees charged on x-token and y-token exchanges that have not been collected yet
 
-### `(collect-fees)`
+#### `(collect-fees)`
 Send the collected fees the fee-to-address
 
 
@@ -187,16 +187,16 @@ Sidecar is required for running the integration tests.
 Check that balances match what is expected as contract calls are made
 
 ## setup with sidecar
-Clone the [Sidecar repo](https://github.com/blockstack/stacks-blockchain-sidecar)
-Install the dependencies
-As of this writing, the `dev:integrated` task will not work, so remove `npm run generate:schemas &&` from likne 8 of package.json
-Then start Sidecar with
+* Clone the [Sidecar repo](https://github.com/blockstack/stacks-blockchain-sidecar)
+* Install the dependencies
+* As of this writing, the `dev:integrated` task will not work, so remove `npm run generate:schemas &&` from likne 8 of package.json
+* Then start Sidecar with
 ```
 npm run dev:integrated
 ```
 
 ### funding addresses with STX
-Edit the `Stacks-dev.toml` file, and as [above](#setup-stx-balances)
+Edit the `Stacks-dev.toml` [file](https://github.com/blockstack/stacks-blockchain-sidecar/blob/master/stacks-blockchain/Stacks-dev.toml), and setup STX balances as described [above](#setup-stx-balances)
 
 Restart Sidecar
 
