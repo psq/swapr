@@ -33,9 +33,7 @@
         ;; (ok true)
       )
       (begin
-        (print u10)
         (err false)
-        ;; (err u10)
       )
     )
   )
