@@ -1,11 +1,11 @@
 {
-  "name": "hello-clarity-sdk",
-  "version": "0.0.0",
+  "name": "swapr",
+  "version": "0.0.1",
   "author": {
-    "name": "Pascal",
+    "name": "Pascal Belloncle",
     "email": "psq@nanorails.com"
   },
-  "repository": "https://github.com/psq/hello-clarity-sdk.git",
+  "repository": "https://github.com/psq/swapr.git",
   "private": true,
   "engines": {
     "node": ">=10"
@@ -13,8 +13,7 @@
   "scripts": {
     "test": "mocha 'test/unit/*.ts'",
     "wrapr": "mocha 'test/integration/wrapr-integration.ts'",
-    "swapr": "mocha 'test/integration/swapr-integration.ts'",
-    "test:watch": "mocha --watch"
+    "swapr": "mocha 'test/integration/swapr-integration.ts'"
   },
   "devDependencies": {
     "@types/node": "^10",

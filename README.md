@@ -35,6 +35,8 @@ Unfortunately, as of writing this, there is no way to add STX to an address in t
 
 However, there is a scenario that shows how to use `wrapr` on a real node (testnet/mocknet for now) under test/integration
 
+2 Typescript clients are provided to make it easier to interact with the contracts, either via `@blockstack/clarity` or via `@blockstack/stacks-transactions`
+
 ## Swapr contract API
 
 You can find the contract [here](contracts/swapr.clar).
@@ -158,6 +160,24 @@ npm run wrapr
 Sidecar is required for running the integration tests. Sidecar is needed to check the state of the transaction.
 
 ### wrapr test scenario
+* Alice sends 100000 STX to wrap them, and receives 100000 wrapr tokens
+* Alice unwraps 20000 wrapr token, and receives 20000 STX back
+* Alice transfers 50000 wrapr tokens to Bob
+* Bob unwraps 20000 wrapr tokens and receives 20000 STX
+
+Check that balances match what is expected as contract calls are made.
+
+## Runing the `swapr` integration tests using `@blockstack/stacks-transactions`
+
+```
+npm run swapr
+```
+Sidecar is required for running the integration tests. Sidecar is needed to check the state of the transaction.
+
+### swapr test scenario
+
+The test deploys 2 instances of the my-token contract to implement `token1` and `token2`, 1 instance of the wrapr contract, and 2 instances of the swapr contract to implement 2 exchanges, `token1-token2` and `swapr-token1`.
+
 * Alice wraps 800000 STX
 * Bob wraps 800000 STX
 * Zoe wraps 500000 STX
@@ -175,25 +195,8 @@ Sidecar is required for running the integration tests. Sidecar is needed to chec
 * Zoe exchange swapr for 50000 token1
 * Zoe exchange 50000 token1 for token2
 
-Check that balances match what is expected as contract calls are made
 
-## Runing the `swapr` integration tests using `@blockstack/stacks-transactions`
-
-```
-npm run swapr
-```
-Sidecar is required for running the integration tests. Sidecar is needed to check the state of the transaction.
-
-### swapr test scenario
-
-The test deploys 2 instances of the my-token contract to implement token1 and token2, 1 instance of the wrapr contract, and 2 instances of the swapr contract to implement 2 exchanges, token1-token2 and swapr-token1.
-
-* Alice sends 100000 STX to wrap them, and receives 100000 wrapr tokens
-* Alice unwraps 20000 wrapr token, and receives 20000 STX back
-* Alice transfers 50000 wrapr tokens to Bob
-* Bob unwraps 20000 wrapr tokens and receives 20000 STX
-
-Check that balances match what is expected as contract calls are made
+Check that balances match what is expected as contract calls are made.
 
 ## Setup with sidecar
 * Clone the [Sidecar repo](https://github.com/blockstack/stacks-blockchain-sidecar)
@@ -211,11 +214,8 @@ Restart Sidecar
 
 Note: you need to restart Sidecar each time you want to run the integration tests, so that the contracts can be re-deployed.
 
-
-
-
 ## Further thoughts
-Solidity does not make it easy to implement `sqrt`, although the "egyptian" method seems fine, however not having loops in Clarity makes it impractical to implement, so the contract uses the old method, but if the x pair is a lot less valuable than the y pair, rounding issues may occur.  Rather, I would hope `sqrt` can be added as a prinitive to Clarity (see section 3.4 of the V2 whitepaper), at least the `isqrt` variant:
+Solidity does not make it easy to implement `sqrt`, although the "egyptian" method seems fine, however not having loops in Clarity makes it impractical to implement, so the contract uses the old method, but if the x pair is a lot less valuable than the y pair, rounding issues may be more prominent.  Rather, I would hope `sqrt` can be added as a prinitive to Clarity (see section 3.4 of the V2 whitepaper), at least the `isqrt` variant:
 ```
 the integer square root (isqrt) of a positive integer n is the positive integer m which is the greatest integer less than or equal to the square root of n
 ```
@@ -227,7 +227,7 @@ Sidecar does not include the return value from the contract, so you need to make
 
 I disagree with the formula showed in section 3.3.2 of the x-y-k paper (the `+ 1` should not be there), so I'm using my own formula, which I re-calculated several times.  The modeling I did in a spreadsheet was clearly showing that with small numbers, the formula would be way off using the one from the x-y-k paper...  Story to be continued.
 
-The client code feels very repetitive (whether for `clarity-js-sdk`, for `@blockstack/stacks-transactions`), and there is probably an opportunity to generate the client code from the contract itself, as the patterns used are pretty similar and only depend on the paramter/returnt type.
+The client code feels very repetitive (whether for `@blockstack/clarity`, for `@blockstack/stacks-transactions`), and there is probably an opportunity to generate the client code from the contract itself, as the patterns used are pretty similar and only depend on the paramter/returnt type.
 
 Some web app would be nice, and should be next step.
 
