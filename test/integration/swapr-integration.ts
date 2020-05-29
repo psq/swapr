@@ -5,6 +5,8 @@ import {
   makeContractCall,
   TransactionVersion,
   FungibleConditionCode,
+  ClarityValue,
+  ClarityType,
 
   serializeCV,
   deserializeCV,
@@ -29,6 +31,7 @@ const assert = chai.assert
 import {
   wait,
   waitForTX,
+  cvToString,
 } from '../../src/tx-utils'
 import { replaceKey } from '../../src/utils'
 
@@ -87,8 +90,19 @@ describe("swapr scenario", async () => {
 
   it("scenario #1", async () => {
     const tx_wrap_alice = await wraprTXClient.wrap(800000, { keys_sender: keys_alice })
+    console.log("tx_wrap_alice", cvToString(tx_wrap_alice))
+    assert.equal(tx_wrap_alice.list[0].value.toString(), '800000')  // wrapped value
+    assert.equal(tx_wrap_alice.list[1].value.toString(), '800000')  // total wrapped
+
     const tx_wrap_bob = await wraprTXClient.wrap(800000, { keys_sender: keys_bob })
+    console.log("tx_wrap_bob", cvToString(tx_wrap_bob))
+    assert.equal(tx_wrap_bob.list[0].value.toString(), '800000')
+    assert.equal(tx_wrap_bob.list[1].value.toString(), '1600000')
+
     const tx_wrap_zoe = await wraprTXClient.wrap(500000, { keys_sender: keys_zoe })
+    console.log("tx_wrap_zoe", cvToString(tx_wrap_zoe))
+    assert.equal(tx_wrap_zoe.list[0].value.toString(), '500000')
+    assert.equal(tx_wrap_zoe.list[1].value.toString(), '2100000')
 
     // check individual balances
     const balance_alice_wrapr_0 = await wraprTXClient.balanceOf(keys_alice, { keys_sender: keys_alice })
@@ -125,17 +139,23 @@ describe("swapr scenario", async () => {
     // 5 token1 for 2 token2
 
     // zoe is operating the pools and will get the 5bp fee while alice and bob will get 25bp
-    await swaprToken1Token2TXClient.setFeeTo(keys_zoe, { keys_sender: keys_zoe })
-    await swaprWraprToken1TXClient.setFeeTo(keys_zoe, { keys_sender: keys_zoe })
+    const token1_token2_set_fee = await swaprToken1Token2TXClient.setFeeTo(keys_zoe, { keys_sender: keys_zoe })
+    console.log("token1_token2_set_fee", cvToString(token1_token2_set_fee))
+
+    const swapr_token1_set_fee = await swaprWraprToken1TXClient.setFeeTo(keys_zoe, { keys_sender: keys_zoe })
+    console.log("swapr_token1_set_fee", cvToString(swapr_token1_set_fee))
 
     // alice funds wrapr-token1
     const tx_add_alice_0 = await swaprWraprToken1TXClient.addToPosition(500000, 1000000, { keys_sender: keys_alice })
+    console.log("tx_add_alice_0", cvToString(tx_add_alice_0))
 
     // bob funds token1-token2
     const tx_add_bob_0 = await swaprToken1Token2TXClient.addToPosition(500000, 200000, { keys_sender: keys_bob })
+    console.log("tx_add_bob_0", cvToString(tx_add_bob_0))
 
     // alice funds token1-token2
     const tx_add_alice_1 = await swaprToken1Token2TXClient.addToPosition(1000000, 400000, { keys_sender: keys_alice })
+    console.log("tx_add_alice_1", cvToString(tx_add_alice_1))
 
     // check pool balances
     const wrapr_token1_balances_0 = await swaprWraprToken1TXClient.balances({ keys_sender: keys_alice })
@@ -190,15 +210,26 @@ describe("swapr scenario", async () => {
 
     // alice exchanges token2 for token1
     const tx_swap_alice_0 = await swaprToken1Token2TXClient.swapExactYforX(25000, { keys_sender: keys_alice })
+    console.log("tx_swap_alice_0", cvToString(tx_swap_alice_0))
+    assert.equal(tx_swap_alice_0.list[0].value.toString(), '59827')
+    assert.equal(tx_swap_alice_0.list[1].value.toString(), '25000')
 
     // bob exchanges wrapr for token1
     const tx_swap_bob_0 = await swaprWraprToken1TXClient.swapXforExactY(30000, { keys_sender: keys_bob })
+    console.log("tx_swap_bob_0", cvToString(tx_swap_bob_0))
+    assert.equal(tx_swap_bob_0.list[0].value.toString(), '15510')
+    assert.equal(tx_swap_bob_0.list[1].value.toString(), '30000')
 
     // zoe exchanges wrapr for token1, then token1 for token2
     const tx_swap_zoe_0 = await swaprWraprToken1TXClient.swapXforExactY(50000, { keys_sender: keys_zoe })
-    // TODO(psq): unfortunately, can't get the results on how much these 500000 token1 did cost, except by checking zoe's token1 balance right after the transaction completes
+    console.log("tx_swap_zoe_0", cvToString(tx_swap_zoe_0))
+    assert.equal(tx_swap_zoe_0.list[0].value.toString(), '28100')
+    assert.equal(tx_swap_zoe_0.list[1].value.toString(), '50000')
+
     const tx_swap_zoe_1 = await swaprToken1Token2TXClient.swapExactXforY(50000, { keys_sender: keys_zoe })
-    // TODO(psq): same, we'll figure out how many
+    console.log("tx_swap_zoe_1", cvToString(tx_swap_zoe_1))
+    assert.equal(tx_swap_zoe_1.list[0].value.toString(), '50000')
+    assert.equal(tx_swap_zoe_1.list[1].value.toString(), '20909')
 
     // check individual balances
     const balance_alice_wrapr_1 = await wraprTXClient.balanceOf(keys_alice, { keys_sender: keys_alice })

@@ -29,6 +29,7 @@ const assert = chai.assert
 import {
   wait,
   waitForTX,
+  cvToString,
 } from '../../src/tx-utils'
 import { replaceKey } from '../../src/utils'
 

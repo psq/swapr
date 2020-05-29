@@ -1,3 +1,27 @@
+import {
+  makeSmartContractDeploy,
+  makeContractCall,
+  TransactionVersion,
+  FungibleConditionCode,
+  ClarityValue,
+  ClarityType,
+
+  serializeCV,
+  deserializeCV,
+  standardPrincipalCV,
+  uintCV,
+
+  BooleanCV,
+  PrincipalCV,
+  UIntCV,
+
+  ChainID,
+  makeStandardSTXPostCondition,
+  makeContractSTXPostCondition,
+  StacksTestnet,
+  broadcastTransaction,
+} from '@blockstack/stacks-transactions'
+
 export function wait(ms: number) {
   return new Promise((accept) => setTimeout(accept, ms))
 }
@@ -38,5 +62,44 @@ export async function waitForTX(base_url: string, tx_id: string, max_wait: numbe
     throw new Error(`did not return a value after ${max_Wait}`)
   } catch (e) {
     throw e
+  }
+}
+
+// TODO(psq): this is not exported from the top level of @blockstack/stacks-transactions, so remove when something equivalent is available
+export function cvToString(val: ClarityValue, encoding: 'tryAscii' | 'hex' = 'tryAscii'): string {
+  switch (val.type) {
+    case ClarityType.BoolTrue:
+      return 'true';
+    case ClarityType.BoolFalse:
+      return 'false';
+    case ClarityType.Int:
+      return val.value.fromTwos(CLARITY_INT_SIZE).toString();
+    case ClarityType.UInt:
+      return val.value.toString();
+    case ClarityType.Buffer:
+      if (encoding === 'tryAscii') {
+        const str = val.buffer.toString('ascii');
+        if (/[ -~]/.test(str)) {
+          return JSON.stringify(str);
+        }
+      }
+      return `0x${val.buffer.toString('hex')}`;
+    case ClarityType.OptionalNone:
+      return 'none';
+    case ClarityType.OptionalSome:
+      return `(some ${cvToString(val.value, encoding)})`;
+    case ClarityType.ResponseErr:
+      return `(err ${cvToString(val.value, encoding)})`;
+    case ClarityType.ResponseOk:
+      return `(ok ${cvToString(val.value, encoding)})`;
+    case ClarityType.PrincipalStandard:
+    case ClarityType.PrincipalContract:
+      return principalToString(val);
+    case ClarityType.List:
+      return `(list ${val.list.map(v => cvToString(v, encoding)).join(' ')})`;
+    case ClarityType.Tuple:
+      return `(tuple ${Object.keys(val.data)
+        .map(key => `(${key} ${cvToString(val.data[key], encoding)})`)
+        .join(' ')})`;
   }
 }

@@ -41,7 +41,7 @@ export class SwaprTXClient {
   }
 
   async deployContract(keys_owner: any) {
-    const fee = new BigNum(13681)
+    const fee = new BigNum(13950)
     const contract_swapr_body = replaceKey(
       replaceKey(
         replaceKey(fs.readFileSync('./contracts/swapr.clar').toString(),
@@ -66,7 +66,9 @@ export class SwaprTXClient {
     })
     const tx_id = await broadcastTransaction(transaction_deploy_trait, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
-    return tx
+
+    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex"))
+    return result
   }
 
   async addToPosition(x: number, y: number, params: { keys_sender: any }) {
@@ -94,7 +96,9 @@ export class SwaprTXClient {
     })
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
-    return tx
+
+    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as ListCV
+    return result
   }
 
   async reducePosition(percent: number, params: { keys_sender: any }) {
@@ -122,7 +126,9 @@ export class SwaprTXClient {
     })
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
-    return tx
+
+    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as ListCV
+    return result
   }
 
   async swapExactXforY(dx: number, params: { keys_sender: any }) {
@@ -150,7 +156,9 @@ export class SwaprTXClient {
     })
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
-    return tx
+
+    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as ListCV
+    return result
   }
 
   async swapXforExactY(dy: number, params: { keys_sender: any }) {
@@ -178,7 +186,9 @@ export class SwaprTXClient {
     })
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
-    return tx
+
+    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as ListCV
+    return result
   }
 
   async swapExactYforX(dy: number, params: { keys_sender: any }) {
@@ -206,7 +216,9 @@ export class SwaprTXClient {
     })
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
-    return tx
+
+    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as ListCV
+    return result
   }
 
   async swapYforExactX(dx: number, params: { keys_sender: any }) {
@@ -234,7 +246,9 @@ export class SwaprTXClient {
     })
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
-    return tx
+
+    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as ListCV
+    return result
   }
 
   // read only
@@ -411,7 +425,9 @@ export class SwaprTXClient {
     })
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
-    return tx
+
+    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as BooleanCV
+    return result
   }
 
   async resetFeeTo(params: { keys_sender: any }) {
@@ -439,7 +455,9 @@ export class SwaprTXClient {
     })
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
-    return tx
+
+    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as BooleanCV
+    return result
   }
 
   async collectFees(params: { keys_sender: any }) {
@@ -467,7 +485,9 @@ export class SwaprTXClient {
     })
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
-    return tx
+
+    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as ListCV
+    return result
   }
 
   // read only

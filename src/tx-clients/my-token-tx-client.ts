@@ -52,7 +52,9 @@ export class MyTokenTXClient {
     })
     const tx_id = await broadcastTransaction(transaction_deploy_trait, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
-    return tx
+
+    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex"))
+    return result
   }
 
   async transfer(recipient: string, amount: number, params: { sender: string }): Promise<Receipt> {
@@ -80,7 +82,9 @@ export class MyTokenTXClient {
     })
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
-    return tx
+
+    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex"))
+    return result
   }
 
   // read only
