@@ -146,13 +146,13 @@ Verify the balances with
 
 again, using the proper addresses
 
-## Runing the unit tests
+## Running the unit tests
 
 ```
 npm test
 ```
 
-## Runing the `wrapr` integration tests using `@blockstack/stacks-transactions`
+## Running the `wrapr` integration tests using `@blockstack/stacks-transactions`
 
 ```
 npm run wrapr
@@ -167,7 +167,7 @@ Sidecar is required for running the integration tests. Sidecar is needed to chec
 
 Check that balances match what is expected as contract calls are made.
 
-## Runing the `swapr` integration tests using `@blockstack/stacks-transactions`
+## Running the `swapr` integration tests using `@blockstack/stacks-transactions`
 
 ```
 npm run swapr
