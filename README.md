@@ -152,22 +152,22 @@ npm run wrapr
 Sidecar is required for running the integration tests.
 
 ### wrapr test scenario
-Alice wraps 800000 STX
-Bob wraps 800000 STX
-Zoe wraps 500000 STX
+* Alice wraps 800000 STX
+* Bob wraps 800000 STX
+* Zoe wraps 500000 STX
 
-Zoe calls setFeeTo on token1-token2 exchange contract to collect 5 basis point of the 30 basis point exchange fee
-Zoe calls setFeeTO on swapr-token1 exchange contract
+* Zoe calls setFeeTo on token1-token2 exchange contract to collect 5 basis point of the 30 basis point exchange fee
+* Zoe calls setFeeTO on swapr-token1 exchange contract
 
-Alice adds liquidity to swapr-token1 exchange 500000 swapr and 1000000 token1
-Alice adds liquidity to token1-token2 exchange 500000 token1 and 200000 token2
-Alice adds liquidity to token1-token2 exchange 1000000 token1 and 400000 token2
+* Alice adds liquidity to swapr-token1 exchange 500000 swapr and 1000000 token1
+* Alice adds liquidity to token1-token2 exchange 500000 token1 and 200000 token2
+* Alice adds liquidity to token1-token2 exchange 1000000 token1 and 400000 token2
 
-Alice exchanges token1 for 50000 token2
-Bob exchanges 30000 swapr for token1
+* Alice exchanges token1 for 50000 token2
+* Bob exchanges 30000 swapr for token1
 
-Zoe exchange swapr for 50000 token1
-Zoe exchange 50000 token1 for token2
+* Zoe exchange swapr for 50000 token1
+* Zoe exchange 50000 token1 for token2
 
 Check that balances match what is expected as contract calls are made
 
@@ -179,10 +179,10 @@ npm run swapr
 Sidecar is required for running the integration tests.
 
 ### swapr test scenario
-Alice sends 100000 STX to wrap them, and receives 100000 wrapr tokens
-Alice unwraps 20000 wrapr token, and receives 20000 STX back
-Alice transfers 50000 wrapr tokens to Bob
-Bob unwraps 20000 wrapr tokens and receives 20000 STX
+* Alice sends 100000 STX to wrap them, and receives 100000 wrapr tokens
+* Alice unwraps 20000 wrapr token, and receives 20000 STX back
+* Alice transfers 50000 wrapr tokens to Bob
+* Bob unwraps 20000 wrapr tokens and receives 20000 STX
 
 Check that balances match what is expected as contract calls are made
 
