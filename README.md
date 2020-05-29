@@ -179,6 +179,9 @@ npm run swapr
 Sidecar is required for running the integration tests.
 
 ### swapr test scenario
+
+The test deploys 2 instances of the my-token contract to implement token1 and token2, 1 instance of the wrapr contract, and 2 instances of the swapr contract to implement 2 exchanges, token1-token2 and swapr-token1.
+
 * Alice sends 100000 STX to wrap them, and receives 100000 wrapr tokens
 * Alice unwraps 20000 wrapr token, and receives 20000 STX back
 * Alice transfers 50000 wrapr tokens to Bob
