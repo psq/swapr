@@ -10,7 +10,7 @@ The API has been reimagined, and hopefully simplified to its minima, withough im
 
 So that you can also exchange STX with other tokens, a separate contract, `wrapr`, is also included, and can be used on its own.  This contract will allow you to wrap STX into a fungible token, in a fashion similar to what `WETH` provides in the `ETH` world.
 
-_Important note:_ to run the integration tests, you need my custome version of Sidecar, see [instructions](https://github.com/psq/swapr#setup-with-sidecar) below.  This versions exposes the returned value from the transaction, which the current of version of Sidecar does not.
+__Important note:__ to run the integration tests, you need my custome version of Sidecar, see [instructions](https://github.com/psq/swapr#setup-with-sidecar) below.  This versions exposes the returned value from the transaction, which the current of version of Sidecar does not.
 
 ## Wrapr contract API
 
