@@ -10,6 +10,7 @@ The API has been reimagined, and hopefully simplified to its minima, withough im
 
 So that you can also exchange STX with other tokens, a separate contract, `wrapr`, is also included, and can be used on its own.  This contract will allow you to wrap STX into a fungible token, in a fashion similar to what `WETH` provides in the `ETH` world.
 
+## *Important note:* to run the integration tests, you need my custome version of Sidecar, see [instructions](https://github.com/psq/swapr#setup-with-sidecar) below.  This versions exposes the returned value from the transaction, which the current of version of Sidecar does not.
 
 ## Wrapr contract API
 
@@ -157,7 +158,7 @@ npm test
 ```
 npm run wrapr
 ```
-Sidecar is required for running the integration tests. Sidecar is needed to check the state of the transaction.
+Sidecar is required for running the integration tests. Sidecar is needed to check the state of the transaction.  See [setup instructions](https://github.com/psq/swapr#setup-with-sidecar).
 
 ### wrapr test scenario
 * Alice sends 100000 STX to wrap them, and receives 100000 wrapr tokens
@@ -172,7 +173,7 @@ Check that balances match what is expected as contract calls are made.
 ```
 npm run swapr
 ```
-Sidecar is required for running the integration tests. Sidecar is needed to check the state of the transaction.
+Sidecar is required for running the integration tests. Sidecar is needed to check the state of the transaction.  See [setup instructions](https://github.com/psq/swapr#setup-with-sidecar).
 
 ### swapr test scenario
 
@@ -199,7 +200,8 @@ The test deploys 2 instances of the my-token contract to implement `token1` and 
 Check that balances match what is expected as contract calls are made.
 
 ## Setup with sidecar
-* Clone the [Sidecar repo](https://github.com/blockstack/stacks-blockchain-sidecar)
+* Clone my custome version of [Sidecar repo](https://github.com/psq/stacks-blockchain-sidecar)
+* Switch to the `feature/raw_result` branch *don't miss this step*
 * Install the dependencies
 * As of this writing, the `dev:integrated` task will not work, so remove `npm run generate:schemas &&` from likne 8 of package.json
 * Then start Sidecar with
