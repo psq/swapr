@@ -155,15 +155,15 @@ npm test
 ```
 npm run wrapr
 ```
-Sidecar is required for running the integration tests.
+Sidecar is required for running the integration tests. Sidecar is needed to check the state of the transaction.
 
 ### wrapr test scenario
 * Alice wraps 800000 STX
 * Bob wraps 800000 STX
 * Zoe wraps 500000 STX
 
-* Zoe calls setFeeTo on token1-token2 exchange contract to collect 5 basis point of the 30 basis point exchange fee
-* Zoe calls setFeeTO on swapr-token1 exchange contract
+* Zoe sets the fee address on token1-token2 exchange contract to collect 5 basis point of the 30 basis point exchange fee
+* Zoe sets the fee address on swapr-token1 exchange contract
 
 * Alice adds liquidity to swapr-token1 exchange 500000 swapr and 1000000 token1
 * Alice adds liquidity to token1-token2 exchange 500000 token1 and 200000 token2
@@ -182,7 +182,7 @@ Check that balances match what is expected as contract calls are made
 ```
 npm run swapr
 ```
-Sidecar is required for running the integration tests.
+Sidecar is required for running the integration tests. Sidecar is needed to check the state of the transaction.
 
 ### swapr test scenario
 
