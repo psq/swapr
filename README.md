@@ -147,25 +147,42 @@ npm test
 ### Runing the `wrapr` integration tests using `@blockstack/stacks-transactions`
 
 ```
-npm wrapr
+npm run wrapr
 ```
+Sidecar is required for running the integration tests.
+
 
 ### Runing the `swapr` integration tests using `@blockstack/stacks-transactions`
 
 ```
-npm swapr
+npm run swapr
 ```
+Sidecar is required for running the integration tests.
 
 ## setup with sidecar
-TBD, but definitely needed to run the integration tests
+Clone the [Sidecar repo](https://github.com/blockstack/stacks-blockchain-sidecar)
+Install the dependencies
+As of this writing, the `dev:integrated` task will not work, so remove `npm run generate:schemas &&` from likne 8 of package.json
+Then start Sidecar with
+```
+npm run dev:integrated
+```
+
+### funding addresses with STX
+Edit the `Stacks-dev.toml` file, and as [above](#setup-stx-balances)
+
+Restart Sidecar
+
+Note: you need to restart Sidecar each time you want to run the integration tests, so that the contracts can be re-deployed.
+
 
 
 
 ## Further thoughts
-Solidity does not make it easy to implement `sqrt`, although the "egyptian" method seems fine, however not having loops in Clarity makes it impractical to implement, so the contract uses the old method, but if the x pair is a lot less valuable than the y pair, rounding issues may occur.  Rahter, I would hope `sqrt` can be added as a prinitive to Clarity (see section 3.4 of the V2 whitepaper)
+Solidity does not make it easy to implement `sqrt`, although the "egyptian" method seems fine, however not having loops in Clarity makes it impractical to implement, so the contract uses the old method, but if the x pair is a lot less valuable than the y pair, rounding issues may occur.  Rahter, I would hope `sqrt` can be added as a prinitive to Clarity (see section 3.4 of the V2 whitepaper), at least the `isqrt`
 
 The current design of the Clarity traits makes it quite impractical to implement exchanging multiple pairs with single contracts, so a contract will need to be custom written (easy to automate) and deployed for each pair.
 
 I disagree with the formula showed in section 3.3.2 of the x-y-k paper (the `+ 1` should not be there), so unless someone can explain why it is there, I'm using my own formula, which re-calculated several times.  The modeling I did in a spreadsheet was clearly showing that with small numbers, the formula would be way off using the one from the x-y-k paper...  Story to be continued.
 
-Some web app would be nice, and should be next step
+Some web app would be nice, and should be next step.
