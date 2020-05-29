@@ -195,7 +195,7 @@ The test deploys 2 instances of the my-token contract to implement token1 and to
 
 Check that balances match what is expected as contract calls are made
 
-## setup with sidecar
+## Setup with sidecar
 * Clone the [Sidecar repo](https://github.com/blockstack/stacks-blockchain-sidecar)
 * Install the dependencies
 * As of this writing, the `dev:integrated` task will not work, so remove `npm run generate:schemas &&` from likne 8 of package.json
@@ -204,7 +204,7 @@ Check that balances match what is expected as contract calls are made
 npm run dev:integrated
 ```
 
-### funding addresses with STX
+### Funding addresses with STX
 Edit the `Stacks-dev.toml` [file](https://github.com/blockstack/stacks-blockchain-sidecar/blob/master/stacks-blockchain/Stacks-dev.toml), and setup STX balances as described [above](#setup-stx-balances)
 
 Restart Sidecar
@@ -223,9 +223,11 @@ From the [Wikipedia](https://en.wikipedia.org/wiki/Integer_square_root) definiti
 
 The current design of the Clarity traits makes it quite impractical to implement exchanging multiple pairs with a single contract, so a contract will need to be custom written (easy to automate) and deployed for each pair.  There is ongoing work to make traits more usable.  However, to be able to use a single contract for all pairs, there would be a need to keep some reference to a trait so data can be stored and retrieved.  The current implementation forbids to store any references to traits so that you can't call them later on (a valid concern), but maybe being able to keep a hash of a trait would make sense, so that hash can be used as a key into a map to store a pair's data.
 
+Sidecar does not include the return value from the contract, so you need to make extra calls to find out what happened, you can only tell whether the transaction succeeded and committed, and failed and nothing was committed.
+
 I disagree with the formula showed in section 3.3.2 of the x-y-k paper (the `+ 1` should not be there), so I'm using my own formula, which I re-calculated several times.  The modeling I did in a spreadsheet was clearly showing that with small numbers, the formula would be way off using the one from the x-y-k paper...  Story to be continued.
 
-The client codes feels very repetitive (whether for `clarity-js-sdk`, for `@blockstack/stacks-transactions`), and there is probably an opportunity to generate the client code from the contract itself, as the patterns used are pretty similar and only depend on the paramter/returnt type.
+The client code feels very repetitive (whether for `clarity-js-sdk`, for `@blockstack/stacks-transactions`), and there is probably an opportunity to generate the client code from the contract itself, as the patterns used are pretty similar and only depend on the paramter/returnt type.
 
 Some web app would be nice, and should be next step.
 
