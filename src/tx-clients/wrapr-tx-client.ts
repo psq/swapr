@@ -113,7 +113,7 @@ export class WraprTXClient {
   }
 
   async transfer(key_recipient, amount: number, params: { keys_sender: any }) {
-    console.log("transfer", keys_sender.stacksAddress, params.key_recipient.stacksAddress, amount)
+    console.log("transfer", key_recipient.stacksAddress, amount, params.keys_sender.stacksAddress)
     const fee = new BigNum(256)
     const transaction = await makeContractCall({
       contractAddress: this.keys.stacksAddress,

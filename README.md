@@ -138,26 +138,45 @@ Verify the balances with
 
 again, using the proper addresses
 
-### Runing the unit tests
+## Runing the unit tests
 
 ```
 npm test
 ```
 
-### Runing the `wrapr` integration tests using `@blockstack/stacks-transactions`
+## Runing the `wrapr` integration tests using `@blockstack/stacks-transactions`
 
 ```
 npm run wrapr
 ```
 Sidecar is required for running the integration tests.
 
+### Test scenario
 
-### Runing the `swapr` integration tests using `@blockstack/stacks-transactions`
+
+
+## Runing the `swapr` integration tests using `@blockstack/stacks-transactions`
 
 ```
 npm run swapr
 ```
 Sidecar is required for running the integration tests.
+
+### swapr test scenario
+Alice sends 100000 STX to wrap them, and receives 100000 wrapr tokens
+Check that the total supply is now 100000
+Alice unwraps 20000 wrapr token, and receives 20000 STX back
+Check that the total supply is now 80000
+Check that Alice wrapr balance is 80000
+Check that Bob wrapr balance is 0
+Alice transfers 50000 wrapr tokens to Bob
+Bob unwraps 20000 wrapr tokens and receives 20000 STX
+Check that Alice wrapr balance is
+Check that Alice STX balance is
+Check that Bob wrapr balance is
+Check that Bob STX balance is
+Check that the contract balance is xyz STX
+
 
 ## setup with sidecar
 Clone the [Sidecar repo](https://github.com/blockstack/stacks-blockchain-sidecar)
@@ -179,10 +198,16 @@ Note: you need to restart Sidecar each time you want to run the integration test
 
 
 ## Further thoughts
-Solidity does not make it easy to implement `sqrt`, although the "egyptian" method seems fine, however not having loops in Clarity makes it impractical to implement, so the contract uses the old method, but if the x pair is a lot less valuable than the y pair, rounding issues may occur.  Rahter, I would hope `sqrt` can be added as a prinitive to Clarity (see section 3.4 of the V2 whitepaper), at least the `isqrt`
+Solidity does not make it easy to implement `sqrt`, although the "egyptian" method seems fine, however not having loops in Clarity makes it impractical to implement, so the contract uses the old method, but if the x pair is a lot less valuable than the y pair, rounding issues may occur.  Rahter, I would hope `sqrt` can be added as a prinitive to Clarity (see section 3.4 of the V2 whitepaper), at least the `isqrt` variant:
+```
+the integer square root (isqrt) of a positive integer n is the positive integer m which is the greatest integer less than or equal to the square root of n
+```
+From the [Wikipedia](https://en.wikipedia.org/wiki/Integer_square_root) definition.
 
-The current design of the Clarity traits makes it quite impractical to implement exchanging multiple pairs with single contracts, so a contract will need to be custom written (easy to automate) and deployed for each pair.
+The current design of the Clarity traits makes it quite impractical to implement exchanging multiple pairs with single contracts, so a contract will need to be custom written (easy to automate) and deployed for each pair.  However, there is ongoing work to make traits more usable.  However, to be able to use a single contract for all pairs, there would be a need to keep some reference to a trait so data can be stored.  The current implementation forbids to store any references to traits so that you can't call them later on (a valid concern), but maybe being able to keep a hash of a trait would make sense, so that hash can be used as a key into a map to store a pair's data.
 
 I disagree with the formula showed in section 3.3.2 of the x-y-k paper (the `+ 1` should not be there), so unless someone can explain why it is there, I'm using my own formula, which re-calculated several times.  The modeling I did in a spreadsheet was clearly showing that with small numbers, the formula would be way off using the one from the x-y-k paper...  Story to be continued.
+
+The client codes feels very repetitive (whether for `clarity-js-sdk`, for `@blockstack/stacks-transactions`), and there is probably an opportunity to generate the client code from the contract itself, as the patterns used are pretty similar and only depend on the paramter/returnt type.
 
 Some web app would be nice, and should be next step.
