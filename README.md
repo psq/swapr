@@ -10,7 +10,17 @@ The API has been reimagined, and hopefully simplified to its minima, withough im
 
 So that you can also exchange STX with other tokens, a separate contract, `wrapr`, is also included, and can be used on its own.  This contract will allow you to wrap STX into a fungible token, in a fashion similar to what `WETH` provides in the `ETH` world.
 
-__Important note:__ to run the integration tests, you need my custom version of Sidecar, see [instructions](https://github.com/psq/swapr#setup-with-sidecar) below.  This versions exposes the returned value from the transaction, which the current of version of Sidecar does not.
+__Important note:__ to run the integration tests, you need my custom version of Sidecar, see [instructions](#setup-with-sidecar) below.  This versions exposes the returned value from the transaction, which the current of version of Sidecar does not.
+
+* [Swapr contract API](#wrapr-contract-api)
+* [Swapr contract API](#swapr-contract-api)
+* [Setup with mocknet](#setup-with-mocknet)
+* [Running the unit tests](#running-the-unit-tests)
+* [Running the wrapr integration tests using @blockstack/stacks-transactions](#running-the-wrapr-integration-tests-using-blockstackstacks-transactions)
+* [Running the swapr integration tests using @blockstack/stacks-transactions](#running-the-swapr-integration-tests-using-blockstackstacks-transactions)
+* [Using the clients from an app](#using-the-clients-from-an-app)
+* [Setup with sidecar](#setup-with-sidecar)
+* [Further thoughts](#further-thoughts)
 
 ## Wrapr contract API
 
@@ -31,7 +41,7 @@ Get the total amount of STX currently wrapped by all
 #### `(balance-of (owner principal))` read-only
 Get the balance of `wrapr` owned by `owner`
 
-## Wrapr contract notes
+### Wrapr contract notes
 Unfortunately, as of writing this, there is no way to add STX to an address in the testing framework used for unit testing, so only minimal testing is provided as part of the swapr unit tests
 
 However, there is a scenario that shows how to use `wrapr` on a real node (testnet/mocknet for now) under test/integration
@@ -96,7 +106,7 @@ Get the amount of fees charged on x-token and y-token exchanges that have not be
 Send the collected fees the fee-to-address
 
 
-## setup with mocknet
+## Setup with mocknet
 
 ### setup mocknet with lastest from master
 
@@ -158,7 +168,7 @@ npm test
 ```
 npm run wrapr
 ```
-Sidecar is required for running the integration tests. Sidecar is needed to check the state of the transaction.  See [setup instructions](https://github.com/psq/swapr#setup-with-sidecar).
+Sidecar is required for running the integration tests. Sidecar is needed to check the state of the transaction.  See [setup instructions](#setup-with-sidecar).
 
 ### wrapr test scenario
 * Alice sends 100000 STX to wrap them, and receives 100000 wrapr tokens
@@ -173,7 +183,7 @@ Check that balances match what is expected as contract calls are made.
 ```
 npm run swapr
 ```
-Sidecar is required for running the integration tests. Sidecar is needed to check the state of the transaction.  See [setup instructions](https://github.com/psq/swapr#setup-with-sidecar).
+Sidecar is required for running the integration tests. Sidecar is needed to check the state of the transaction.  See [setup instructions](#setup-with-sidecar).
 
 ### swapr test scenario
 
@@ -196,8 +206,10 @@ The test deploys 2 instances of the my-token contract to implement `token1` and 
 * Zoe exchange swapr for 50000 token1
 * Zoe exchange 50000 token1 for token2
 
-
 Check that balances match what is expected as contract calls are made.
+
+## Using the clients from an app
+TBD
 
 ## Setup with sidecar
 * Clone my custom version of [Sidecar repo](https://github.com/psq/stacks-blockchain-sidecar)
