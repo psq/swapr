@@ -224,8 +224,13 @@ The `wrapr` and `swapr` clients under `src/tx-clients` can be use to interact wi
 
 Then you can call the `wrap` function like so
 ```
-  const tx_wrap_result = await wraprTXClient.wrap(2000000, { keys_sender: { stackAddress: 'STF4HK0PN8S7B8CBN564KY6VAH5D0P2J8WDGEZAH' } })
-  const result = tx_wrap_alice.list[0].value  // as per the contract, the return value is a `(list amount total-supply)` returned as `ClarityValue`
+  const tx_wrap_result = await wraprTXClient.wrap(
+  	2000000,
+  	{ keys_sender: { stackAddress: 'STF4HK0PN8S7B8CBN564KY6VAH5D0P2J8WDGEZAH' } }
+  )
+
+  // as per the contract, the return value is a `(list amount total-supply)` returned as `ClarityValue`
+  const result = tx_wrap_alice.list[0].value
   console.log(result.toString())  // displays the `BigNum` value for `amount`
 
 ```
