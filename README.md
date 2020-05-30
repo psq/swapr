@@ -231,7 +231,9 @@ Then you can call the `wrap` function like so
 
   // as per the contract, the return value is a `(list amount total-supply)` returned as `ClarityValue`
   const result = tx_wrap_alice.list[0].value
-  console.log(result.toString())  // displays the `BigNum` value for `amount`
+
+  // displays the `BigNum` value for `amount`
+  console.log(result.toString())
 
 ```
 
