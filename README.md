@@ -216,7 +216,7 @@ The `wrapr` and `swapr` clients under `src/tx-clients` can be use to interact wi
   import { WraprTXClient } from 'swapr'
 
   const network = new StacksTestnet()
-  network.coreApiUrl = STACKS_API_URL  // a Sidecar server URL where the contract is deployed
+  network.coreApiUrl = STACKS_API_URL  // a Sidecar server URL that is connected to a stacks node connected to a network where the contracts are deployed
 
   const wraprTXClient = new WraprTXClient({ stackAddress: 'ST32N7A3G9P7J0VZ2JCJCG5DMB1TDWY8Q08KQ3B99' }, network)
 
