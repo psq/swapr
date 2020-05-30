@@ -12,7 +12,7 @@ import {
   uintCV,
 
   BooleanCV,
-  PrincipalCV,
+  // PrincipalCV,
   UIntCV,
 
   ChainID,
@@ -20,6 +20,9 @@ import {
   makeContractSTXPostCondition,
   StacksTestnet,
   broadcastTransaction,
+  CLARITY_INT_SIZE,
+  addressToString,
+
 } from '@blockstack/stacks-transactions'
 
 export function wait(ms: number) {
@@ -59,13 +62,28 @@ export async function waitForTX(base_url: string, tx_id: string, max_wait: numbe
         throw new Error(`Request failed with ${response.status} ${response.statusText}`)
       }
     }
-    throw new Error(`did not return a value after ${max_Wait}`)
+    throw new Error(`did not return a value after ${max_wait}`)
   } catch (e) {
     throw e
   }
 }
 
 // TODO(psq): this is not exported from the top level of @blockstack/stacks-transactions, so remove when something equivalent is available
+// export function addressToString(address: Address): string {
+//   return c32address(address.version, address.hash160).toString();
+// }
+
+function principalToString(principal: any): string {
+  if (principal.type === ClarityType.PrincipalStandard) {
+    return addressToString(principal.address);
+  } else if (principal.type === ClarityType.PrincipalContract) {
+    const address = addressToString(principal.address);
+    return `${address}.${principal.contractName.content}`;
+  } else {
+    throw new Error(`Unexpected principal data: ${JSON.stringify(principal)}`);
+  }
+}
+
 export function cvToString(val: ClarityValue, encoding: 'tryAscii' | 'hex' = 'tryAscii'): string {
   switch (val.type) {
     case ClarityType.BoolTrue:

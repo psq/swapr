@@ -1,3 +1,11 @@
+import {
+  ClarityParseError,
+  NoLiquidityError,
+  NotOwnerError,
+  NotOKErr,
+  NotSomeErr,
+} from './errors'
+
 export function parse(value: string) {
   let index = 0
   function sub() {
@@ -5,6 +13,7 @@ export function parse(value: string) {
     let current = index
     function saveKeyword() {
       if (index - 1 > current) {
+        // @ts-ignore
         keywords.push(value.slice(current, index - 1))
       }
     }
@@ -12,6 +21,7 @@ export function parse(value: string) {
       const c = value[index++]
       // console.log("c", c, index)
       if (c === '(') {
+        // @ts-ignore
         keywords.push(sub())
         current = index
       } else if (c === ')') {
@@ -28,7 +38,7 @@ export function parse(value: string) {
   return sub()[0]
 }
 
-export function unwrapXYList(tree: Array) {
+export function unwrapXYList(tree: any) {
   // console.log("unwrapXYList", tree)
   return {
     x: parseInt(tree[0].substring(1)),
@@ -36,7 +46,7 @@ export function unwrapXYList(tree: Array) {
   }
 }
 
-export function unwrapSome(tree: Array) {
+export function unwrapSome(tree: any): any {
   // console.log("unwrapSome", tree)
   if (tree[0] === 'some') {
     return tree[1]

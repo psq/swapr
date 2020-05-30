@@ -1,6 +1,8 @@
 const BigNum = require('bn.js')
 
 export class StacksClient {
+  network: any
+
   constructor(network) {
     this.network = network
   }

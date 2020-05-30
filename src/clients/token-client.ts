@@ -19,7 +19,7 @@ export class TokenClient extends Client {
     )
   }
 
-  async transfer(recipient: string, amount: number, params: { sender: string }): Promise<Receipt> {
+  async transfer(recipient: string, amount: number, params: { sender: string }): Promise<boolean> {
     const tx = this.createTransaction({
       method: { name: "transfer", args: [`'${recipient}`, `u${amount}`] }
     })

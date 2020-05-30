@@ -6,11 +6,14 @@
     "email": "psq@nanorails.com"
   },
   "repository": "https://github.com/psq/swapr.git",
-  "private": true,
+  "private": false,
+  "main": "lib/index",
+  "license": "MIT",
   "engines": {
     "node": ">=10"
   },
   "scripts": {
+    "build": "rimraf ./lib && tsc",
     "test": "mocha 'test/unit/*.ts'",
     "wrapr": "mocha 'test/integration/wrapr-integration.ts'",
     "swapr": "mocha 'test/integration/swapr-integration.ts'"
@@ -23,7 +26,8 @@
     "@types/chai": "^4.1.7",
     "mocha": "^6.1.4",
     "chai-string": "^1.5.0",
-    "@types/mocha": "^5.2.7"
+    "@types/mocha": "^5.2.7",
+    "rimraf": "^3.0.2"
   },
   "dependencies": {
     "@blockstack/clarity": "^0.1.16",

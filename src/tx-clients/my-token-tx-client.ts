@@ -1,10 +1,12 @@
 const BigNum = require('bn.js')
-import fs from 'fs'
+// @ts-ignore
+import { readFileSync } from 'fs'
 import {
   makeSmartContractDeploy,
   makeContractCall,
   TransactionVersion,
   FungibleConditionCode,
+  ClarityValue,
 
   serializeCV,
   deserializeCV,
@@ -12,7 +14,7 @@ import {
   uintCV,
 
   BooleanCV,
-  PrincipalCV,
+  // PrincipalCV,
   UIntCV,
 
   ChainID,
@@ -20,6 +22,8 @@ import {
   makeContractSTXPostCondition,
   StacksTestnet,
   broadcastTransaction,
+
+  PostConditionMode,
 } from '@blockstack/stacks-transactions'
 
 import {
@@ -31,6 +35,10 @@ import { replaceKey } from '../utils'
 
 
 export class MyTokenTXClient {
+  keys: any
+  network: any
+  contract_name: string
+
   constructor(contract_name, keys, network) {
     this.keys = keys
     this.network = network
@@ -39,7 +47,7 @@ export class MyTokenTXClient {
 
   async deployContract() {
     const fee = new BigNum(5380)
-    const contract_swapr_body = replaceKey(fs.readFileSync('./contracts/my-token.clar').toString(), 'SP2TPZ623K5N2WYF1BWRMP5A93PSBWWADQGKJRJCS', this.keys.stacksAddress)
+    const contract_swapr_body = replaceKey(readFileSync('./contracts/my-token.clar').toString(), 'SP2TPZ623K5N2WYF1BWRMP5A93PSBWWADQGKJRJCS', this.keys.stacksAddress)
 
     console.log(`deploying ${this.contract_name} contract`)
     const transaction_deploy_trait = await makeSmartContractDeploy({
@@ -57,14 +65,14 @@ export class MyTokenTXClient {
     return result
   }
 
-  async transfer(recipient: string, amount: number, params: { sender: string }): Promise<Receipt> {
-    console.log("transfer", params.keys_sender.stacksAddress, address)
+  async transfer(keys_recipient: any, amount: number, params: { keys_sender: any }): Promise<ClarityValue> {
+    console.log("transfer", params.keys_sender.stacksAddress, keys_recipient.stacksAddress)
     const fee = new BigNum(256)
     const transaction = await makeContractCall({
       contractAddress: this.keys.stacksAddress,
       contractName: this.contract_name,
       functionName: "transfer",
-      functionArgs: [standardPrincipalCV(address), UIntCV(amount)],
+      functionArgs: [standardPrincipalCV(keys_recipient.stacksAddress), uintCV(amount)],
       senderKey: params.keys_sender.secretKey,
       network: this.network,
       postConditionMode: PostConditionMode.Allow,
@@ -88,7 +96,7 @@ export class MyTokenTXClient {
   }
 
   // read only
-  async balanceOf(keys_owner, params: { keys_sender: any }) {
+  async balanceOf(keys_owner: any, params: { keys_sender: any }) {
     console.log("balanceOf with sender", keys_owner.stacksAddress, params.keys_sender.stacksAddress)
     const function_name = "balance-of"
 
@@ -109,6 +117,7 @@ export class MyTokenTXClient {
         const result_value = deserializeCV(Buffer.from(result.result.substr(2), "hex"))
         const result_data = result_value as UIntCV
         // console.log(function_name, result_data.value.value.toString())
+        // @ts-ignore
         return result_data.value.value
       } else {
         console.log(result)

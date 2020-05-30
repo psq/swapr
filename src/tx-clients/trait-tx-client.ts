@@ -1,5 +1,5 @@
 const BigNum = require('bn.js')
-import fs from 'fs'
+import { readFileSync } from 'fs'
 import {
   makeSmartContractDeploy,
   makeContractCall,
@@ -12,7 +12,7 @@ import {
   uintCV,
 
   BooleanCV,
-  PrincipalCV,
+  // PrincipalCV,
   UIntCV,
 
   ChainID,
@@ -31,6 +31,10 @@ import { replaceKey } from '../utils'
 
 
 export class TraitTXClient {
+  keys: any
+  network: any
+  contract_name: string
+
   constructor(keys, network) {
     this.keys = keys
     this.network = network
@@ -39,7 +43,7 @@ export class TraitTXClient {
 
 	async deployContract() {
 	  const fee = new BigNum(2154)
-    const contract_trait_body = fs.readFileSync('./contracts/token-transfer-trait.clar').toString()
+    const contract_trait_body = readFileSync('./contracts/token-transfer-trait.clar').toString()
 
 	  console.log("deploying trait contract")
 	  const transaction_deploy_trait = await makeSmartContractDeploy({

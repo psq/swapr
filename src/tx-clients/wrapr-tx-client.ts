@@ -1,5 +1,5 @@
 const BigNum = require('bn.js')
-import fs from 'fs'
+import { readFileSync } from 'fs'
 import {
   makeSmartContractDeploy,
   makeContractCall,
@@ -12,7 +12,7 @@ import {
   uintCV,
 
   BooleanCV,
-  PrincipalCV,
+  // PrincipalCV,
   UIntCV,
 
   ChainID,
@@ -33,6 +33,10 @@ import { replaceKey } from '../utils'
 
 
 export class WraprTXClient {
+  keys: any
+  network: any
+  contract_name: string
+
   constructor(keys, network) {
     this.keys = keys
     this.network = network
@@ -41,7 +45,7 @@ export class WraprTXClient {
 
   async deployContract() {
     const fee = new BigNum(2555)
-    const contract_wrapr_body = replaceKey(fs.readFileSync('./contracts/wrapr.clar').toString(), 'SP2TPZ623K5N2WYF1BWRMP5A93PSBWWADQGKJRJCS', this.keys.stacksAddress)
+    const contract_wrapr_body = replaceKey(readFileSync('./contracts/wrapr.clar').toString(), 'SP2TPZ623K5N2WYF1BWRMP5A93PSBWWADQGKJRJCS', this.keys.stacksAddress)
 
     console.log("deploying wrapr contract")
     const transaction_deploy_trait = await makeSmartContractDeploy({
@@ -167,6 +171,7 @@ export class WraprTXClient {
         const result_value = deserializeCV(Buffer.from(result.result.substr(2), "hex"))
         const result_data = result_value as UIntCV
         // console.log(function_name, result_data.value.value.toString())
+        // @ts-ignore
         return result_data.value.value
       } else {
         console.log(result)
@@ -200,6 +205,7 @@ export class WraprTXClient {
         const result_value = deserializeCV(Buffer.from(result.result.substr(2), "hex"))
         const result_data = result_value as UIntCV
         // console.log(function_name, result_data.value.value.toString())
+        // @ts-ignore
         return result_data.value.value
       } else {
         console.log(result)

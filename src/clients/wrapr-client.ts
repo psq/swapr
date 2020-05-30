@@ -19,7 +19,7 @@ export class WraprClient extends Client {
     );
   }
 
-  async wrap(amount: number, params: { sender: string }): Promise<Receipt> {
+  async wrap(amount: number, params: { sender: string }): Promise<boolean> {
     const tx = this.createTransaction({
       method: { name: "wrap", args: [`u${amount}`] }
     });
@@ -33,7 +33,7 @@ export class WraprClient extends Client {
     throw new TransferError()
   }
 
-  async unwrap(amount: number, params: { sender: string }): Promise<Receipt> {
+  async unwrap(amount: number, params: { sender: string }): Promise<boolean> {
     const tx = this.createTransaction({
       method: { name: "unwrap", args: [`u${amount}`] }
     })
@@ -47,7 +47,7 @@ export class WraprClient extends Client {
     throw new TransferError()
   }
 
-  async transfer(recipient: string, amount: number, params: { sender: string }): Promise<Receipt> {
+  async transfer(recipient: string, amount: number, params: { sender: string }): Promise<boolean> {
     const tx = this.createTransaction({
       method: { name: "transfer", args: [`'${recipient}`, `u${amount}`] }
     })

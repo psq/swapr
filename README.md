@@ -209,7 +209,26 @@ The test deploys 2 instances of the my-token contract to implement `token1` and 
 Check that balances match what is expected as contract calls are made.
 
 ## Using the clients from an app
-TBD
+The `wrapr` and `swapr` clients under `src/tx-clients` can be use to interact with the contracts.  You would just skip the deploy step and only need to provide the `stackAddress` in the keys object
+
+```
+  import { StacksTestnet } from '@blockstack/stacks-transactions'
+  import { WraprTXClient } from 'swapr'
+
+  const network = new StacksTestnet()
+  network.coreApiUrl = STACKS_API_URL  // a Sidecar server URL where the contract is deployed
+
+  const wraprTXClient = new WraprTXClient({ stackAddress: 'ST32N7A3G9P7J0VZ2JCJCG5DMB1TDWY8Q08KQ3B99' }, network)
+
+```
+
+Then you can call the `wrap` function like so
+```
+  const tx_wrap_result = await wraprTXClient.wrap(2000000, { keys_sender: { stackAddress: 'STF4HK0PN8S7B8CBN564KY6VAH5D0P2J8WDGEZAH' } })
+  const result = tx_wrap_alice.list[0].value  // as per the contract, the return value is a `(list amount total-supply)` returned as `ClarityValue`
+  console.log(result.toString())  // displays the `BigNum` value for `amount`
+
+```
 
 ## Setup with sidecar
 * Clone my custom version of [Sidecar repo](https://github.com/psq/stacks-blockchain-sidecar)

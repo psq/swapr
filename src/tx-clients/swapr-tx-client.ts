@@ -1,5 +1,5 @@
 const BigNum = require('bn.js')
-import fs from 'fs'
+import { readFileSync } from 'fs'
 import {
   makeSmartContractDeploy,
   makeContractCall,
@@ -13,6 +13,7 @@ import {
 
   BooleanCV,
   ListCV,
+  // @ts-ignore
   PrincipalCV,
   UIntCV,
 
@@ -32,6 +33,12 @@ import {
 import { replaceKey } from '../utils'
 
 export class SwaprTXClient {
+  keys: any
+  network: any
+  contract_name: string
+  token1: string
+  token2: string
+
   constructor(token1, token2, keys, network) {
     this.keys = keys
     this.network = network
@@ -44,7 +51,7 @@ export class SwaprTXClient {
     const fee = new BigNum(13950)
     const contract_swapr_body = replaceKey(
       replaceKey(
-        replaceKey(fs.readFileSync('./contracts/swapr.clar').toString(),
+        replaceKey(readFileSync('./contracts/swapr.clar').toString(),
           'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token',
           `${this.keys.stacksAddress}.${this.token1}`),
         'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token',
@@ -252,7 +259,7 @@ export class SwaprTXClient {
   }
 
   // read only
-  async positionOf(keys_owner: string, params: { keys_sender: any }) {
+  async positionOf(keys_owner: any, params: { keys_sender: any }) {
     console.log("balanceOf with sender", keys_owner.stacksAddress, params.keys_sender.stacksAddress)
     const function_name = "get-position-of"
 
@@ -273,6 +280,7 @@ export class SwaprTXClient {
         const result_value = deserializeCV(Buffer.from(result.result.substr(2), "hex"))
         const result_data = result_value as UIntCV
         console.log(function_name, result_data)
+        // @ts-ignore
         return result_data.value.value
       } else {
         console.log(result)
@@ -302,6 +310,7 @@ export class SwaprTXClient {
         const result_value = deserializeCV(Buffer.from(result.result.substr(2), "hex"))
         const result_data = result_value as ListCV
         // console.log(function_name, result_data)
+        // @ts-ignore
         return [result_data.value.list[0].value, result_data.value.list[1].value]
       } else {
         console.log(result)
@@ -331,6 +340,7 @@ export class SwaprTXClient {
         const result_value = deserializeCV(Buffer.from(result.result.substr(2), "hex"))
         const result_data = result_value as UIntCV
         console.log(function_name, result_data)
+        // @ts-ignore
         return result_data.value.value
       } else {
         console.log(result)
@@ -341,7 +351,7 @@ export class SwaprTXClient {
   }
 
   // read only
-  async balancesOf(keys_owner: string, params: { keys_sender: any }) {
+  async balancesOf(keys_owner: any, params: { keys_sender: any }) {
     console.log("balanceOf with sender", keys_owner.stacksAddress, params.keys_sender.stacksAddress)
     const function_name = "get-balances-of"
 
@@ -362,6 +372,7 @@ export class SwaprTXClient {
         const result_value = deserializeCV(Buffer.from(result.result.substr(2), "hex"))
         const result_data = result_value as ListCV
         // console.log(function_name, result_data)
+        // @ts-ignore
         return [result_data.value.list[0].value, result_data.value.list[1].value]
       } else {
         console.log(result)
@@ -391,6 +402,7 @@ export class SwaprTXClient {
         const result_value = deserializeCV(Buffer.from(result.result.substr(2), "hex"))
         const result_data = result_value as ListCV
         // console.log(function_name, result_data)
+        // @ts-ignore
         return [result_data.value.list[0].value, result_data.value.list[1].value]
       } else {
         console.log(result)
@@ -400,7 +412,7 @@ export class SwaprTXClient {
     }
   }
 
-  async setFeeTo(keys_collector: string, params: { keys_sender: any }) {
+  async setFeeTo(keys_collector: any, params: { keys_sender: any }) {
     console.log("setFeeTo", keys_collector.stacksAddress, params.keys_sender.stacksAddress)
     const fee = new BigNum(256)
     const transaction = await makeContractCall({

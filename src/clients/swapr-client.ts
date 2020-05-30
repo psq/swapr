@@ -23,7 +23,7 @@ export class SwaprClient extends Client {
     )
   }
 
-  async addToPosition(x: number, y: number, params: { sender: string }): Promise<Receipt> {
+  async addToPosition(x: number, y: number, params: { sender: string }): Promise<boolean> {
     const tx = this.createTransaction({
       method: { name: "add-to-position", args: [`u${x}`, `u${y}`] }
     })
@@ -34,7 +34,7 @@ export class SwaprClient extends Client {
     return result.startsWith('Transaction executed and committed. Returned: true')
   }
 
-  async reducePosition(percent: number, params: { sender: string }): Promise<Receipt> {
+  async reducePosition(percent: number, params: { sender: string }): Promise<Object> {
     const tx = this.createTransaction({
       method: { name: "reduce-position", args: [`u${percent}`] }
     })
@@ -48,9 +48,10 @@ export class SwaprClient extends Client {
       const parsed = parse(start_of_list.substring(0, start_of_list.indexOf(')') + 1))
       return unwrapXYList(parsed)
     }
+    throw new NotOKErr()
   }
 
-  async swapExactXforY(dx: number, params: { sender: string }): Promise<Receipt> {
+  async swapExactXforY(dx: number, params: { sender: string }): Promise<Object> {
     const tx = this.createTransaction({
       method: { name: "swap-exact-x-for-y", args: [`u${dx}`] }
     })
@@ -64,9 +65,10 @@ export class SwaprClient extends Client {
       const parsed = parse(start_of_list.substring(0, start_of_list.indexOf(')') + 1))
       return unwrapXYList(parsed)
     }
+    throw new NotOKErr()
   }
 
-  async swapXforExactY(dy: number, params: { sender: string }): Promise<Receipt> {
+  async swapXforExactY(dy: number, params: { sender: string }): Promise<Object> {
     const tx = this.createTransaction({
       method: { name: "swap-x-for-exact-y", args: [`u${dy}`] }
     })
@@ -80,9 +82,10 @@ export class SwaprClient extends Client {
       const parsed = parse(start_of_list.substring(0, start_of_list.indexOf(')') + 1))
       return unwrapXYList(parsed)
     }
+    throw new NotOKErr()
   }
 
-  async swapExactYforX(dy: number, params: { sender: string }): Promise<Receipt> {
+  async swapExactYforX(dy: number, params: { sender: string }): Promise<Object> {
     const tx = this.createTransaction({
       method: { name: "swap-exact-y-for-x", args: [`u${dy}`] }
     })
@@ -96,9 +99,10 @@ export class SwaprClient extends Client {
       const parsed = parse(start_of_list.substring(0, start_of_list.indexOf(')') + 1))
       return unwrapXYList(parsed)
     }
+    throw new NotOKErr()
   }
 
-  async swapYforExactX(dx: number, params: { sender: string }): Promise<Receipt> {
+  async swapYforExactX(dx: number, params: { sender: string }): Promise<Object> {
     const tx = this.createTransaction({
       method: { name: "swap-y-for-exact-x", args: [`u${dx}`] }
     })
@@ -112,6 +116,7 @@ export class SwaprClient extends Client {
       const parsed = parse(start_of_list.substring(0, start_of_list.indexOf(')') + 1))
       return unwrapXYList(parsed)
     }
+    throw new NotOKErr()
   }
 
   async positionOf(owner: string): Promise<number> {
@@ -125,7 +130,7 @@ export class SwaprClient extends Client {
     return Result.unwrapUInt(receipt)
   }
 
-  async balances(): Promise<number> {
+  async balances(): Promise<Object> {
     const query = this.createQuery({
       method: {
         name: 'get-balances',
@@ -147,7 +152,7 @@ export class SwaprClient extends Client {
     return Result.unwrapUInt(receipt)
   }
 
-  async balancesOf(owner: string): Promise<number> {
+  async balancesOf(owner: string): Promise<Object> {
     const query = this.createQuery({
       method: {
         name: 'get-balances-of',
@@ -164,7 +169,7 @@ export class SwaprClient extends Client {
     }
   }
 
-  async setFeeTo(address: string, params: { sender: string }): Promise<Receipt> {
+  async setFeeTo(address: string, params: { sender: string }): Promise<boolean> {
     const tx = this.createTransaction({
       method: { name: "set-fee-to-address", args: [`'${address}`] }
     })
@@ -187,7 +192,7 @@ export class SwaprClient extends Client {
     throw new NotOwnerError()
   }
 
-  async resetFeeTo(params: { sender: string }): Promise<Receipt> {
+  async resetFeeTo(params: { sender: string }): Promise<boolean> {
     const tx = this.createTransaction({
       method: { name: "reset-fee-to-address", args: [] }
     })
@@ -210,7 +215,7 @@ export class SwaprClient extends Client {
     throw new NotOwnerError()
   }
 
-  async collectFees(params: { sender: string }): Promise<Receipt> {
+  async collectFees(params: { sender: string }): Promise<Object> {
     const tx = this.createTransaction({
       method: { name: "collect-fees", args: [] }
     })
@@ -230,7 +235,7 @@ export class SwaprClient extends Client {
     throw new NotOwnerError()
   }
 
-  async getFeeTo(): Promise<number> {
+  async getFeeTo(): Promise<string | null> {
     const query = this.createQuery({
       atChaintip: true,
       method: { name: "get-fee-to-address", args: [] }
@@ -238,10 +243,10 @@ export class SwaprClient extends Client {
     const result = await this.submitQuery(query)
     // console.log("getFeeTo", Result.unwrap(result))
     const value = unwrapOK(parse(Result.unwrap(result)))
-    return value === 'none' ? null : unwrapSome(value)
+    return (value === 'none' ? null : unwrapSome(value))
   }
 
-  async fees(): Promise<number> {
+  async fees(): Promise<Object> {
     const query = this.createQuery({
       method: {
         name: 'get-fees',
@@ -251,6 +256,5 @@ export class SwaprClient extends Client {
     const receipt = await this.submitQuery(query)
     return unwrapXYList(unwrapOK(parse(Result.unwrap(receipt))))
   }
-
 
 }

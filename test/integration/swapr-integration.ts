@@ -1,5 +1,6 @@
 const BigNum = require('bn.js')
-import fs from 'fs'
+// @ts-ignore
+import { readFileSync } from 'fs'
 import {
   makeSmartContractDeploy,
   makeContractCall,
@@ -59,10 +60,10 @@ import {
 const STACKS_API_URL = 'http://localhost:3999'
 
 describe("swapr scenario", async () => {
-  const keys_alice = JSON.parse(fs.readFileSync('./keys-alice.json').toString())
-  const keys_bob = JSON.parse(fs.readFileSync('./keys-bob.json').toString())
-  const keys_zoe = JSON.parse(fs.readFileSync('./keys-zoe.json').toString())
-  const keys_contracts = JSON.parse(fs.readFileSync('./keys-contracts.json').toString())
+  const keys_alice = JSON.parse(readFileSync('./keys-alice.json').toString())
+  const keys_bob = JSON.parse(readFileSync('./keys-bob.json').toString())
+  const keys_zoe = JSON.parse(readFileSync('./keys-zoe.json').toString())
+  const keys_contracts = JSON.parse(readFileSync('./keys-contracts.json').toString())
 
   const network = new StacksTestnet()
   network.coreApiUrl = STACKS_API_URL
