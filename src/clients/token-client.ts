@@ -11,12 +11,15 @@ import {
 } from '../utils'
 
 export class TokenClient extends Client {
-  constructor(principal: string, provider: Provider) {
+  token_name: string
+
+  constructor(name: string, principal: string, provider: Provider) {
     super(
       `${principal}.my-token`,
       'my-token',
       provider
     )
+    this.token_name = name  // TODO(psq): currently can not use the same trick used in tx clients, so instead make a temp file with replaced values?
   }
 
   async transfer(recipient: string, amount: number, params: { sender: string }): Promise<boolean> {

@@ -26,7 +26,7 @@ import {
   wait,
   waitForTX,
 } from '../tx-utils'
-import { replaceKey } from '../utils'
+import { replaceString } from '../utils'
 
 
 
@@ -57,7 +57,7 @@ export class TraitTXClient {
 	  const tx_id = await broadcastTransaction(transaction_deploy_trait, this.network)
 	  const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
 
-    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex"))
+    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex"))
     return result
 	}
 

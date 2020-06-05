@@ -34,7 +34,7 @@ import {
   waitForTX,
   cvToString,
 } from '../../src/tx-utils'
-import { replaceKey } from '../../src/utils'
+import { replaceString } from '../../src/utils'
 
 import {
   TraitTXClient,
@@ -72,8 +72,8 @@ describe("swapr scenario", async () => {
   const traitTXClient = new TraitTXClient(keys_contracts, network)
   const wraprTXClient = new WraprTXClient(keys_contracts, network)
 
-  const token1TXClient = new MyTokenTXClient('token1', keys_contracts, network)
-  const token2TXClient = new MyTokenTXClient('token2', keys_contracts, network)
+  const token1TXClient = new MyTokenTXClient('token1', 'token1', keys_contracts, network)
+  const token2TXClient = new MyTokenTXClient('token2', 'token2', keys_contracts, network)
 
   const swaprToken1Token2TXClient = new SwaprTXClient('token1', 'token2', keys_contracts, network)
   const swaprWraprToken1TXClient = new SwaprTXClient('wrapr', 'token1', keys_contracts, network)

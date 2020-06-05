@@ -16,6 +16,10 @@
   )
 )
 
+(define-read-only (name)
+  (ok "wrapr")
+)
+
 ;; transfer amount STX and return wrapped fungible token
 ;; mints new token
 (define-public (wrap (amount uint))
@@ -30,7 +34,6 @@
         (print amount)
         (print (var-get total-supply))
         (ok (list amount (var-get total-supply)))
-        ;; (ok true)
       )
       (begin
         (err false)
@@ -55,7 +58,7 @@
       )
       (begin
         (var-set total-supply (- (var-get total-supply) amount))
-        (ok true)
+        (ok (list amount (var-get total-supply)))
       )
       (err false)
     )

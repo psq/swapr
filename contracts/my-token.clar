@@ -58,9 +58,14 @@
   (ok (allowance-of spender owner))
 )
 
-;; Transfers tokens to a specified principal.
+;; Transfers tokens to a specified principal (<trait>)
 (define-public (transfer (recipient principal) (amount uint))
   (ft-transfer? fungible-token amount tx-sender recipient)
+)
+
+;; token name (<trait>)
+(define-read-only (name)
+  (ok "{{token-name}}")
 )
 
 ;; Decrease allowance of a specified spender.
@@ -143,6 +148,7 @@
     (ok (ft-get-balance fungible-token owner))
   )
 )
+
 ;; Mint new tokens.
 (define-private (mint! (account principal) (amount uint))
   (if (<= amount u0)

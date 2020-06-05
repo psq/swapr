@@ -377,3 +377,19 @@
     )
   )
 )
+
+
+;; TODO(psq): add contract to swapr-registry
+;; (define-public (add-pair (contract-address principal) (name-x (buff 32)) (token-x principal) (name-y (buff 32)) (token-y principal))
+;; (define-constant x-token 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token)
+;; (define-constant y-token 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token)
+
+(begin
+  (contract-call?
+    'SP1XY88EQMX4CKK4VD7FGS235N6PASR0ACF68GK01.swapr-registry
+    add-pair
+    'SP138CBPVKYBQQ480EZXJQK89HCHY32XBQ0T4BCCD.swapr  ;; swapr contract
+    "{{token1}}" 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token  ;; token 1
+    "{{token2}}" 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token  ;; token 2
+  )
+)

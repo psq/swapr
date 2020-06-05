@@ -273,7 +273,7 @@ From the [Wikipedia](https://en.wikipedia.org/wiki/Integer_square_root) definiti
 
 The current design of the Clarity traits makes it quite impractical to implement exchanging multiple pairs with a single contract, so a contract will need to be custom written (easy to automate) and deployed for each pair.  There is ongoing work to make traits more usable.  However, to be able to use a single contract for all pairs, there would be a need to keep some reference to a trait so data can be stored and retrieved.  The current implementation forbids to store any references to traits so that you can't call them later on (a valid concern), but maybe being able to keep a hash of a trait would make sense, so that hash can be used as a key into a map to store a pair's data.
 
-Sidecar does not include the return value from the contract, so you need to make extra calls to find out what happened, you can only tell whether the transaction succeeded and committed, and failed and nothing was committed.
+Sidecar does not include the return value from the contract, so you need to make extra calls to find out what happened, you can only tell whether the transaction succeeded and committed, and failed and nothing was committed.  I created a PR for this, but still under discussion: https://github.com/blockstack/stacks-blockchain-sidecar/pull/129.
 
 I disagree with the formula showed in section 3.3.2 of the x-y-k paper (the `+ 1` should not be there), so I'm using my own formula, which I re-calculated several times.  The modeling I did in a spreadsheet was clearly showing that with small numbers, the formula would be way off using the one from the x-y-k paper...  Story to be continued.
 

@@ -32,7 +32,7 @@ import {
   waitForTX,
   cvToString,
 } from '../../src/tx-utils'
-import { replaceKey } from '../../src/utils'
+import { replaceString } from '../../src/utils'
 
 import {
   TraitTXClient,

@@ -30,7 +30,9 @@ import {
   wait,
   waitForTX,
 } from '../tx-utils'
-import { replaceKey } from '../utils'
+import {
+  replaceString,
+} from '../utils'
 
 
 
@@ -38,16 +40,24 @@ export class MyTokenTXClient {
   keys: any
   network: any
   contract_name: string
+  token_name: string
 
-  constructor(contract_name, keys, network) {
+  constructor(token_name: string, contract_name: strings, keys: any, network: any) {
     this.keys = keys
     this.network = network
     this.contract_name = contract_name
+    this.token_name = token_name
   }
 
   async deployContract() {
     const fee = new BigNum(5380)
-    const contract_swapr_body = replaceKey(readFileSync('./contracts/my-token.clar').toString(), 'SP2TPZ623K5N2WYF1BWRMP5A93PSBWWADQGKJRJCS', this.keys.stacksAddress)
+    const contract_swapr_body = replaceString(
+      replaceString(readFileSync('./contracts/my-token.clar').toString(),
+        'SP2TPZ623K5N2WYF1BWRMP5A93PSBWWADQGKJRJCS',
+        this.keys.stacksAddress),
+      '{{token-name}}',
+      this.token_name
+    )
 
     console.log(`deploying ${this.contract_name} contract`)
     const transaction_deploy_trait = await makeSmartContractDeploy({
@@ -61,7 +71,7 @@ export class MyTokenTXClient {
     const tx_id = await broadcastTransaction(transaction_deploy_trait, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
 
-    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex"))
+    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex"))
     return result
   }
 
@@ -91,7 +101,7 @@ export class MyTokenTXClient {
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
 
-    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex"))
+    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex"))
     return result
   }
 

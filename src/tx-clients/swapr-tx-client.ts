@@ -30,7 +30,7 @@ import {
   wait,
   waitForTX,
 } from '../tx-utils'
-import { replaceKey } from '../utils'
+import { replaceString } from '../utils'
 
 export class SwaprTXClient {
   keys: any
@@ -39,7 +39,7 @@ export class SwaprTXClient {
   token1: string
   token2: string
 
-  constructor(token1, token2, keys, network) {
+  constructor(token1_name, token1, token2_name, token2, keys, network) {
     this.keys = keys
     this.network = network
     this.token1 = token1
@@ -48,17 +48,27 @@ export class SwaprTXClient {
   }
 
   async deployContract(keys_owner: any) {
-    const fee = new BigNum(13950)
-    const contract_swapr_body = replaceKey(
-      replaceKey(
-        replaceKey(readFileSync('./contracts/swapr.clar').toString(),
-          'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token',
-          `${this.keys.stacksAddress}.${this.token1}`),
-        'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token',
-        `${this.keys.stacksAddress}.${this.token2}`),
-      'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR',
-      `${keys_owner.stacksAddress}`
+    const fee = new BigNum(14060)
+    const contract_swapr_body = replaceString(
+      replaceString(
+        replaceString(
+          replaceString(
+            replaceString(
+              replaceString(readFileSync('./contracts/swapr.clar').toString(),
+                'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token',
+                `${this.keys.stacksAddress}.${this.token1}`),
+              'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token',
+              `${this.keys.stacksAddress}.${this.token2}`),
+            'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR',
+            `${keys_owner.stacksAddress}`),
+          '{{token1}}',
+          this.token1),
+        '{{token2}}',
+        this.token2),
+      'SP138CBPVKYBQQ480EZXJQK89HCHY32XBQ0T4BCCD',
+      `${this.keys.stacksAddress}.${this.contract_name}`
     )
+
 
     // console.log("contract_swapr_body", this.token1, this.token2, contract_swapr_body)
 
@@ -74,7 +84,7 @@ export class SwaprTXClient {
     const tx_id = await broadcastTransaction(transaction_deploy_trait, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
 
-    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex"))
+    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex"))
     return result
   }
 
@@ -104,7 +114,7 @@ export class SwaprTXClient {
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
 
-    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as ListCV
+    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex")) as ListCV
     return result
   }
 
@@ -134,7 +144,7 @@ export class SwaprTXClient {
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
 
-    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as ListCV
+    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex")) as ListCV
     return result
   }
 
@@ -164,7 +174,7 @@ export class SwaprTXClient {
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
 
-    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as ListCV
+    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex")) as ListCV
     return result
   }
 
@@ -194,7 +204,7 @@ export class SwaprTXClient {
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
 
-    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as ListCV
+    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex")) as ListCV
     return result
   }
 
@@ -224,7 +234,7 @@ export class SwaprTXClient {
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
 
-    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as ListCV
+    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex")) as ListCV
     return result
   }
 
@@ -254,7 +264,7 @@ export class SwaprTXClient {
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
 
-    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as ListCV
+    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex")) as ListCV
     return result
   }
 
@@ -438,7 +448,7 @@ export class SwaprTXClient {
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
 
-    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as BooleanCV
+    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex")) as BooleanCV
     return result
   }
 
@@ -468,7 +478,7 @@ export class SwaprTXClient {
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
 
-    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as BooleanCV
+    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex")) as BooleanCV
     return result
   }
 
@@ -498,7 +508,7 @@ export class SwaprTXClient {
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
 
-    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex")) as ListCV
+    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex")) as ListCV
     return result
   }
 

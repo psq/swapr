@@ -38,6 +38,11 @@ export function parse(value: string) {
   return sub()[0]
 }
 
+export function unwrapList(tree: any) {
+  // console.log("unwrapList", tree)
+  return tree
+}
+
 export function unwrapXYList(tree: any) {
   // console.log("unwrapXYList", tree)
   return {
@@ -64,7 +69,7 @@ export function unwrapOK(tree) {
   }
 }
 
-export function replaceKey(body: string, original: string, replacement: string) {
+export function replaceString(body: string, original: string, replacement: string) {
   const regexp = new RegExp(original, 'g')  // limited to principal and contract names with . and - should work
   return body.replace(regexp, replacement)
 }

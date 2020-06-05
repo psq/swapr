@@ -28,7 +28,7 @@ import {
   wait,
   waitForTX,
 } from '../tx-utils'
-import { replaceKey } from '../utils'
+import { replaceString } from '../utils'
 
 
 
@@ -45,7 +45,7 @@ export class WraprTXClient {
 
   async deployContract() {
     const fee = new BigNum(2555)
-    const contract_wrapr_body = replaceKey(readFileSync('./contracts/wrapr.clar').toString(), 'SP2TPZ623K5N2WYF1BWRMP5A93PSBWWADQGKJRJCS', this.keys.stacksAddress)
+    const contract_wrapr_body = replaceString(readFileSync('./contracts/wrapr.clar').toString(), 'SP2TPZ623K5N2WYF1BWRMP5A93PSBWWADQGKJRJCS', this.keys.stacksAddress)
 
     console.log("deploying wrapr contract")
     const transaction_deploy_trait = await makeSmartContractDeploy({
@@ -59,7 +59,7 @@ export class WraprTXClient {
     const tx_id = await broadcastTransaction(transaction_deploy_trait, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
 
-    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex"))
+    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex"))
     return result
   }
 
@@ -88,7 +88,7 @@ export class WraprTXClient {
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
 
-    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex"))
+    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex"))
     return result
   }
 
@@ -118,7 +118,7 @@ export class WraprTXClient {
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
 
-    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex"))
+    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex"))
     return result
   }
 
@@ -148,7 +148,7 @@ export class WraprTXClient {
     const tx_id = await broadcastTransaction(transaction, this.network)
     const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
 
-    const result = deserializeCV(Buffer.from(tx.tx_result.substr(2), "hex"))
+    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex"))
     return result
   }
 
