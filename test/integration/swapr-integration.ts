@@ -53,8 +53,13 @@ import {
 } from '../../src/tx-clients/swapr-tx-client'
 
 import {
+  SwaprRegistryTXClient,
+} from '../../src/tx-clients/swapr-registry-tx-client'
+
+import {
   StacksClient,
 } from '../../src/tx-clients/stacks-client'
+
 
 // const STACKS_API_URL = 'http://localhost:20443'
 const STACKS_API_URL = 'http://localhost:3999'
@@ -72,6 +77,8 @@ describe("swapr scenario", async () => {
   const traitTXClient = new TraitTXClient(keys_contracts, network)
   const wraprTXClient = new WraprTXClient(keys_contracts, network)
 
+  const swaprRegistryTXClient = new SwaprRegistryTXClient(keys_contracts, network)
+
   const token1TXClient = new MyTokenTXClient('token1', 'token1', keys_contracts, network)
   const token2TXClient = new MyTokenTXClient('token2', 'token2', keys_contracts, network)
 
@@ -79,8 +86,16 @@ describe("swapr scenario", async () => {
   const swaprWraprToken1TXClient = new SwaprTXClient('wrapr', 'token1', keys_contracts, network)
 
   before(async () => {
-    await traitTXClient.deployContract()
+    try {
+      await traitTXClient.deployContract()
+    } catch(e) {
+      if (e.message.indexOf('ContractAlreadyExists') === -1) {
+        console.log(e.message)
+      }
+    }
     await wraprTXClient.deployContract()
+
+    await swaprRegistryTXClient.deployContract()
 
     await token1TXClient.deployContract()
     await token2TXClient.deployContract()

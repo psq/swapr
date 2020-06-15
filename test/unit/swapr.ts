@@ -8,7 +8,7 @@ const assert = chai.assert
 import { WraprClient } from "../../src/clients/wrapr-client"
 import { SwaprClient } from "../../src/clients/swapr-client"
 import { TokenClient } from "../../src/clients/token-client"
-import { RegistryClient } from "../../src/clients/registry-client"
+import { SwaprRegistryClient } from "../../src/clients/swapr-registry-client"
 import {
   NoLiquidityError,
   NotOKErr,
@@ -56,7 +56,7 @@ describe("full test suite", () => {
     y_token_client = new TokenClient("token2", "SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH", provider)
     swaprClient = new SwaprClient(provider)
     wraprClient = new WraprClient(provider)
-    registryClient = new RegistryClient(provider)
+    registryClient = new SwaprRegistryClient(provider)
   })
 
   it("should have a valid syntax", async () => {

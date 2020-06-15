@@ -39,7 +39,7 @@ export class SwaprTXClient {
   token1: string
   token2: string
 
-  constructor(token1_name, token1, token2_name, token2, keys, network) {
+  constructor(token1, token2, keys, network) {
     this.keys = keys
     this.network = network
     this.token1 = token1
@@ -48,24 +48,27 @@ export class SwaprTXClient {
   }
 
   async deployContract(keys_owner: any) {
-    const fee = new BigNum(14060)
+    const fee = new BigNum(14640)
     const contract_swapr_body = replaceString(
       replaceString(
         replaceString(
           replaceString(
             replaceString(
-              replaceString(readFileSync('./contracts/swapr.clar').toString(),
-                'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token',
-                `${this.keys.stacksAddress}.${this.token1}`),
-              'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token',
-              `${this.keys.stacksAddress}.${this.token2}`),
+              replaceString(
+                replaceString(readFileSync('./contracts/swapr.clar').toString(),
+                  'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token',
+                  `${this.keys.stacksAddress}.${this.token1}`),
+                'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token',
+                `${this.keys.stacksAddress}.${this.token2}`),
+              'SP1XY88EQMX4CKK4VD7FGS235N6PASR0ACF68GK01',
+              `${this.keys.stacksAddress}`),
             'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR',
             `${keys_owner.stacksAddress}`),
           '{{token1}}',
           this.token1),
         '{{token2}}',
         this.token2),
-      'SP138CBPVKYBQQ480EZXJQK89HCHY32XBQ0T4BCCD',
+      'SP138CBPVKYBQQ480EZXJQK89HCHY32XBQ0T4BCCD.swapr',
       `${this.keys.stacksAddress}.${this.contract_name}`
     )
 

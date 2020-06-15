@@ -50,7 +50,7 @@ export class MyTokenTXClient {
   }
 
   async deployContract() {
-    const fee = new BigNum(5380)
+    const fee = new BigNum(5458)
     const contract_swapr_body = replaceString(
       replaceString(readFileSync('./contracts/my-token.clar').toString(),
         'SP2TPZ623K5N2WYF1BWRMP5A93PSBWWADQGKJRJCS',
