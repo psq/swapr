@@ -11,7 +11,7 @@ import {
   unwrapOK,
 } from '../utils'
 
-export class RegistryClient extends Client {
+export class SwaprRegistryClient extends Client {
   constructor(provider: Provider) {
     super(
       'SP1XY88EQMX4CKK4VD7FGS235N6PASR0ACF68GK01.swapr-registry',

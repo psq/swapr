@@ -59,7 +59,7 @@ describe("full test suite", () => {
     registryClient = new SwaprRegistryClient(provider)
   })
 
-  it("should have a valid syntax", async () => {
+  it.only("should have a valid syntax", async () => {
     await tokenTraitClient.checkContract()
     await tokenTraitClient.deployContract() // deploy first
 
