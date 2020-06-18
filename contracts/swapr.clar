@@ -16,6 +16,7 @@
 (define-constant balance-too-low-err (err u7))
 (define-constant too-many-pairs-err (err u8))
 (define-constant pair-already-exists-err (err u9))
+
 ;; for future use, or debug
 (define-constant e10-err (err u20))
 (define-constant e11-err (err u21))
@@ -83,16 +84,6 @@
   (ok (get shares-total (unwrap! (map-get? pairs-data-map ((token-x token-x) (token-y token-y))) invalid-pair-err)))
 )
 
-;; get the balances owner provided as liquidity, plus fees based on current exchange rate
-;; (define-read-only (get-balances-of (owner principal))
-;;   (let ((x (var-get x-balance)) (y (var-get y-balance)) (balance (var-get total-balances)) (share (shares-of owner)))
-;;     (if (> balance u0)
-;;       (ok (list (/ (* x share) balance) (/ (* y share) balance)))  ;; less precision loss doing * first
-;;       no-liquidity-err  ;; no liquidity
-;;     )
-;;   )
-;; )
-
 (define-read-only (get-balances-of (token-x principal) (token-y principal) (owner principal))
   (let ((pair (unwrap! (map-get? pairs-data-map ((token-x token-x) (token-y token-y))) invalid-pair-err)))
     (let ((x (get balance-x pair)) (y (get balance-y pair)) (shares-total (get shares-total pair)) (shares (shares-of token-x token-y owner)))
@@ -104,21 +95,6 @@
   )
 )
 
-;; Internal - Increase position of a specified spender.
-;; (define-private (increase-shares (owner principal) (amount uint))
-;;   (let ((balance (shares-of owner)))
-;;     (if (<= amount u0)
-;;       false
-;;       (begin
-;;         (print (tuple (owner owner)))
-;;         (print (map-set shares
-;;           ((owner owner))
-;;           ((balance (+ balance amount)))))
-;;         true)
-;;     )
-;;   )
-;; )
-
 (define-private (increase-shares (token-x principal) (token-y principal) (owner principal) (amount uint))
   (let ((shares (shares-of token-x token-y owner)))
     (map-set shares-map
@@ -128,20 +104,6 @@
     (ok true)
   )
 )
-
-;; Decrease position of a specified spender.
-;; (define-private (decrease-shares (owner principal) (amount uint))
-;;   (let ((balance (shares-of owner)))
-;;     (if (or (> amount balance) (<= amount u0))
-;;       true
-;;       (begin
-;;         (map-set shares
-;;           ((owner owner))
-;;           ((balance (- balance amount))))
-;;         true)
-;;     )
-;;   )
-;; )
 
 (define-private (decrease-shares (token-x principal) (token-y principal) (owner principal) (amount uint))
   (let ((shares (shares-of token-x token-y owner)))
@@ -159,10 +121,6 @@
 )
 
 ;; get overall balances for the pair
-;; (define-read-only (get-balances (token-x principal) (token-y principal))
-;;   (ok (list (var-get x-balance) (var-get y-balance)))
-;; )
-
 (define-read-only (get-balances (token-x principal) (token-y principal))
   (let ((pair (unwrap! (map-get? pairs-data-map ((token-x token-x) (token-y token-y))) invalid-pair-err)))
     (ok (list (get balance-x pair) (get balance-y pair)))
@@ -172,41 +130,6 @@
 ;; since we can't use a constant to refer to contract address, here what x and y are
 ;; (define-constant x-token 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token)
 ;; (define-constant y-token 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token)
-
-;; how much of each token to buy, unless this is the first addition
-;; TODO(psq): use 0 for x or y to get perfect ratio based on current exchange rate, otherwise this will upset the balance
-;; although that would be an opportunity to arbitrage that out for someone
-;; (define-public (add-to-position (token-x-trait <can-transfer-tokens>) (token-y-trait <can-transfer-tokens>) (x uint) (y uint))
-;;   (let ((token-x (contract-of token-x-trait)) (token-y (contract-of token-y-trait))))
-;;     (let ((pair (unwrap! (map-get? pairs-data-map ((token-x principal) (token-y principal))) invalid-pair-err)) (contract-address (as-contract tx-sender)))
-;;       (if
-;;         (and
-;;           (is-ok (print (contract-call? token-x-trait transfer contract-address x)))
-;;           (is-ok (print (contract-call? token-y-trait transfer contract-address y)))
-;;         )
-;;         (begin
-;;           (if (is-eq (var-get total-balances) u0)
-;;             (begin
-;;               (increase-shares tx-sender x)
-;;               (var-set total-balances x)
-;;             )
-;;             (let ((new-shares (* (/ x (var-get x-balance)) (var-get total-balances))))
-;;               (increase-shares tx-sender new-shares)
-;;               (var-set total-balances (+ new-shares (var-get total-balances)))
-;;             )
-;;           )
-;;           (var-set x-balance (+ x (var-get x-balance)))
-;;           (var-set y-balance (+ y (var-get y-balance)))
-;;           (ok true)
-;;         )
-;;         (begin
-;;           transfer-failed-err
-;;         )
-;;       )
-;;     )
-;;   )
-;; )
-
 (define-public (add-to-position (token-x-trait <can-transfer-tokens>) (token-y-trait <can-transfer-tokens>) (x uint) (y uint))
   (let ((token-x (contract-of token-x-trait)) (token-y (contract-of token-y-trait)))
     (let ((pair (unwrap! (map-get? pairs-data-map ((token-x token-x) (token-y token-y))) invalid-pair-err)) (contract-address (as-contract tx-sender)))
@@ -291,32 +214,6 @@
 
 ;; ;; reduce the amount of liquidity the sender provides to the pool
 ;; ;; to close, use u100
-;; (define-public (reduce-position (percent uint))
-;;   (let ((position (shares-of tx-sender)) (balances (var-get total-balances)) (contract-address (as-contract tx-sender)) (sender tx-sender))
-;;     (let ((withdrawal (/ (* position percent) u100)))
-;;       (let ((remaing-position (- position withdrawal)) (withdrawal-x (/ (* withdrawal (var-get x-balance)) balances)) (withdrawal-y (/ (* withdrawal (var-get y-balance)) balances)))
-;;         (if
-;;           (and
-;;             (<= percent u100)
-;;             (is-ok (print (as-contract (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer sender withdrawal-x))))
-;;             (is-ok (print (as-contract (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer sender withdrawal-y))))
-;;           )
-;;           (begin
-;;             (decrease-shares tx-sender withdrawal)
-;;             (var-set total-balances (- balances withdrawal))
-;;             (var-set x-balance (- (var-get x-balance) withdrawal-x))
-;;             (var-set y-balance (- (var-get y-balance) withdrawal-y))
-;;             (ok (list withdrawal-x withdrawal-y))
-;;           )
-;;           (begin
-;;             (err transfer-failed-err)
-;;           )
-;;         )
-;;       )
-;;     )
-;;   )
-;; )
-
 (define-public (reduce-position (token-x-trait <can-transfer-tokens>) (token-y-trait <can-transfer-tokens>) (percent uint))
   (let ((token-x (contract-of token-x-trait)) (token-y (contract-of token-y-trait)))
     (let ((pair (unwrap! (map-get? pairs-data-map ((token-x token-x) (token-y token-y))) invalid-pair-err)))
@@ -353,82 +250,114 @@
 )
 
 ;; ;; exchange known dx of x-token for whatever dy of y-token based on current liquidity, returns (dx dy)
-;; (define-public (swap-exact-x-for-y (dx uint))
-;;   ;; calculate dy
-;;   ;; calculate fee on dx
-;;   ;; transfer
-;;   ;; update balances
-;;   (let
-;;     (
-;;       (contract-address (as-contract tx-sender))
-;;       (sender tx-sender)
-;;       (dy (/ (* u997 (var-get y-balance) dx) (+ (* u1000 (var-get x-balance)) (* u997 dx)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
-;;       (fee (/ (* u5 dx) u10000)) ;; 5 bp
-;;     )
-;;     (print contract-address)
-;;     (print (var-get x-balance))
-;;     (print (var-get y-balance))
-;;     (print dx)
-;;     (print dy)
-;;     (print fee)
-;;     (if (and
-;;       (is-ok (print (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer contract-address dx)))
-;;       (is-ok (print (as-contract (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer sender dy))))
-;;       )
-;;       (begin
-;;         (var-set y-balance (- (var-get y-balance) dy))  ;; remove dy
-;;         (if (is-some (var-get fee-to-address))  ;; only collect fee when fee-to-address is set
-;;           (begin
-;;             (var-set x-balance (- (+ (var-get x-balance) dx) fee))  ;; add dx - fee
-;;             (var-set fee-balance-x (+ fee (var-get fee-balance-x)))
-;;           )
-;;           (var-set x-balance (+ (var-get x-balance) dx))  ;; add dx
-;;         )
-;;         (ok (list dx dy))
-;;       )
-;;       transfer-failed-err
-;;     )
-;;   )
-;; )
+(define-public (swap-exact-x-for-y (token-x-trait <can-transfer-tokens>) (token-y-trait <can-transfer-tokens>) (dx uint))
+  ;; calculate dy
+  ;; calculate fee on dx
+  ;; transfer
+  ;; update balances
+  (let ((token-x (contract-of token-x-trait)) (token-y (contract-of token-y-trait)))
+    (let ((pair (unwrap! (map-get? pairs-data-map ((token-x token-x) (token-y token-y))) invalid-pair-err)))
+      (let
+        (
+          (contract-address (as-contract tx-sender))
+          (sender tx-sender)
+          (dy (/ (* u997 (get balance-y pair) dx) (+ (* u1000 (get balance-x pair)) (* u997 dx)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
+          (fee (/ (* u5 dx) u10000)) ;; 5 bp
+        )
+        (print contract-address)
+        (print (get balance-x pair))
+        (print (get balance-y pair))
+        (print dx)
+        (print dy)
+        (print fee)
+        (if (and
+          (is-ok (print (contract-call? token-x-trait transfer contract-address dx)))
+          (is-ok (print (as-contract (contract-call? token-y-trait transfer sender dy))))
+          )
+          (begin
+            (map-set pairs-data-map ((token-x token-x) (token-y token-y))
+              (
+                (shares-total (get shares-total pair))
+                (balance-x
+                  (if (is-some (get fee-to-address pair))  ;; only collect fee when fee-to-address is set
+                    (- (+ (get balance-x pair) dx) fee)  ;; add dx - fee
+                    (+ (get balance-x pair) dx)  ;; add dx
+                  )
+                )
+                (balance-y (- (get balance-y pair) dy))
+                (fee-balance-x
+                  (if (is-some (get fee-to-address pair))  ;; only collect fee when fee-to-address is set
+                    (+ fee (get fee-balance-x pair))
+                    (get fee-balance-x pair)
+                  )
+                )
+                (fee-balance-y (get fee-balance-y pair))
+                (fee-to-address (get fee-to-address pair))
+              )
+            )
+            (ok (list dx dy))
+          )
+          transfer-failed-err
+        )
+      )
+    )
+  )
+)
 
 ;; ;; exchange whatever dx of x-token for known dy of y-token based on liquidity, returns (dx dy)
-;; (define-public (swap-x-for-exact-y (dy uint))
-;;   ;; calculate dx
-;;   ;; calculate fee on dx
-;;   ;; transfer
-;;   ;; update balances
-;;   (let
-;;     (
-;;       (contract-address (as-contract tx-sender))
-;;       (sender tx-sender)
-;;       (dx (/ (* u1000 (var-get x-balance) dy) (* u997 (- (var-get y-balance) dy)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
-;;       (fee (/ (* (var-get x-balance) dy) (* u1994 (- (var-get y-balance) dy)))) ;; 5 bp
-;;     )
-;;     (print contract-address)
-;;     (print (var-get x-balance))
-;;     (print (var-get y-balance))
-;;     (print dx)
-;;     (print dy)
-;;     (print fee)
-;;     (if (and
-;;       (is-ok (print (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer contract-address dx)))
-;;       (is-ok (print (as-contract (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer sender dy))))
-;;       )
-;;       (begin
-;;         (var-set y-balance (- (var-get y-balance) dy))  ;; remove dy
-;;         (if (is-some (var-get fee-to-address))  ;; only collect fee when fee-to-address is set
-;;           (begin
-;;             (var-set x-balance (- (+ (var-get x-balance) dx) fee))  ;; add dx - fee
-;;             (var-set fee-balance-x (+ fee (var-get fee-balance-x)))
-;;           )
-;;           (var-set x-balance (+ (var-get x-balance) dx))  ;; add dx
-;;         )
-;;         (ok (list dx dy))
-;;       )
-;;       transfer-failed-err
-;;     )
-;;   )
-;; )
+(define-public (swap-x-for-exact-y (token-x-trait <can-transfer-tokens>) (token-y-trait <can-transfer-tokens>) (dy uint))
+  ;; calculate dx
+  ;; calculate fee on dx
+  ;; transfer
+  ;; update balances
+  (let ((token-x (contract-of token-x-trait)) (token-y (contract-of token-y-trait)))
+    (let ((pair (unwrap! (map-get? pairs-data-map ((token-x token-x) (token-y token-y))) invalid-pair-err)))
+      (let
+        (
+          (contract-address (as-contract tx-sender))
+          (sender tx-sender)
+          (dx (/ (* u1000 (get balance-x pair) dy) (* u997 (- (get balance-y pair) dy)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
+          (fee (/ (* (get balance-x pair) dy) (* u1994 (- (get balance-y pair) dy)))) ;; 5 bp
+        )
+        (print contract-address)
+        (print (get balance-x pair))
+        (print (get balance-y pair))
+        (print dx)
+        (print dy)
+        (print fee)
+        (if (and
+          (is-ok (print (contract-call? token-x-trait transfer contract-address dx)))
+          (is-ok (print (as-contract (contract-call? token-y-trait transfer sender dy))))
+          )
+          (begin
+            (map-set pairs-data-map ((token-x token-x) (token-y token-y))
+              (
+                (shares-total (get shares-total pair))
+                (balance-x
+                  (if (is-some (get fee-to-address pair))  ;; only collect fee when fee-to-address is set
+                    (- (+ (get balance-x pair) dx) fee)  ;; add dx - fee
+                    (+ (get balance-x pair) dx)  ;; add dx
+                  )
+                )
+                (balance-y (- (get balance-y pair) dy))
+                (fee-balance-x
+                  (if (is-some (get fee-to-address pair))  ;; only collect fee when fee-to-address is set
+                    (+ fee (get fee-balance-x pair))
+                    (get fee-balance-x pair)
+                  )
+                )
+                (fee-balance-y (get fee-balance-y pair))
+                (fee-to-address (get fee-to-address pair))
+              )
+            )
+            (ok (list dx dy))
+          )
+          transfer-failed-err
+        )
+      )
+    )
+  )
+)
 
 ;; ;; exchange known dy for whatever dx based on liquidity, returns (dx dy)
 ;; (define-public (swap-exact-y-for-x (dy uint))
@@ -599,19 +528,3 @@
     )
   )
 )
-
-
-;; TODO(psq): add contract to swapr-registry
-;; (define-public (add-pair (contract-address principal) (name-x (buff 32)) (token-x principal) (name-y (buff 32)) (token-y principal))
-;; (define-constant x-token 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token)
-;; (define-constant y-token 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token)
-
-;; (begin
-;;   (contract-call?
-;;     'SP1XY88EQMX4CKK4VD7FGS235N6PASR0ACF68GK01.swapr-registry
-;;     add-pair
-;;     'SP138CBPVKYBQQ480EZXJQK89HCHY32XBQ0T4BCCD.swapr  ;; swapr contract
-;;     "{{token1}}" 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token  ;; token 1
-;;     "{{token2}}" 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token  ;; token 2
-;;   )
-;; )
