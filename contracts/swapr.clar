@@ -27,8 +27,8 @@
 ;; (define-data-var y-balance uint u0)
 
 ;; ;; fees collected so far, that have not been withdrawn (saves gas while doing exchanges)
-;; (define-data-var fee-x-balance uint u0)
-;; (define-data-var fee-y-balance uint u0)
+;; (define-data-var fee-balance-x uint u0)
+;; (define-data-var fee-balance-y uint u0)
 
 ;; ;; balances help by all the clients holding shares, this is equal to the sum of all the balances held in shares by each client
 ;; (define-data-var total-balances uint u0)
@@ -43,7 +43,7 @@
 ;; V2
 ;; variables
 ;; (name) => (token-x, token-y)
-;; (token-x, token-y) => (shares-total, balance-x, balance-y, fee-x-balance, fee-y-balance, fee-to-address)
+;; (token-x, token-y) => (shares-total, balance-x, balance-y, fee-balance-x, fee-balance-y, fee-to-address)
 ;; (token-x, token-y, principal) => (shares)
 
 (define-map pairs-map
@@ -53,7 +53,7 @@
 
 (define-map pairs-data-map
   ((token-x principal) (token-y principal))
-  ((shares-total uint) (balance-x uint) (balance-y uint) (fee-x-balance uint) (fee-y-balance uint) (fee-to-address (optional principal)))
+  ((shares-total uint) (balance-x uint) (balance-y uint) (fee-balance-x uint) (fee-balance-y uint) (fee-to-address (optional principal)))
 )
 
 (define-map shares-map
@@ -233,8 +233,8 @@
               )
               (balance-x (+ x (get balance-x pair)))
               (balance-y (+ y (get balance-y pair)))
-              (fee-x-balance (get fee-x-balance pair))
-              (fee-y-balance (get fee-y-balance pair))
+              (fee-balance-x (get fee-balance-x pair))
+              (fee-balance-y (get fee-balance-y pair))
               (fee-to-address (get fee-to-address pair))
             )
           )
@@ -272,8 +272,8 @@
               (shares-total u0)
               (balance-x u0)
               (balance-y u0)
-              (fee-x-balance u0)
-              (fee-y-balance u0)
+              (fee-balance-x u0)
+              (fee-balance-y u0)
               (fee-to-address none)
             )
           )
@@ -336,8 +336,8 @@
                     (shares-total (- shares-total withdrawal))
                     (balance-x (- (get balance-x pair) withdrawal-x))
                     (balance-y (- (get balance-y pair) withdrawal-y))
-                    (fee-x-balance (get fee-x-balance pair))
-                    (fee-y-balance (get fee-y-balance pair))
+                    (fee-balance-x (get fee-balance-x pair))
+                    (fee-balance-y (get fee-balance-y pair))
                     (fee-to-address (get fee-to-address pair))
                   )
                 )
@@ -380,7 +380,7 @@
 ;;         (if (is-some (var-get fee-to-address))  ;; only collect fee when fee-to-address is set
 ;;           (begin
 ;;             (var-set x-balance (- (+ (var-get x-balance) dx) fee))  ;; add dx - fee
-;;             (var-set fee-x-balance (+ fee (var-get fee-x-balance)))
+;;             (var-set fee-balance-x (+ fee (var-get fee-balance-x)))
 ;;           )
 ;;           (var-set x-balance (+ (var-get x-balance) dx))  ;; add dx
 ;;         )
@@ -419,7 +419,7 @@
 ;;         (if (is-some (var-get fee-to-address))  ;; only collect fee when fee-to-address is set
 ;;           (begin
 ;;             (var-set x-balance (- (+ (var-get x-balance) dx) fee))  ;; add dx - fee
-;;             (var-set fee-x-balance (+ fee (var-get fee-x-balance)))
+;;             (var-set fee-balance-x (+ fee (var-get fee-balance-x)))
 ;;           )
 ;;           (var-set x-balance (+ (var-get x-balance) dx))  ;; add dx
 ;;         )
@@ -456,7 +456,7 @@
 ;;         (var-set x-balance (- (var-get x-balance) dx))  ;; remove dx
 ;;         (if (is-some (var-get fee-to-address))  ;; only collect fee when fee-to-address is set
 ;;           (begin
-;;             (var-set fee-y-balance (+ fee (var-get fee-y-balance)))
+;;             (var-set fee-balance-y (+ fee (var-get fee-balance-y)))
 ;;             (var-set y-balance (- (+ (var-get y-balance) dy) fee))  ;; add dy - fee
 ;;           )
 ;;           (var-set y-balance (+ (var-get y-balance) dy))  ;; add dy
@@ -496,7 +496,7 @@
 ;;         (if (is-some (var-get fee-to-address))  ;; only collect fee when fee-to-address is set
 ;;           (begin
 ;;             (var-set y-balance (- (+ (var-get y-balance) dy) fee))  ;; add dy - fee
-;;             (var-set fee-y-balance (+ fee (var-get fee-y-balance)))
+;;             (var-set fee-balance-y (+ fee (var-get fee-balance-y)))
 ;;           )
 ;;           (var-set y-balance (+ (var-get y-balance) dy))  ;; add dy
 ;;         )
@@ -508,67 +508,97 @@
 ;; )
 
 ;; ;; activate the contract fee for swaps by setting the collection address, restricted to contract owner
-;; (define-public (set-fee-to-address (address principal))
-;;   (begin
-;;     (if (is-eq tx-sender contract-owner)
-;;       (begin
-;;         (var-set fee-to-address (some address))
-;;         (ok true)
-;;       )
-;;       not-owner-err
-;;     )
-;;   )
-;; )
+(define-public (set-fee-to-address (token-x principal) (token-y principal) (address principal))
+  (let ((pair (unwrap! (map-get? pairs-data-map ((token-x token-x) (token-y token-y))) invalid-pair-err)))
+    (if (is-eq tx-sender contract-owner)
+      (begin
+        (map-set pairs-data-map ((token-x token-x) (token-y token-y))
+          (
+            (shares-total (get shares-total pair))
+            (balance-x (get balance-x pair))
+            (balance-y (get balance-y pair))
+            (fee-balance-x (get fee-balance-y pair))
+            (fee-balance-y (get fee-balance-y pair))
+            (fee-to-address (some address))
+          )
+        )
+        (ok true)
+      )
+      not-owner-err
+    )
+  )
+)
 
 ;; ;; clear the contract fee addres
 ;; ;; TODO(psq): if there are any collected fees, prevent this from happening, as the fees can no longer be colllect with `collect-fees`
-;; (define-public (reset-fee-to-address)
-;;   (begin
-;;     (if (is-eq tx-sender contract-owner)
-;;       (begin
-;;         (var-set fee-to-address none)
-;;         (ok true)
-;;       )
-;;       not-owner-err
-;;     )
-;;   )
-;; )
+(define-public (reset-fee-to-address (token-x principal) (token-y principal))
+  (let ((pair (unwrap! (map-get? pairs-data-map ((token-x token-x) (token-y token-y))) invalid-pair-err)))
+    (if (is-eq tx-sender contract-owner)
+      (begin
+        (map-set pairs-data-map ((token-x token-x) (token-y token-y))
+          (
+            (shares-total (get shares-total pair))
+            (balance-x (get balance-x pair))
+            (balance-y (get balance-y pair))
+            (fee-balance-x (get fee-balance-y pair))
+            (fee-balance-y (get fee-balance-y pair))
+            (fee-to-address none)
+          )
+        )
+        (ok true)
+      )
+      not-owner-err
+    )
+  )
+)
 
 ;; ;; get the current address used to collect a fee
-;; (define-read-only (get-fee-to-address)
-;;   (ok (var-get fee-to-address))
-;; )
+(define-read-only (get-fee-to-address (token-x principal) (token-y principal))
+  (let ((pair (unwrap! (map-get? pairs-data-map ((token-x token-x) (token-y token-y))) invalid-pair-err)))
+    (ok (get fee-to-address pair))
+  )
+)
 
 ;; ;; get the amount of fees charged on x-token and y-token exchanges that have not been collected yet
-;; (define-read-only (get-fees)
-;;   (begin
-;;     (ok (list (var-get fee-x-balance) (var-get fee-y-balance)))
-;;   )
-;; )
+(define-read-only (get-fees (token-x principal) (token-y principal))
+  (let ((pair (unwrap! (map-get? pairs-data-map ((token-x token-x) (token-y token-y))) invalid-pair-err)))
+    (ok (list (get fee-balance-x pair) (get fee-balance-y pair)))
+  )
+)
 
 ;; ;; send the collected fees the fee-to-address
-;; (define-public (collect-fees)
-;;   (let ((address (unwrap! (var-get fee-to-address) no-fee-to-address-err)) (fee-x (var-get fee-x-balance)) (fee-y (var-get fee-y-balance)))
-;;     (print fee-x)
-;;     (print fee-y)
-;;     (print (as-contract tx-sender))
-;;     (print (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token balance-of (as-contract tx-sender)))
-;;     (print (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token balance-of (as-contract tx-sender)))
-;;     (print address)
-;;     (if
-;;       (and
-;;         (or (is-eq fee-x u0) (is-ok (print (as-contract (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer address fee-x)))))
-;;         (or (is-eq fee-y u0) (is-ok (print (as-contract (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer address fee-y)))))
-;;       )
-;;       (begin
-;;         (var-set fee-x-balance u0)
-;;         (var-set fee-y-balance u0)
-;;         (ok (list fee-x fee-y))
-;;       )
-;;       transfer-failed-err
-;;     )
-;;   )
-;; )
+(define-public (collect-fees (token-x-trait <can-transfer-tokens>) (token-y-trait <can-transfer-tokens>))
+  (let ((token-x (contract-of token-x-trait)) (token-y (contract-of token-y-trait)))
+    (let ((pair (unwrap! (map-get? pairs-data-map ((token-x token-x) (token-y token-y))) invalid-pair-err)))
+      (let ((address (unwrap! (get fee-to-address pair) no-fee-to-address-err)) (fee-x (get fee-balance-x pair)) (fee-y (get fee-balance-y pair)))
+        (print fee-x)
+        (print fee-y)
+        (print (as-contract tx-sender))
+        (print address)
+        (if
+          (and
+            (or (is-eq fee-x u0) (is-ok (print (as-contract (contract-call? token-x-trait transfer address fee-x)))))
+            (or (is-eq fee-y u0) (is-ok (print (as-contract (contract-call? token-y-trait transfer address fee-y)))))
+          )
+          (begin
+            (map-set pairs-data-map ((token-x token-x) (token-y token-y))
+              (
+                (shares-total (get shares-total pair))
+                (balance-x (get balance-x pair))
+                (balance-y (get balance-y pair))
+                (fee-balance-x u0)
+                (fee-balance-y u0)
+                (fee-to-address (get fee-to-address pair))
+              )
+            )
+            (ok (list fee-x fee-y))
+          )
+          transfer-failed-err
+        )
+      )
+    )
+  )
+)
 
 
 ;; TODO(psq): add contract to swapr-registry
