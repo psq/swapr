@@ -24,8 +24,8 @@
 
 ;; ;; V1
 ;; ;; overall balance of x-token and y-token held by the contract
-;; (define-data-var x-balance uint u0)
-;; (define-data-var y-balance uint u0)
+;; (define-data-var balance-x uint u0)
+;; (define-data-var balance-y uint u0)
 
 ;; ;; fees collected so far, that have not been withdrawn (saves gas while doing exchanges)
 ;; (define-data-var fee-balance-x uint u0)
@@ -360,81 +360,113 @@
 )
 
 ;; ;; exchange known dy for whatever dx based on liquidity, returns (dx dy)
-;; (define-public (swap-exact-y-for-x (dy uint))
-;;   ;; calculate dx
-;;   ;; calculate fee on dy
-;;   ;; transfer
-;;   ;; update balances
-;;   (let
-;;     (
-;;       (contract-address (as-contract tx-sender))
-;;       (sender tx-sender)
-;;       (dx (/ (* u997 (var-get x-balance) dy) (+ (* u1000 (var-get y-balance)) (* u997 dy)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
-;;       (fee (/ (* u5 dy) u10000)) ;; 5 bp
-;;     )
-;;     (print (var-get x-balance))
-;;     (print (var-get y-balance))
-;;     (print dx)
-;;     (print dy)
-;;     (print fee)
-;;     (if (and
-;;       (is-ok (print (as-contract (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer sender dx))))
-;;       (is-ok (print (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer contract-address dy)))
-;;       )
-;;       (begin
-;;         (var-set x-balance (- (var-get x-balance) dx))  ;; remove dx
-;;         (if (is-some (var-get fee-to-address))  ;; only collect fee when fee-to-address is set
-;;           (begin
-;;             (var-set fee-balance-y (+ fee (var-get fee-balance-y)))
-;;             (var-set y-balance (- (+ (var-get y-balance) dy) fee))  ;; add dy - fee
-;;           )
-;;           (var-set y-balance (+ (var-get y-balance) dy))  ;; add dy
-;;         )
-;;         (ok (list dx dy))
-;;       )
-;;       transfer-failed-err
-;;     )
-;;   )
-;; )
+(define-public (swap-exact-y-for-x (token-x-trait <can-transfer-tokens>) (token-y-trait <can-transfer-tokens>) (dy uint))
+  ;; calculate dx
+  ;; calculate fee on dy
+  ;; transfer
+  ;; update balances
+  (let ((token-x (contract-of token-x-trait)) (token-y (contract-of token-y-trait)))
+    (let ((pair (unwrap! (map-get? pairs-data-map ((token-x token-x) (token-y token-y))) invalid-pair-err)))
+      (let
+        (
+          (contract-address (as-contract tx-sender))
+          (sender tx-sender)
+          (dx (/ (* u997 (get balance-x pair) dy) (+ (* u1000 (get balance-y pair)) (* u997 dy)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
+          (fee (/ (* u5 dy) u10000)) ;; 5 bp
+        )
+        (print (get balance-x pair))
+        (print (get balance-y pair))
+        (print dx)
+        (print dy)
+        (print fee)
+        (if (and
+          (is-ok (print (as-contract (contract-call? token-x-trait transfer sender dx))))
+          (is-ok (print (contract-call? token-y-trait transfer contract-address dy)))
+          )
+          (begin
+            (map-set pairs-data-map ((token-x token-x) (token-y token-y))
+              (
+                (shares-total (get shares-total pair))
+                (balance-x (- (get balance-x pair) dx)) ;; remove dx
+                (balance-y
+                  (if (is-some (get fee-to-address pair))  ;; only collect fee when fee-to-address is set
+                    (- (+ (get balance-y pair) dy) fee)  ;; add dy - fee
+                    (+ (get balance-y pair) dy)  ;; add dy
+                  )
+                )
+                (fee-balance-x (get fee-balance-x pair))
+                (fee-balance-y
+                  (if (is-some (get fee-to-address pair))  ;; only collect fee when fee-to-address is set
+                    (+ fee (get fee-balance-y pair))
+                    (get fee-balance-y pair)
+                  )
+                )
+                (fee-to-address (get fee-to-address pair))
+              )
+            )
+            (ok (list dx dy))
+          )
+          transfer-failed-err
+        )
+      )
+    )
+  )
+)
 
 ;; ;; exchange whatever dy for known dx based on liquidity, returns (dx dy)
-;; (define-public (swap-y-for-exact-x (dx uint))
-;;   ;; calculate dy
-;;   ;; calculate fee on dy
-;;   ;; transfer
-;;   ;; update balances
-;;   (let
-;;     (
-;;       (contract-address (as-contract tx-sender))
-;;       (sender tx-sender)
-;;       (dy (/ (* u1000 (var-get y-balance) dx) (* u997 (- (var-get x-balance) dx)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
-;;       (fee (/ (* (var-get y-balance) dx) (* u1994 (- (var-get x-balance) dx)))) ;; 5 bp
-;;     )
-;;     (print contract-address)
-;;     (print (var-get x-balance))
-;;     (print (var-get y-balance))
-;;     (print dx)
-;;     (print dy)
-;;     (print fee)
-;;     (if (and
-;;       (is-ok (print (as-contract (contract-call? 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token transfer sender dx))))
-;;       (is-ok (print (contract-call? 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token transfer contract-address dy)))
-;;       )
-;;       (begin
-;;         (var-set x-balance (- (var-get x-balance) dx))  ;; remove dx
-;;         (if (is-some (var-get fee-to-address))  ;; only collect fee when fee-to-address is set
-;;           (begin
-;;             (var-set y-balance (- (+ (var-get y-balance) dy) fee))  ;; add dy - fee
-;;             (var-set fee-balance-y (+ fee (var-get fee-balance-y)))
-;;           )
-;;           (var-set y-balance (+ (var-get y-balance) dy))  ;; add dy
-;;         )
-;;         (ok (list dx dy))
-;;       )
-;;       transfer-failed-err
-;;     )
-;;   )
-;; )
+(define-public (swap-y-for-exact-x (token-x-trait <can-transfer-tokens>) (token-y-trait <can-transfer-tokens>) (dx uint))
+  ;; calculate dy
+  ;; calculate fee on dy
+  ;; transfer
+  ;; update balances
+  (let ((token-x (contract-of token-x-trait)) (token-y (contract-of token-y-trait)))
+    (let ((pair (unwrap! (map-get? pairs-data-map ((token-x token-x) (token-y token-y))) invalid-pair-err)))
+      (let
+        (
+          (contract-address (as-contract tx-sender))
+          (sender tx-sender)
+          (dy (/ (* u1000 (get balance-y pair) dx) (* u997 (- (get balance-x pair) dx)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
+          (fee (/ (* (get balance-y pair) dx) (* u1994 (- (get balance-x pair) dx)))) ;; 5 bp
+        )
+        (print contract-address)
+        (print (get balance-x pair))
+        (print (get balance-y pair))
+        (print dx)
+        (print dy)
+        (print fee)
+        (if (and
+          (is-ok (print (as-contract (contract-call? token-x-trait transfer sender dx))))
+          (is-ok (print (contract-call? token-y-trait transfer contract-address dy)))
+          )
+          (begin
+            (map-set pairs-data-map ((token-x token-x) (token-y token-y))
+              (
+                (shares-total (get shares-total pair))
+                (balance-x (- (get balance-x pair) dx)) ;; remove dx
+                (balance-y
+                  (if (is-some (get fee-to-address pair))  ;; only collect fee when fee-to-address is set
+                    (- (+ (get balance-y pair) dy) fee)  ;; add dy - fee
+                    (+ (get balance-y pair) dy)  ;; add dy
+                  )
+                )
+                (fee-balance-x (get fee-balance-x pair))
+                (fee-balance-y
+                  (if (is-some (get fee-to-address pair))  ;; only collect fee when fee-to-address is set
+                    (+ fee (get fee-balance-y pair))
+                    (get fee-balance-y pair)
+                  )
+                )
+                (fee-to-address (get fee-to-address pair))
+              )
+            )
+            (ok (list dx dy))
+          )
+          transfer-failed-err
+        )
+      )
+    )
+  )
+)
 
 ;; ;; activate the contract fee for swaps by setting the collection address, restricted to contract owner
 (define-public (set-fee-to-address (token-x principal) (token-y principal) (address principal))
