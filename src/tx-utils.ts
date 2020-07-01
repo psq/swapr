@@ -44,11 +44,16 @@ export async function waitForTX(base_url: string, tx_id: string, max_wait: numbe
     let wait_count = Math.round(max_wait / wait_time)
     while (wait_count > 0) {
       const response = await fetch(`${base_url}/sidecar/v1/tx/${unwrapped_tx_id}`, options)
-
+      // console.log("waitForTX.response", response)
       if (response.ok) {
         const json = await response.json()
+        // console.log("waitForTX.json", json)
         if (json.tx_status === 'success') {
           return json
+        } else if (json.tx_status === 'pending') {
+          console.log("pending... waiting", wait_count)
+          await wait(500)
+          wait_count--
         } else {
           throw new Error(`transaction ${unwrapped_tx_id} failed: ${json.tx_status}`)
         }

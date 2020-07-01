@@ -103,7 +103,7 @@ describe("wrapr scenario", async () => {
     assert.equal(balance_bob_token_1.toString(), '30000')
 
     const balance_bob_stx_1 = await stacksClient.STXBalance(keys_bob)
-    assert.equal(balance_bob_stx_1.toString(), ((new BigNum('1020000')).sub(bob_fees)).toString())
+    assert.equal(balance_bob_stx_1.toString(), ((new BigNum('1020001')).sub(bob_fees)).toString())
 
     const balance_wrapr_stx = await stacksClient.STXBalance(keys_contracts)
     assert.equal(balance_wrapr_stx.toString(), new BigNum('1995291').toString())

@@ -136,6 +136,7 @@
       ;; TODO(psq) check if x or y is 0, to calculate proper exchange rate unless shares-total is 0, which would be an error
       (if
         (and
+          ;; TODO(psq): check that the amount transfered in matches the amount requested
           (is-ok (print (contract-call? token-x-trait transfer contract-address x)))
           (is-ok (print (contract-call? token-y-trait transfer contract-address y)))
         )
@@ -271,6 +272,7 @@
         (print dy)
         (print fee)
         (if (and
+          ;; TODO(psq): check that the amount transfered in matches the amount requested
           (is-ok (print (contract-call? token-x-trait transfer contract-address dx)))
           (is-ok (print (as-contract (contract-call? token-y-trait transfer sender dy))))
           )
@@ -326,6 +328,7 @@
         (print dy)
         (print fee)
         (if (and
+          ;; TODO(psq): check that the amount transfered in matches the amount requested
           (is-ok (print (contract-call? token-x-trait transfer contract-address dx)))
           (is-ok (print (as-contract (contract-call? token-y-trait transfer sender dy))))
           )
@@ -380,6 +383,7 @@
         (print dy)
         (print fee)
         (if (and
+          ;; TODO(psq): check that the amount transfered in matches the amount requested
           (is-ok (print (as-contract (contract-call? token-x-trait transfer sender dx))))
           (is-ok (print (contract-call? token-y-trait transfer contract-address dy)))
           )
@@ -435,6 +439,7 @@
         (print dy)
         (print fee)
         (if (and
+          ;; TODO(psq): check that the amount transfered in matches the amount requested
           (is-ok (print (as-contract (contract-call? token-x-trait transfer sender dx))))
           (is-ok (print (contract-call? token-y-trait transfer contract-address dy)))
           )
