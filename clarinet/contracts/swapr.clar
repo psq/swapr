@@ -243,32 +243,35 @@
           (dy (/ (* u997 balance-x dx) (+ (* u1000 balance-y) (* u997 dx)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
           (fee (/ (* u5 dx) u10000)) ;; 5 bp
         )
-        (if (and
-          ;; TODO(psq): check that the amount transfered in matches the amount requested
-            (is-ok (contract-call? token-x-trait transfer dx sender contract-address))
-            (is-ok (as-contract (contract-call? token-y-trait transfer dy contract-address sender)))
-          )
-          (begin
-            (map-set pairs-data-map { token-x: token-x, token-y: token-y }
-              {
-                shares-total: (get shares-total pair),
-                balance-x: (+ (get balance-x pair) dx),
-                balance-y: (- (get balance-y pair) dy),
-                fee-balance-x:
-                  (if (is-some (get fee-to-address pair))  ;; only collect fee when fee-to-address is set
-                    (+ fee (get fee-balance-x pair))
-                    (get fee-balance-x pair)
-                  )
-                ,
-                fee-balance-y: (get fee-balance-y pair),
-                fee-to-address: (get fee-to-address pair),
-                name: (get name pair),
-                swapr-token: (get swapr-token pair),
-              }
+        (if (< min-dy dy)
+          (if (and
+            ;; TODO(psq): check that the amount transfered in matches the amount requested
+              (is-ok (contract-call? token-x-trait transfer dx sender contract-address))
+              (is-ok (as-contract (contract-call? token-y-trait transfer dy contract-address sender)))
             )
-            (ok (list dx dy))
+            (begin
+              (map-set pairs-data-map { token-x: token-x, token-y: token-y }
+                {
+                  shares-total: (get shares-total pair),
+                  balance-x: (+ (get balance-x pair) dx),
+                  balance-y: (- (get balance-y pair) dy),
+                  fee-balance-x:
+                    (if (is-some (get fee-to-address pair))  ;; only collect fee when fee-to-address is set
+                      (+ fee (get fee-balance-x pair))
+                      (get fee-balance-x pair)
+                    )
+                  ,
+                  fee-balance-y: (get fee-balance-y pair),
+                  fee-to-address: (get fee-to-address pair),
+                  name: (get name pair),
+                  swapr-token: (get swapr-token pair),
+                }
+              )
+              (ok (list dx dy))
+            )
+            transfer-failed-err
           )
-          transfer-failed-err
+          too-much-slippage-err
         )
       )
     )
@@ -292,32 +295,35 @@
           (dx (/ (* u997 balance-x dy) (+ (* u1000 balance-y) (* u997 dy)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
           (fee (/ (* u5 dy) u10000)) ;; 5 bp
         )
-        (if (and
-          ;; TODO(psq): check that the amount transfered in matches the amount requested
-          (is-ok (as-contract (contract-call? token-x-trait transfer dx contract-address sender)))
-          (is-ok (contract-call? token-y-trait transfer dy sender contract-address))
-          )
-          (begin
-            (map-set pairs-data-map { token-x: token-x, token-y: token-y }
-              {
-                shares-total: (get shares-total pair),
-                balance-x: (- (get balance-x pair) dx),
-                balance-y: (+ (get balance-y pair) dy),
-                fee-balance-x: (get fee-balance-x pair),
-                fee-balance-y:
-                  (if (is-some (get fee-to-address pair))  ;; only collect fee when fee-to-address is set
-                    (+ fee (get fee-balance-y pair))
-                    (get fee-balance-y pair)
-                  )
-                ,
-                fee-to-address: (get fee-to-address pair),
-                name: (get name pair),
-                swapr-token: (get swapr-token pair),
-              }
+        (if (< min-dx dx)
+          (if (and
+            ;; TODO(psq): check that the amount transfered in matches the amount requested
+            (is-ok (as-contract (contract-call? token-x-trait transfer dx contract-address sender)))
+            (is-ok (contract-call? token-y-trait transfer dy sender contract-address))
             )
-            (ok (list dx dy))
+            (begin
+              (map-set pairs-data-map { token-x: token-x, token-y: token-y }
+                {
+                  shares-total: (get shares-total pair),
+                  balance-x: (- (get balance-x pair) dx),
+                  balance-y: (+ (get balance-y pair) dy),
+                  fee-balance-x: (get fee-balance-x pair),
+                  fee-balance-y:
+                    (if (is-some (get fee-to-address pair))  ;; only collect fee when fee-to-address is set
+                      (+ fee (get fee-balance-y pair))
+                      (get fee-balance-y pair)
+                    )
+                  ,
+                  fee-to-address: (get fee-to-address pair),
+                  name: (get name pair),
+                  swapr-token: (get swapr-token pair),
+                }
+              )
+              (ok (list dx dy))
+            )
+            transfer-failed-err
           )
-          transfer-failed-err
+          too-much-slippage-err
         )
       )
     )

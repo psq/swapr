@@ -1,6 +1,6 @@
 
 import { Clarinet, Tx, types } from 'https://deno.land/x/clarinet@v0.3.0/index.ts'
-import { assertEquals } from 'https://deno.land/std@0.90.0/testing/asserts.ts'
+import { assertEquals, assertExists } from 'https://deno.land/std@0.90.0/testing/asserts.ts'
 import { unwrapList, unwrapOK, unwrapTuple, unwrapUInt, parse } from './utils.js'
 
 Clarinet.test({
@@ -23,6 +23,9 @@ Clarinet.test({
     assertEquals(block.receipts.length, 1)
     assertEquals(block.height, 2)
     console.log("")
+
+    assertExists(unwrapOK(parse(block.receipts[0].result)))
+
 
     const result_get_pair_count = chain.callReadOnlyFn('swapr', 'get-pair-count', [], accounts[0].address).result
     console.log("result_get_pair_count", result_get_pair_count)
@@ -58,12 +61,15 @@ Clarinet.test({
         types.principal('ST000000000000000000002AMW42H.plaid-token'),
         types.principal('ST000000000000000000002AMW42H.stx-token'),
         types.uint(10000),
-        types.uint(7000),  // with 1.5 exchange rate, would get 6642 with fee
+        types.uint(6600),  // with 1.5 exchange rate, would get 6642 with fee
       ], accounts[0].address),
 
     ])
     assertEquals(block.receipts.length, 1)
     assertEquals(block.height, 3)
+
+    assertExists(unwrapOK(parse(block.receipts[0].result)))
+
 
     const result_pair1_get_balances_2 = chain.callReadOnlyFn('swapr', 'get-balances', [types.principal(pair1['token-x']), types.principal(pair1['token-y'])], accounts[0].address).result
     console.log("result_pair1_get_balances_2", result_pair1_get_balances_2)
