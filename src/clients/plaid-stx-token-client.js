@@ -18,7 +18,7 @@ export class PlaidSTXTokenClient extends Client {
   constructor(provider) {
     super(
       `SP3MT6QYRJ51YDNEEHCKA0232QHQCWSW4N5S8M370.plaid-stx-token`,
-      'plaid-stx-token',
+      './clarinet/contracts/plaid-stx-token',
       provider
     )
   }

@@ -65,8 +65,8 @@ describe("full test suite", () => {
     )
     provider = await ProviderRegistry.createProvider()
 
-    sip_010_client = new Client('SP3MT6QYRJ51YDNEEHCKA0232QHQCWSW4N5S8M370.sip-010', 'sip-010', provider)
-    swapr_trait_client = new Client('SP3MT6QYRJ51YDNEEHCKA0232QHQCWSW4N5S8M370.swapr-trait', 'swapr-trait', provider)
+    sip_010_client = new Client('SP3MT6QYRJ51YDNEEHCKA0232QHQCWSW4N5S8M370.sip-010', './clarinet/contracts/sip-010', provider)
+    swapr_trait_client = new Client('SP3MT6QYRJ51YDNEEHCKA0232QHQCWSW4N5S8M370.swapr-trait', './clarinet/contracts/swapr-trait', provider)
     plaid_token_client = new PlaidTokenClient(provider)
     stx_token_client = new STXTokenClient(provider)
     plaid_stx_token_client = new PlaidSTXTokenClient(provider)

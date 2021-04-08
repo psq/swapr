@@ -17,7 +17,7 @@ export class STXTokenClient extends Client {
   constructor(provider) {
     super(
       'SP3MT6QYRJ51YDNEEHCKA0232QHQCWSW4N5S8M370.stx-token',
-      'stx-token',
+      './clarinet/contracts/stx-token',
       provider
     );
   }

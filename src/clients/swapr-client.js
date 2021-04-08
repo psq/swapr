@@ -21,7 +21,7 @@ export class SwaprClient extends Client {
   constructor(provider) {
     super(
       'SP138CBPVKYBQQ480EZXJQK89HCHY32XBQ0T4BCCD.swapr',
-      'swapr',
+      './clarinet/contracts/swapr',
       provider
     )
   }
