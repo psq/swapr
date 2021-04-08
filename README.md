@@ -58,25 +58,15 @@ Add x amount of the X token, and y amount of Y token by transfering from the sen
 #### `(reduce-position (percent uint))`
 Transfer back proportional amount of token X and token Y to the sender based on the sender's share of the pool, up to 100% of what the sender owns.
 
-#### `(swap-exact-x-for-y (dx uint))`
+#### `(swap-x-for-y (dx uint))`
 Send x of the X token, and gets back an amount of token Y based on current exchange rate, give or take slippage
 
 Returns `dy`.
 
-#### `(swap-x-for-exact-y (dy uint))`
-Send the amount of X token necessary to get back y of token Y at current exchange rate, give or take slippage
-
-Returns `dx`.
-
-#### `(swap-exact-y-for-x (dy uint))`
+#### `(swap-y-for-x (dy uint))`
 Send y of the Y token, and gets back an amount of token X based on current exchange rate, give or take slippage
 
 Returns `dx`.
-
-#### `(swap-y-for-exact-x (dx uint))`
-Send the amount of Y token necessary to get back x of token X at current exchange rate, give or take slippage
-
-Returns `dy`.
 
 #### `(get-position-of (owner principal))`  read-only
 Get the X and Y token positions for `owner`

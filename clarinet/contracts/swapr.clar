@@ -229,7 +229,7 @@
 
 ;; exchange known dx of x-token for whatever dy of y-token based on current liquidity, returns (dx dy)
 ;; the swap will not happen if can't get at least min-dy back
-(define-public (swap-exact-x-for-y (token-x-trait <src20-token>) (token-y-trait <src20-token>) (dx uint) (min-dy uint))
+(define-public (swap-x-for-y (token-x-trait <src20-token>) (token-y-trait <src20-token>) (dx uint) (min-dy uint))
   ;; calculate dy
   ;; calculate fee on dx
   ;; transfer
@@ -277,7 +277,7 @@
 
 ;; exchange known dy for whatever dx based on liquidity, returns (dx dy)
 ;; the swap will not happen if can't get at least min-dx back
-(define-public (swap-exact-y-for-x (token-x-trait <src20-token>) (token-y-trait <src20-token>) (dy uint) (min-dx uint))
+(define-public (swap-y-for-x (token-x-trait <src20-token>) (token-y-trait <src20-token>) (dy uint) (min-dx uint))
   ;; calculate dx
   ;; calculate fee on dy
   ;; transfer

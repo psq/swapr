@@ -151,13 +151,13 @@ export class SwaprTXClient {
     return result
   }
 
-  async swapExactXforY(dx: number, params: { keys_sender: any }) {
-    console.log("swapExactXforY", params.keys_sender.stacksAddress, dx)
+  async swapXforY(dx: number, params: { keys_sender: any }) {
+    console.log("swapXforY", params.keys_sender.stacksAddress, dx)
     const fee = new BigNum(256)
     const transaction = await makeContractCall({
       contractAddress: this.keys.stacksAddress,
       contractName: this.contract_name,
-      functionName: "swap-exact-x-for-y",
+      functionName: "swap-x-for-y",
       functionArgs: [uintCV(dx)],
       senderKey: params.keys_sender.secretKey,
       network: this.network,
@@ -181,74 +181,14 @@ export class SwaprTXClient {
     return result
   }
 
-  async swapXforExactY(dy: number, params: { keys_sender: any }) {
-    console.log("swapXforExactY", params.keys_sender.stacksAddress, dy)
+  async swapYforX(dy: number, params: { keys_sender: any }) {
+    console.log("swapYforX", params.keys_sender.stacksAddress, dy)
     const fee = new BigNum(256)
     const transaction = await makeContractCall({
       contractAddress: this.keys.stacksAddress,
       contractName: this.contract_name,
-      functionName: "swap-x-for-exact-y",
+      functionName: "swap-y-for-x",
       functionArgs: [uintCV(dy)],
-      senderKey: params.keys_sender.secretKey,
-      network: this.network,
-      postConditionMode: PostConditionMode.Allow,
-      postConditions: [
-        // makeStandardSTXPostCondition(
-        //   keys_sender.stacksAddress,
-        //   FungibleConditionCode.Equal,
-        //   new BigNum(amount)
-        // ),
-        // makeStandardFungiblePostCondition(
-        // ),
-      ],
-      fee,
-      // nonce: new BigNum(0),
-    })
-    const tx_id = await broadcastTransaction(transaction, this.network)
-    const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
-
-    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex")) as ListCV
-    return result
-  }
-
-  async swapExactYforX(dy: number, params: { keys_sender: any }) {
-    console.log("swapExactYforX", params.keys_sender.stacksAddress, dy)
-    const fee = new BigNum(256)
-    const transaction = await makeContractCall({
-      contractAddress: this.keys.stacksAddress,
-      contractName: this.contract_name,
-      functionName: "swap-exact-y-for-x",
-      functionArgs: [uintCV(dy)],
-      senderKey: params.keys_sender.secretKey,
-      network: this.network,
-      postConditionMode: PostConditionMode.Allow,
-      postConditions: [
-        // makeStandardSTXPostCondition(
-        //   keys_sender.stacksAddress,
-        //   FungibleConditionCode.Equal,
-        //   new BigNum(amount)
-        // ),
-        // makeStandardFungiblePostCondition(
-        // ),
-      ],
-      fee,
-      // nonce: new BigNum(0),
-    })
-    const tx_id = await broadcastTransaction(transaction, this.network)
-    const tx = await waitForTX(this.network.coreApiUrl, tx_id, 10000)
-
-    const result = deserializeCV(Buffer.from(tx.tx_result.hex.substr(2), "hex")) as ListCV
-    return result
-  }
-
-  async swapYforExactX(dx: number, params: { keys_sender: any }) {
-    console.log("swapYforExactX", params.keys_sender.stacksAddress, dx)
-    const fee = new BigNum(256)
-    const transaction = await makeContractCall({
-      contractAddress: this.keys.stacksAddress,
-      contractName: this.contract_name,
-      functionName: "swap-y-for-exact-x",
-      functionArgs: [uintCV(dx)],
       senderKey: params.keys_sender.secretKey,
       network: this.network,
       postConditionMode: PostConditionMode.Allow,

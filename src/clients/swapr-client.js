@@ -67,9 +67,9 @@ export class SwaprClient extends Client {
     throw new NotOKErr()
   }
 
-  async swapExactXforY(dx, params) {
+  async swapXforY(dx, params) {
     const tx = this.createTransaction({
-      method: { name: "swap-exact-x-for-y", args: [`u${dx}`] }
+      method: { name: "swap-x-for-y", args: [`u${dx}`] }
     })
     await tx.sign(params.sender)
     const receipt = await this.submitTransaction(tx)
@@ -101,9 +101,9 @@ export class SwaprClient extends Client {
     throw new NotOKErr()
   }
 
-  async swapExactYforX(dy, params) {
+  async swapYforX(dy, params) {
     const tx = this.createTransaction({
-      method: { name: "swap-exact-y-for-x", args: [`u${dy}`] }
+      method: { name: "swap-y-for-x", args: [`u${dy}`] }
     })
     await tx.sign(params.sender)
     const receipt = await this.submitTransaction(tx)

@@ -53,8 +53,8 @@ Clarinet.test({
 
     block = chain.mineBlock([
 
-      // swap-exact-x-for-y (token-x-trait <src20-token>) (token-y-trait <src20-token>) (dx uint) (min-dy uint)
-      Tx.contractCall('swapr', 'swap-exact-x-for-y', [
+      // swap-x-for-y (token-x-trait <src20-token>) (token-y-trait <src20-token>) (dx uint) (min-dy uint)
+      Tx.contractCall('swapr', 'swap-x-for-y', [
         types.principal('ST000000000000000000002AMW42H.plaid-token'),
         types.principal('ST000000000000000000002AMW42H.stx-token'),
         types.uint(10000),
