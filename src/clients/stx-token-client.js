@@ -1,25 +1,28 @@
-import { Client, Provider, Receipt, Result } from '@blockstack/clarity'
+import clarity from '@blockstack/clarity'
+
+const { Client, Provider, Receipt, Result } = clarity
+
 import {
   TransferError,
-} from '../errors'
+} from '../errors.js'
 
 import {
   parse,
   unwrapXYList,
   unwrapSome,
   unwrapOK,
-} from '../utils'
+} from '../utils.js'
 
-export class WraprClient extends Client {
-  constructor(provider: Provider) {
+export class STXTokenClient extends Client {
+  constructor(provider) {
     super(
-      'SP3MT6QYRJ51YDNEEHCKA0232QHQCWSW4N5S8M370.wrapr',
-      'wrapr',
+      'SP3MT6QYRJ51YDNEEHCKA0232QHQCWSW4N5S8M370.stx-token',
+      'stx-token',
       provider
     );
   }
 
-  async wrap(amount: number, params: { sender: string }): Promise<boolean> {
+  async wrap(amount, params) {
     const tx = this.createTransaction({
       method: { name: "wrap", args: [`u${amount}`] }
     });
@@ -33,7 +36,7 @@ export class WraprClient extends Client {
     throw new TransferError()
   }
 
-  async unwrap(amount: number, params: { sender: string }): Promise<boolean> {
+  async unwrap(amount, params) {
     const tx = this.createTransaction({
       method: { name: "unwrap", args: [`u${amount}`] }
     })
@@ -47,7 +50,7 @@ export class WraprClient extends Client {
     throw new TransferError()
   }
 
-  async transfer(recipient: string, amount: number, params: { sender: string }): Promise<boolean> {
+  async transfer(recipient, amount, params) {
     const tx = this.createTransaction({
       method: { name: "transfer", args: [`'${recipient}`, `u${amount}`] }
     })
@@ -62,7 +65,7 @@ export class WraprClient extends Client {
     throw new TransferError()
   }
 
-  async balanceOf(owner: string): Promise<number> {
+  async balanceOf(owner) {
     const query = this.createQuery({
       method: {
         name: 'balance-of',
@@ -74,7 +77,7 @@ export class WraprClient extends Client {
     return Result.unwrapUInt(receipt)
   }
 
-  async totalSupply(): Promise<number> {
+  async totalSupply() {
     const query = this.createQuery({
       method: {
         name: 'get-total-supply',

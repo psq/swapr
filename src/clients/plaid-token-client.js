@@ -1,28 +1,29 @@
-import { Client, Provider, Receipt, Result } from '@blockstack/clarity'
+import clarity from '@blockstack/clarity'
+
+const { Client, Provider, Receipt, Result } = clarity
+
 import {
   TransferError,
-} from '../errors'
+} from '../errors.js'
 
 import {
   parse,
   unwrapXYList,
   unwrapSome,
   unwrapOK,
-} from '../utils'
+} from '../utils.js'
 
-export class TokenClient extends Client {
-  token_name: string
+export class PlaidTokenClient extends Client {
 
-  constructor(name: string, principal: string, provider: Provider) {
+  constructor(provider) {
     super(
-      `${principal}.my-token`,
-      'my-token',
+      `SP3MT6QYRJ51YDNEEHCKA0232QHQCWSW4N5S8M370.plaid-token`,
+      'plaid-token',
       provider
     )
-    this.token_name = name  // TODO(psq): currently can not use the same trick used in tx clients, so instead make a temp file with replaced values?
   }
 
-  async transfer(recipient: string, amount: number, params: { sender: string }): Promise<boolean> {
+  async transfer(recipient, amount, params) {
     const tx = this.createTransaction({
       method: { name: "transfer", args: [`'${recipient}`, `u${amount}`] }
     })
@@ -36,7 +37,7 @@ export class TokenClient extends Client {
     throw TransferError
   }
 
-  async balanceOf(owner: string): Promise<number> {
+  async balanceOf(owner) {
     const query = this.createQuery({
       method: {
         name: 'balance-of',

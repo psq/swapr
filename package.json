@@ -1,6 +1,7 @@
 {
   "name": "swapr",
-  "version": "0.0.1",
+  "type": "module",
+  "version": "0.0.2",
   "author": {
     "name": "Pascal Belloncle",
     "email": "psq@nanorails.com"
@@ -13,26 +14,16 @@
     "node": ">=10"
   },
   "scripts": {
-    "build": "rimraf ./lib && tsc",
-    "test": "mocha 'test/unit/*.ts'",
-    "wrapr": "mocha 'test/integration/wrapr-integration.ts'",
-    "swapr": "mocha 'test/integration/swapr-integration.ts'"
+    "test": "mocha 'test/unit/*.js'",
+    "swapr": "mocha 'test/integration/swapr-integration.js'"
   },
   "devDependencies": {
-    "@types/node": "^10",
-    "typescript": "^3.5.2",
-    "ts-node": "^8.2.0",
-    "chai": "^4.2.0",
-    "@types/chai": "^4.1.7",
-    "mocha": "^6.1.4",
+    "chai": "^4.3.4",
     "chai-string": "^1.5.0",
-    "@types/mocha": "^5.2.7",
-    "rimraf": "^3.0.2"
+    "mocha": "^8.3.2"
   },
   "dependencies": {
-    "@blockstack/clarity": "^0.1.16",
-    "@blockstack/clarity-native-bin": "^0.1.16",
-    "@blockstack/stacks-transactions": "^0.4.4",
-    "bn.js": "^5.1.2"
+    "@blockstack/clarity": "^0.3.11",
+    "@blockstack/clarity-cli": "^0.3.11"
   }
 }

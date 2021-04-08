@@ -1,0 +1,10 @@
+[network]
+name = "Development"
+
+[accounts.wallet_1]
+mnemonic = "market ocean tortoise venue vivid coach machine category conduct enable insect jump fog file test core book chaos crucial burst version curious prosper fever"
+balance = 1_000_000_000_000
+
+[accounts.wallet_2]
+mnemonic = "firm sword marriage reveal please kitten salon waste enjoy desert survey bench wonder hollow endless work senior rough boring mind toast sea obscure release"
+balance = 1_000_000_000_000

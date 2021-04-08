@@ -4,9 +4,9 @@ import {
   NotOwnerError,
   NotOKErr,
   NotSomeErr,
-} from './errors'
+} from './errors.js'
 
-export function parse(value: string) {
+export function parse(value) {
   let index = 0
   function sub() {
     const keywords = []
@@ -38,12 +38,12 @@ export function parse(value: string) {
   return sub()[0]
 }
 
-export function unwrapList(tree: any) {
+export function unwrapList(tree) {
   // console.log("unwrapList", tree)
   return tree
 }
 
-export function unwrapXYList(tree: any) {
+export function unwrapXYList(tree) {
   // console.log("unwrapXYList", tree)
   return {
     x: parseInt(tree[0].substring(1)),
@@ -51,7 +51,7 @@ export function unwrapXYList(tree: any) {
   }
 }
 
-export function unwrapSome(tree: any): any {
+export function unwrapSome(tree) {
   // console.log("unwrapSome", tree)
   if (tree[0] === 'some') {
     return tree[1]
@@ -69,7 +69,7 @@ export function unwrapOK(tree) {
   }
 }
 
-export function replaceString(body: string, original: string, replacement: string) {
+export function replaceString(body, original, replacement) {
   const regexp = new RegExp(original, 'g')  // limited to principal and contract names with . and - should work
   return body.replace(regexp, replacement)
 }

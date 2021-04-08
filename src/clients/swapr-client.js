@@ -1,21 +1,24 @@
-import { Client, Provider, Receipt, Result } from '@blockstack/clarity'
+import clarity from '@blockstack/clarity'
+
+const { Client, Provider, Receipt, Result } = clarity
+
 import {
   ClarityParseError,
   NoLiquidityError,
   NotOwnerError,
   NotOKErr,
   NotSomeErr,
-} from '../errors'
+} from '../errors.js'
 
 import {
   parse,
   unwrapXYList,
   unwrapSome,
   unwrapOK,
-} from '../utils'
+} from '../utils.js'
 
 export class SwaprClient extends Client {
-  constructor(provider: Provider) {
+  constructor(provider) {
     super(
       'SP138CBPVKYBQQ480EZXJQK89HCHY32XBQ0T4BCCD.swapr',
       'swapr',
@@ -23,9 +26,22 @@ export class SwaprClient extends Client {
     )
   }
 
-  async addToPosition(x: number, y: number, params: { sender: string }): Promise<boolean> {
+  async createPair(token_x, token_y, token_swapr, name, x, y, params) {
+    console.log("createPair", token_x, token_y, token_swapr, name, x, y)
     const tx = this.createTransaction({
-      method: { name: "add-to-position", args: [`u${x}`, `u${y}`] }
+      method: { name: "create-pair", args: [`'${token_x}`, `'${token_y}`, `'${token_swapr}`, `"${name}"`, `u${x}`, `u${y}`] }
+      })
+    await tx.sign(params.sender)
+    const receipt = await this.submitTransaction(tx)
+    console.log(receipt)
+    console.log(receipt.debugOutput)
+    const result = Result.unwrap(receipt)
+    return result.startsWith('Transaction executed and committed. Returned: true')
+  }
+
+  async addToPosition(token_x, token_y, token_swapr, x, y, params) {
+    const tx = this.createTransaction({
+      method: { name: "add-to-position", args: [`'${token_x}`, `'${token_y}`, `'${token_swapr}`, `u${x}`, `u${y}`] }
     })
     await tx.sign(params.sender)
     const receipt = await this.submitTransaction(tx)
@@ -34,7 +50,7 @@ export class SwaprClient extends Client {
     return result.startsWith('Transaction executed and committed. Returned: true')
   }
 
-  async reducePosition(percent: number, params: { sender: string }): Promise<Object> {
+  async reducePosition(percent, params) {
     const tx = this.createTransaction({
       method: { name: "reduce-position", args: [`u${percent}`] }
     })
@@ -51,7 +67,7 @@ export class SwaprClient extends Client {
     throw new NotOKErr()
   }
 
-  async swapExactXforY(dx: number, params: { sender: string }): Promise<Object> {
+  async swapExactXforY(dx, params) {
     const tx = this.createTransaction({
       method: { name: "swap-exact-x-for-y", args: [`u${dx}`] }
     })
@@ -68,7 +84,7 @@ export class SwaprClient extends Client {
     throw new NotOKErr()
   }
 
-  async swapXforExactY(dy: number, params: { sender: string }): Promise<Object> {
+  async swapXforExactY(dy, params) {
     const tx = this.createTransaction({
       method: { name: "swap-x-for-exact-y", args: [`u${dy}`] }
     })
@@ -85,7 +101,7 @@ export class SwaprClient extends Client {
     throw new NotOKErr()
   }
 
-  async swapExactYforX(dy: number, params: { sender: string }): Promise<Object> {
+  async swapExactYforX(dy, params) {
     const tx = this.createTransaction({
       method: { name: "swap-exact-y-for-x", args: [`u${dy}`] }
     })
@@ -102,7 +118,7 @@ export class SwaprClient extends Client {
     throw new NotOKErr()
   }
 
-  async swapYforExactX(dx: number, params: { sender: string }): Promise<Object> {
+  async swapYforExactX(dx, params) {
     const tx = this.createTransaction({
       method: { name: "swap-y-for-exact-x", args: [`u${dx}`] }
     })
@@ -119,7 +135,7 @@ export class SwaprClient extends Client {
     throw new NotOKErr()
   }
 
-  async positionOf(owner: string): Promise<number> {
+  async positionOf(owner) {
     const query = this.createQuery({
       method: {
         name: 'get-position-of',
@@ -130,7 +146,7 @@ export class SwaprClient extends Client {
     return Result.unwrapUInt(receipt)
   }
 
-  async balances(): Promise<Object> {
+  async balances() {
     const query = this.createQuery({
       method: {
         name: 'get-balances',
@@ -141,7 +157,7 @@ export class SwaprClient extends Client {
     return unwrapXYList(unwrapOK(parse(Result.unwrap(receipt))))
   }
 
-  async positions(): Promise<number> {
+  async positions() {
     const query = this.createQuery({
       method: {
         name: 'get-positions',
@@ -152,7 +168,7 @@ export class SwaprClient extends Client {
     return Result.unwrapUInt(receipt)
   }
 
-  async balancesOf(owner: string): Promise<Object> {
+  async balancesOf(owner) {
     const query = this.createQuery({
       method: {
         name: 'get-balances-of',
@@ -169,7 +185,7 @@ export class SwaprClient extends Client {
     }
   }
 
-  async setFeeTo(address: string, params: { sender: string }): Promise<boolean> {
+  async setFeeTo(address, params) {
     const tx = this.createTransaction({
       method: { name: "set-fee-to-address", args: [`'${address}`] }
     })
@@ -192,7 +208,7 @@ export class SwaprClient extends Client {
     throw new NotOwnerError()
   }
 
-  async resetFeeTo(params: { sender: string }): Promise<boolean> {
+  async resetFeeTo(params) {
     const tx = this.createTransaction({
       method: { name: "reset-fee-to-address", args: [] }
     })
@@ -215,7 +231,7 @@ export class SwaprClient extends Client {
     throw new NotOwnerError()
   }
 
-  async collectFees(params: { sender: string }): Promise<Object> {
+  async collectFees(params) {
     const tx = this.createTransaction({
       method: { name: "collect-fees", args: [] }
     })
@@ -235,7 +251,7 @@ export class SwaprClient extends Client {
     throw new NotOwnerError()
   }
 
-  async getFeeTo(): Promise<string | null> {
+  async getFeeTo() {
     const query = this.createQuery({
       atChaintip: true,
       method: { name: "get-fee-to-address", args: [] }
@@ -246,7 +262,7 @@ export class SwaprClient extends Client {
     return (value === 'none' ? null : unwrapSome(value))
   }
 
-  async fees(): Promise<Object> {
+  async fees() {
     const query = this.createQuery({
       method: {
         name: 'get-fees',
