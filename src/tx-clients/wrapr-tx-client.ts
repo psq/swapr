@@ -22,7 +22,7 @@ import {
   broadcastTransaction,
 
   PostConditionMode,
-} from '@blockstack/stacks-transactions'
+} from '@stacks/transactions'
 
 import {
   wait,

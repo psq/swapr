@@ -16,12 +16,10 @@
 
 (define-read-only (get-name)
   (ok "plaid-stx-swapr")
-;;   (contract-call? 'ST000000000000000000002AMW42H.swapr get-name 'ST000000000000000000002AMW42H.plaid-token 'ST000000000000000000002AMW42H.stx-token)
 )
 
 (define-read-only (get-symbol)
   (ok "plaid-stx-swapr")
-;;   (contract-call? 'ST000000000000000000002AMW42H.swapr get-symbol 'ST000000000000000000002AMW42H.plaid-token 'ST000000000000000000002AMW42H.stx-token)
 )
 
 ;; the number of decimals used
