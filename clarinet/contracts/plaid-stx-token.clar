@@ -1,5 +1,5 @@
 ;; ;; we implement the sip-010 + a mint function
-(impl-trait 'ST000000000000000000002AMW42H.swapr-trait.swapr-trait)
+(impl-trait 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.swapr-trait.swapr-trait)
 
 ;; ;; we can use an ft-token here, so use it!
 (define-fungible-token token)
@@ -33,7 +33,7 @@
 
 (define-read-only (get-total-supply)
   (ok u0)
-;;   (contract-call? 'ST000000000000000000002AMW42H.swapr get-total-supply 'ST000000000000000000002AMW42H.plaid-token 'ST000000000000000000002AMW42H.stx-token)
+;;   (contract-call? 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.swapr get-total-supply 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.plaid-token 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.stx-token)
 )
 
 (define-read-only (get-token-uri)
@@ -48,7 +48,7 @@
     (print "token-swapr.mint")
     (print contract-caller)
     (print amount)
-    (if (is-eq contract-caller 'ST000000000000000000002AMW42H.swapr)
+    (if (is-eq contract-caller 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.swapr)
       (ft-mint? token amount recipient)
       (err no-acccess-err)
     )

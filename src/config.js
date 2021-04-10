@@ -15,3 +15,6 @@ export const CONTRACT_NAME_PLAID_STX = process.env.CONTRACT_NAME_PLAID_STX
 export const SWAPR_PK = process.env.SWAPR_PK
 export const SWAPR_SK = process.env.SWAPR_SK
 export const SWAPR_STX = process.env.SWAPR_STX
+
+export const USER_STX = process.env.USER_STX
+export const USER_SK = process.env.USER_SK

@@ -1,6 +1,5 @@
 ;; wrap the native STX token into an SRC20 compatible token to be usable along other tokens
-;; (use-trait src20-token .src20-trait.src20-trait)
-(impl-trait 'ST000000000000000000002AMW42H.sip-010.ft-trait)
+(impl-trait 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.sip-010.ft-trait)
 
 (define-fungible-token plaid)
 
@@ -13,7 +12,7 @@
 ;; TODO(psq): we don't have access yet, but once POX is available, this should be a value that
 ;; is available from Clarity
 (define-read-only (get-total-supply)
-  (ok u0)
+  (ok (ft-get-supply plaid))
 )
 
 ;; returns the token name
@@ -27,7 +26,7 @@
 
 ;; the number of decimals used
 (define-read-only (get-decimals)
-  (ok u8)
+  (ok u8)  ;; because we can, and interesting for testing wallets and other clients
 )
 
 (define-read-only (get-token-uri)
@@ -37,6 +36,7 @@
 ;;   "name":"Plaid",
 ;;   "description":"Plaid token, uses as a test token",
 ;;   "image":"https://swapr.finance/tokens/plaid.png"
+;;   "vector":"https://swapr.finance/tokens/plaid.svg"
 ;; }
 
 
@@ -55,5 +55,5 @@
 )
 
 ;; TODO(psq): remove for mainnet, how???
-(ft-mint? plaid u1000000000000 'ST2SVRCJJD90TER037VCSAFA781HQTCPFK9YRA6J5)  ;; expected but clarinet uses ST3AA33M8SS15A30ETXE134ZXD8TNEDHT8Q955G40
-(ft-mint? plaid u1000000000000 'ST3AA33M8SS15A30ETXE134ZXD8TNEDHT8Q955G40)  ;; for clarinet, because not the same derivation
+(ft-mint? plaid u1000000000000 'ST2SVRCJJD90TER037VCSAFA781HQTCPFK9YRA6J5)  ;; expected but clarinet derives ST3AA33M8SS15A30ETXE134ZXD8TNEDHT8Q955G40
+;; (ft-mint? plaid u1000000000000 'ST3AA33M8SS15A30ETXE134ZXD8TNEDHT8Q955G40)  ;; for clarinet, because not the same derivation

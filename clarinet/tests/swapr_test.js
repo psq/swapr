@@ -1,5 +1,5 @@
-// import { Clarinet, Tx, types } from 'https://deno.land/x/clarinet@v0.4.0/index.ts'
-import { Clarinet, Tx, types } from './clarinet.ts'
+import { Clarinet, Tx, types } from 'https://deno.land/x/clarinet@v0.5.0/index.ts'
+// import { Clarinet, Tx, types } from './clarinet.ts'
 import { assertEquals, assertExists } from 'https://deno.land/std@0.90.0/testing/asserts.ts'
 import { unwrapList, unwrapOK, unwrapTuple, unwrapUInt, parse } from './utils.js'
 
@@ -9,9 +9,9 @@ Clarinet.test({
     let block = chain.mineBlock([
 
       Tx.contractCall('swapr', 'create-pair', [
-        types.principal('ST000000000000000000002AMW42H.plaid-token'),
-        types.principal('ST000000000000000000002AMW42H.stx-token'),
-        types.principal('ST000000000000000000002AMW42H.plaid-stx-token'),
+        types.principal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.plaid-token'),
+        types.principal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.stx-token'),
+        types.principal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.plaid-stx-token'),
         types.ascii('plaid-stx-token'),
         types.uint(10000000),
         types.uint(15000000),
@@ -29,8 +29,8 @@ Clarinet.test({
     const result_get_pair_contracts = chain.callReadOnlyFn('swapr', 'get-pair-contracts', [types.uint(1)], accounts[0].address).result
     const pair1 = result_get_pair_contracts.expectTuple()
 
-    pair1['token-x'].expectPrincipal('ST000000000000000000002AMW42H.plaid-token')
-    pair1['token-y'].expectPrincipal('ST000000000000000000002AMW42H.stx-token')
+    pair1['token-x'].expectPrincipal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.plaid-token')
+    pair1['token-y'].expectPrincipal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.stx-token')
 
     const result_get_pair_details = chain.callReadOnlyFn('swapr', 'get-pair-details', [types.principal(pair1['token-x']), types.principal(pair1['token-y'])], accounts[0].address).result
     const pair1_details = result_get_pair_details.expectTuple()
@@ -42,7 +42,7 @@ Clarinet.test({
     pair1_details['fee-to-address'].expectNone()
     pair1_details.name.expectAscii('plaid-stx-token')
     pair1_details['shares-total'].expectUint(12247448)
-    pair1_details['swapr-token'].expectPrincipal('ST000000000000000000002AMW42H.plaid-stx-token')
+    pair1_details['swapr-token'].expectPrincipal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.plaid-stx-token')
 
 
     const result_pair1_get_balances = chain.callReadOnlyFn('swapr', 'get-balances', [types.principal(pair1['token-x']), types.principal(pair1['token-y'])], accounts[0].address).result
@@ -58,10 +58,10 @@ Clarinet.test({
 
     block = chain.mineBlock([
 
-      // swap-x-for-y (token-x-trait <src20-token>) (token-y-trait <src20-token>) (dx uint) (min-dy uint)
+      // swap-x-for-y (token-x-trait <sip-010-token>) (token-y-trait <sip-010-token>) (dx uint) (min-dy uint)
       Tx.contractCall('swapr', 'swap-x-for-y', [
-        types.principal('ST000000000000000000002AMW42H.plaid-token'),
-        types.principal('ST000000000000000000002AMW42H.stx-token'),
+        types.principal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.plaid-token'),
+        types.principal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.stx-token'),
         types.uint(10000),
         types.uint(6600),  // with 1.5 exchange rate, would get 6642 with fee
       ], accounts[0].address),

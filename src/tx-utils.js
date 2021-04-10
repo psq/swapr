@@ -113,7 +113,7 @@ function principalToString(principal) {
 // }
 
 export async function getNonce() {
-  console.log("getNonce for", SWAPR_STX)
+  // console.log("getNonce for", SWAPR_STX)
   const result = await fetch(
     `${STACKS_API_URL}/v2/accounts/${SWAPR_STX}?proof=0`
   )

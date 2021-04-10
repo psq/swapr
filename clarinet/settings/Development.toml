@@ -1,10 +1,12 @@
 [network]
 name = "Development"
 
-[accounts.wallet_1]
-mnemonic = "market ocean tortoise venue vivid coach machine category conduct enable insect jump fog file test core book chaos crucial burst version curious prosper fever"
+[accounts.deployer]
+# ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE
+mnemonic = "fetch outside black test wash cover just actual execute nice door want airport betray quantum stamp fish act pen trust portion fatigue scissors vague"
 balance = 1_000_000_000_000
 
-[accounts.wallet_2]
+[accounts.wallet_1]
+# ST2SVRCJJD90TER037VCSAFA781HQTCPFK9YRA6J5
 mnemonic = "firm sword marriage reveal please kitten salon waste enjoy desert survey bench wonder hollow endless work senior rough boring mind toast sea obscure release"
 balance = 1_000_000_000_000
