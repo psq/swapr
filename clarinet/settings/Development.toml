@@ -10,3 +10,8 @@ balance = 1_000_000_000_000
 # ST2SVRCJJD90TER037VCSAFA781HQTCPFK9YRA6J5
 mnemonic = "firm sword marriage reveal please kitten salon waste enjoy desert survey bench wonder hollow endless work senior rough boring mind toast sea obscure release"
 balance = 1_000_000_000_000
+
+[accounts.wallet_2]
+# ST20ATRN26N9P05V2F1RHFRV24X8C8M3W54E427B2
+mnemonic = "arrange scale orient half ugly kid bike twin magnet joke hurt fiber ethics super receive version wreck media fluid much abstract reward street alter"
+balance = 1_000_000

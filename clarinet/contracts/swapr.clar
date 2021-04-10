@@ -1,7 +1,7 @@
 (use-trait sip-010-token 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.sip-010.ft-trait)
 (use-trait swapr-token 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.swapr-trait.swapr-trait)
 
-(define-constant contract-owner 'ST3J2GVMMM2R07ZFBJDWTYEYAR8FZH5WKDTFJ9AHA)
+(define-constant contract-owner 'ST20ATRN26N9P05V2F1RHFRV24X8C8M3W54E427B2)
 (define-constant no-liquidity-err (err u61))
 (define-constant transfer-failed-err (err u62))
 (define-constant not-owner-err (err u63))

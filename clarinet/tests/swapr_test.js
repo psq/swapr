@@ -21,6 +21,13 @@ Clarinet.test({
     assertEquals(block.receipts.length, 1)
     assertEquals(block.height, 2)
 
+
+
+    const asset_map = chain.getAssetsMaps()
+    console.log("asset_map", asset_map)
+
+
+
     block.receipts[0].result.expectOk().expectBool(true);
 
     const result_get_pair_count = chain.callReadOnlyFn('swapr', 'get-pair-count', [], accounts[0].address).result

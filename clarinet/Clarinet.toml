@@ -1,17 +1,17 @@
 [project]
 name = "swapr.clarinet"
 
-[contracts.plaid-stx-token]
-path = "contracts/plaid-stx-token.clar"
-depends_on = ["swapr-trait", "swapr"]
+[contracts.sip-010]
+path = "contracts/sip-010.clar"
+depends_on = []
+
+[contracts.swapr-trait]
+path = "contracts/swapr-trait.clar"
+depends_on = []
 
 [contracts.plaid-token]
 path = "contracts/plaid-token.clar"
 depends_on = ["sip-010"]
-
-[contracts.sip-010]
-path = "contracts/sip-010.clar"
-depends_on = []
 
 [contracts.stx-token]
 path = "contracts/stx-token.clar"
@@ -21,6 +21,6 @@ depends_on = ["sip-010"]
 path = "contracts/swapr.clar"
 depends_on = ["sip-010", "swapr-trait"]
 
-[contracts.swapr-trait]
-path = "contracts/swapr-trait.clar"
-depends_on = []
+[contracts.plaid-stx-token]
+path = "contracts/plaid-stx-token.clar"
+depends_on = ["swapr-trait", "swapr"]
