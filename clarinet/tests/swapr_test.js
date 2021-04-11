@@ -1,5 +1,5 @@
-// import { Clarinet, Tx, types } from 'https://deno.land/x/clarinet@v0.5.0/index.ts'
-import { Clarinet, Tx, types } from './clarinet.ts'
+import { Clarinet, Tx, types } from 'https://deno.land/x/clarinet@v0.5.2/index.ts'
+// import { Clarinet, Tx, types } from './clarinet.ts'
 import { assertEquals, assertExists } from 'https://deno.land/std@0.90.0/testing/asserts.ts'
 import { unwrapList, unwrapOK, unwrapTuple, unwrapUInt, parse } from './utils.js'
 
