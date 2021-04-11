@@ -6,6 +6,11 @@ import { unwrapList, unwrapOK, unwrapTuple, unwrapUInt, parse } from './utils.js
 Clarinet.test({
   name: "Ensure that <...> - swapr",
   async fn(chain, accounts) {
+    const wallet_1 = accounts.get("wallet_1")
+
+    const asset_map = chain.getAssetsMaps()
+    console.log("asset_map", asset_map)
+
     let block = chain.mineBlock([
 
       Tx.contractCall('swapr', 'create-pair', [
@@ -15,31 +20,27 @@ Clarinet.test({
         types.ascii('plaid-stx-token'),
         types.uint(10000000),
         types.uint(15000000),
-      ], accounts[1].address),
+      ], wallet_1.address),
 
     ])
     assertEquals(block.receipts.length, 1)
     assertEquals(block.height, 2)
 
-    console.log("accounts", accounts)
-
-    const asset_map = chain.getAssetsMaps()
-    console.log("asset_map", asset_map)
 
 
 
     block.receipts[0].result.expectOk().expectBool(true);
 
-    const result_get_pair_count = chain.callReadOnlyFn('swapr', 'get-pair-count', [], accounts[1].address).result
+    const result_get_pair_count = chain.callReadOnlyFn('swapr', 'get-pair-count', [], wallet_1.address).result
     const count = result_get_pair_count.expectOk().expectUint(1)
 
-    const result_get_pair_contracts = chain.callReadOnlyFn('swapr', 'get-pair-contracts', [types.uint(1)], accounts[1].address).result
+    const result_get_pair_contracts = chain.callReadOnlyFn('swapr', 'get-pair-contracts', [types.uint(1)], wallet_1.address).result
     const pair1 = result_get_pair_contracts.expectTuple()
 
     pair1['token-x'].expectPrincipal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.plaid-token')
     pair1['token-y'].expectPrincipal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.stx-token')
 
-    const result_get_pair_details = chain.callReadOnlyFn('swapr', 'get-pair-details', [types.principal(pair1['token-x']), types.principal(pair1['token-y'])], accounts[1].address).result
+    const result_get_pair_details = chain.callReadOnlyFn('swapr', 'get-pair-details', [types.principal(pair1['token-x']), types.principal(pair1['token-y'])], wallet_1.address).result
     const pair1_details = result_get_pair_details.expectTuple()
 
     pair1_details['balance-x'].expectUint(10000000)
@@ -52,15 +53,15 @@ Clarinet.test({
     pair1_details['swapr-token'].expectPrincipal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.plaid-stx-token')
 
 
-    const result_pair1_get_balances = chain.callReadOnlyFn('swapr', 'get-balances', [types.principal(pair1['token-x']), types.principal(pair1['token-y'])], accounts[1].address).result
+    const result_pair1_get_balances = chain.callReadOnlyFn('swapr', 'get-balances', [types.principal(pair1['token-x']), types.principal(pair1['token-y'])], wallet_1.address).result
     const pair1_balances = result_pair1_get_balances.expectOk().expectList()
     pair1_balances[0].expectUint(10000000)
     pair1_balances[1].expectUint(15000000)
 
-    const result_stx_token_balance_1 = chain.callReadOnlyFn('stx-token', 'get-balance-of', [types.principal(accounts[1].address)], accounts[1].address).result
+    const result_stx_token_balance_1 = chain.callReadOnlyFn('stx-token', 'get-balance-of', [types.principal(wallet_1.address)], wallet_1.address).result
     const stx_token_balance_1 = result_stx_token_balance_1.expectOk().expectUint(999985000000)
 
-    const result_plaid_token_balance_1 = chain.callReadOnlyFn('plaid-token', 'get-balance-of', [types.principal(accounts[1].address)], accounts[1].address).result
+    const result_plaid_token_balance_1 = chain.callReadOnlyFn('plaid-token', 'get-balance-of', [types.principal(wallet_1.address)], wallet_1.address).result
     const plaid_token_balance_1 = result_plaid_token_balance_1.expectOk().expectUint(999990000000)
 
     block = chain.mineBlock([
@@ -71,7 +72,7 @@ Clarinet.test({
         types.principal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.stx-token'),
         types.uint(10000),
         types.uint(6600),  // with 1.5 exchange rate, would get 6642 with fee
-      ], accounts[1].address),
+      ], wallet_1.address),
 
     ])
     assertEquals(block.receipts.length, 1)
@@ -81,14 +82,14 @@ Clarinet.test({
     swap_result[0].expectUint(10000)
     swap_result[1].expectUint(6642)
 
-    const result_pair1_get_balances_2 = chain.callReadOnlyFn('swapr', 'get-balances', [types.principal(pair1['token-x']), types.principal(pair1['token-y'])], accounts[1].address).result
+    const result_pair1_get_balances_2 = chain.callReadOnlyFn('swapr', 'get-balances', [types.principal(pair1['token-x']), types.principal(pair1['token-y'])], wallet_1.address).result
     const pair1_balances_2 = result_pair1_get_balances_2.expectOk().expectList()
     pair1_balances_2[0].expectUint(10010000)
     pair1_balances_2[1].expectUint(14993358)
 
-    const result_stx_token_balance_2 = chain.callReadOnlyFn('stx-token', 'get-balance-of', [types.principal(accounts[1].address)], accounts[1].address).result
+    const result_stx_token_balance_2 = chain.callReadOnlyFn('stx-token', 'get-balance-of', [types.principal(wallet_1.address)], wallet_1.address).result
     const plaid_balance_2 = result_stx_token_balance_2.expectOk().expectUint(999985006642)
-    const result_plaid_token_balance_2 = chain.callReadOnlyFn('plaid-token', 'get-balance-of', [types.principal(accounts[1].address)], accounts[1].address).result
+    const result_plaid_token_balance_2 = chain.callReadOnlyFn('plaid-token', 'get-balance-of', [types.principal(wallet_1.address)], wallet_1.address).result
     const stx_balance_2 = result_plaid_token_balance_2.expectOk().expectUint(999989990000)
 
     assertEquals(plaid_balance_2 - plaid_token_balance_1, -4993358)
