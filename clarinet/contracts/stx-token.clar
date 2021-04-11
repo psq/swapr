@@ -14,7 +14,7 @@
 
 ;; returns the token name
 (define-read-only (get-name)
-  (ok "stx")
+  (ok "STX")
 )
 
 (define-read-only (get-symbol)
