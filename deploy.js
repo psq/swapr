@@ -168,14 +168,46 @@ if (!await getContractInfo(CONTRACT_NAME_PLAID_STX)) {
   await deployContract(CONTRACT_NAME_PLAID_STX, './clarinet/contracts/plaid-stx-token.clar')
 }
 
+
+if (!await getContractInfo(CONTRACT_NAME_THING)) {
+  await deployContract(CONTRACT_NAME_THING, './clarinet/contracts/thing-token.clar')
+}
+if (!await getContractInfo(CONTRACT_NAME_PLAID_THING)) {
+  await deployContract(CONTRACT_NAME_PLAID_THING, './clarinet/contracts/plaid-thing-token.clar')
+}
+if (!await getContractInfo(CONTRACT_NAME_TOKENSOFT)) {
+  await deployContract(CONTRACT_NAME_TOKENSOFT, './clarinet/contracts/tokensoft-token.clar')
+}
+if (!await getContractInfo(CONTRACT_NAME_TOKENSOFT_STX)) {
+  await deployContract(CONTRACT_NAME_TOKENSOFT_STX, './clarinet/contracts/tokensoft-stx-token.clar')
+}
+
 // create plaid-stx pair
-const result = await createPair(
+const result_pair_1 = await createPair(
   `${CONTRACT_NAME_PLAID}`,
   `${CONTRACT_NAME_STX}`,
   `${CONTRACT_NAME_PLAID_STX}`,
   'Plaid-STX',
-   250_000_000_000,
+   25_000_000_000_000,
    500_000_000_000,
+)
+
+const result_pair_2 = await createPair(
+  `${CONTRACT_NAME_PLAID}`,
+  `${CONTRACT_NAME_THING}`,
+  `${CONTRACT_NAME_PLAID_THING}`,
+  'Plaid-Thing',
+   100_000_000_000,
+   200_000_000_000,
+)
+
+const result_pair_3 = await createPair(
+  `${CONTRACT_NAME_TOKENSOFT}`,
+  `${CONTRACT_NAME_STX}`,
+  `${CONTRACT_NAME_TOKENSOFT_STX}`,
+  'xBTC-STX',
+   2_000_000_000_000,    // 20 BTC
+   1_200_000_000_000,   // 1_200_000 STX
 )
 console.log("done")
 // create a second pair?

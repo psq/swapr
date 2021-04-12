@@ -1,27 +1,27 @@
 ;; wrap the native STX token into an SRC20 compatible token to be usable along other tokens
 (impl-trait 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.sip-010.ft-trait)
 
-(define-fungible-token plaid)
+(define-fungible-token thing)
 
 ;; get the token balance of owner
 (define-read-only (get-balance-of (owner principal))
-  (ok (ft-get-balance plaid owner))
+  (ok (ft-get-balance thing owner))
 )
 
 ;; returns the total number of tokens
 ;; TODO(psq): we don't have access yet, but once POX is available, this should be a value that
 ;; is available from Clarity
 (define-read-only (get-total-supply)
-  (ok (ft-get-supply plaid))
+  (ok (ft-get-supply thing))
 )
 
 ;; returns the token name
 (define-read-only (get-name)
-  (ok "Plaid")
+  (ok "Thing")
 )
 
 (define-read-only (get-symbol)
-  (ok "PLD")
+  (ok "THG")
 )
 
 ;; the number of decimals used
@@ -30,13 +30,13 @@
 )
 
 (define-read-only (get-token-uri)
-  (ok (some u"https://swapr.finance/tokens/plaid.json"))
+  (ok (some u"https://swapr.finance/tokens/thing.json"))
 )
 ;; {
-;;   "name":"Plaid",
-;;   "description":"Plaid token, used as a test token",
-;;   "image":"https://swapr.finance/tokens/plaid.png",
-;;   "vector":"https://swapr.finance/tokens/plaid.svg"
+;;   "name":"Thing",
+;;   "description":"Thing token, used as a test token",
+;;   "image":"https://swapr.finance/tokens/thing.png",
+;;   "vector":"https://swapr.finance/tokens/thing.svg"
 ;; }
 
 
@@ -45,14 +45,14 @@
 ;; Transfers tokens to a recipient
 (define-public (transfer (amount uint) (sender principal) (recipient principal))
   (begin
-    (print "plaid.transfer")
+    (print "thing.transfer")
     (print amount)
     (print tx-sender)
     (print recipient)
     (asserts! (is-eq tx-sender sender) (err u255)) ;; too strict?
-    (print (ft-transfer? plaid amount tx-sender recipient))
+    (print (ft-transfer? thing amount tx-sender recipient))
   )
 )
 
 ;; TODO(psq): remove for mainnet, how???
-(ft-mint? plaid u100000000000000 'ST2SVRCJJD90TER037VCSAFA781HQTCPFK9YRA6J5)
+(ft-mint? thing u1000000000000 'ST2SVRCJJD90TER037VCSAFA781HQTCPFK9YRA6J5)

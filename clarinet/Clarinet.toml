@@ -24,3 +24,23 @@ depends_on = ["sip-010", "swapr-trait"]
 [contracts.plaid-stx-token]
 path = "contracts/plaid-stx-token.clar"
 depends_on = ["swapr-trait", "swapr"]
+
+[contracts.restricted-token-trait]
+path = "contracts/restricted-token-trait.clar"
+depends_on = []
+
+[contracts.thing-token]
+path = "contracts/thing-token.clar"
+depends_on = ["sip-010"]
+
+[contracts.plaid-thing-token]
+path = "contracts/plaid-thing-token.clar"
+depends_on = ["swapr-trait", "swapr"]
+
+[contracts.tokensoft-token]
+path = "contracts/tokensoft-token.clar"
+depends_on = ["sip-010", "restricted-token-trait"]
+
+[contracts.tokensoft-stx-token]
+path = "contracts/tokensoft-stx-token.clar"
+depends_on = ["swapr-trait", "swapr"]

@@ -32,7 +32,7 @@
 ;; {
 ;;   "name":"STX",
 ;;   "description":"STX token, as a SIP-010 compatible token",
-;;   "image":"https://swapr.finance/tokens/stx.png"
+;;   "image":"https://swapr.finance/tokens/stx.png",
 ;;   "vector":"https://swapr.finance/tokens/stx.svg"
 ;; }
 

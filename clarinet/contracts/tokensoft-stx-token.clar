@@ -2,7 +2,7 @@
 (impl-trait 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.swapr-trait.swapr-trait)
 
 ;; ;; we can use an ft-token here, so use it!
-(define-fungible-token plaid-stx-token)
+(define-fungible-token tokensoft-stx-token)
 
 (define-constant no-acccess-err u40)
 
@@ -10,16 +10,16 @@
 
 (define-public (transfer (amount uint) (sender principal) (recipient principal))
   (begin
-    (ft-transfer? plaid-stx-token amount tx-sender recipient)
+    (ft-transfer? tokensoft-stx-token amount tx-sender recipient)
   )
 )
 
 (define-read-only (get-name)
-  (ok "Plaid STX swapr")
+  (ok "Plaid Thing swapr")
 )
 
 (define-read-only (get-symbol)
-  (ok "plaid-stx-swapr")
+  (ok "tokensoft-stx-swapr")
 )
 
 ;; the number of decimals used
@@ -28,22 +28,22 @@
 )
 
 (define-read-only (get-balance-of (owner principal))
-  (ok (ft-get-balance plaid-stx-token owner))
+  (ok (ft-get-balance tokensoft-stx-token owner))
 )
 
 (define-read-only (get-total-supply)
   (ok u0)
-;;   (contract-call? 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.swapr get-total-supply 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.plaid-token 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.stx-token)
+;;   (contract-call? 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.swapr get-total-supply 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.plaid-token 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.thing-token)
 )
 
 (define-read-only (get-token-uri)
-  (ok (some u"https://swapr.finance/tokens/plaid-stx-token.json"))
+  (ok (some u"https://swapr.finance/tokens/tokensoft-stx-token.json"))
 )
 ;; {
-;;   "name":"Plaid-STX",
-;;   "description":"Plaid-STX swapr token",
-;;   "image":"https://swapr.finance/tokens/plaid-stx.png",
-;;   "vector":"https://swapr.finance/tokens/plaid-stx.svg"
+;;   "name":"Plaid-Thing",
+;;   "description":"Plaid-Thing swapr token",
+;;   "image":"https://swapr.finance/tokens/plaid-thing.png",
+;;   "vector":"https://swapr.finance/tokens/plaid-thing.svg"
 ;; }
 
 
@@ -55,7 +55,7 @@
     (print contract-caller)
     (print amount)
     (if (is-eq contract-caller 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.swapr)
-      (ft-mint? plaid-stx-token amount recipient)
+      (ft-mint? tokensoft-stx-token amount recipient)
       (err no-acccess-err)
     )
   )
