@@ -71,7 +71,7 @@ Clarinet.test({
         types.principal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.plaid-token'),
         types.principal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.stx-token'),
         types.uint(10000),
-        types.uint(14900),  // with 1.5 exchange rate, would get 6642 with fee
+        types.uint(14900),
       ], wallet_1.address),
 
     ])
@@ -94,6 +94,25 @@ Clarinet.test({
 
     assertEquals(plaid_balance_2 - plaid_token_balance_1, -14885060)
     assertEquals(stx_balance_2 - stx_token_balance_1, 99000004990000)
+
+    block = chain.mineBlock([
+
+      // swap-x-for-y (token-x-trait <sip-010-token>) (token-y-trait <sip-010-token>) (dx uint) (min-dy uint)
+      Tx.contractCall('swapr', 'swap-y-for-x', [
+        types.principal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.plaid-token'),
+        types.principal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.stx-token'),
+        types.uint(30000),
+        types.uint(19900),
+      ], wallet_1.address),
+
+    ])
+    assertEquals(block.receipts.length, 1)
+    assertEquals(block.height, 4)
+
+    const swap_result_3 = block.receipts[0].result.expectOk().expectList();
+    swap_result_3[0].expectUint(19940)
+    swap_result_3[1].expectUint(30000)
+
 
   },
 })
