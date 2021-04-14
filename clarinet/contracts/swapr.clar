@@ -240,7 +240,7 @@
         (
           (contract-address (as-contract tx-sender))
           (sender tx-sender)
-          (dy (/ (* u997 balance-x dx) (+ (* u1000 balance-y) (* u997 dx)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
+          (dy (/ (* u997 balance-y dx) (+ (* u1000 balance-x) (* u997 dx)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
           (fee (/ (* u5 dx) u10000)) ;; 5 bp
         )
         (if (< min-dy dy)

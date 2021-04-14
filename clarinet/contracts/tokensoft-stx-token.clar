@@ -15,11 +15,11 @@
 )
 
 (define-read-only (get-name)
-  (ok "Plaid Thing swapr")
+  (ok "xBTC Thing swapr")
 )
 
 (define-read-only (get-symbol)
-  (ok "tokensoft-stx-swapr")
+  (ok "xbtc-stx-swapr")
 )
 
 ;; the number of decimals used

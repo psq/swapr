@@ -23,12 +23,17 @@ import {
   MODE,
   STACKS_API_URL,
 
-  CONTRACT_NAME_SIP010,
+  CONTRACT_NAME_SIP010_TRAIT,
   CONTRACT_NAME_SWAPR_TRAIT,
+  CONTRACT_NAME_RESTRICTED_TOKEN_TRAIT,
   CONTRACT_NAME_SWAPR,
   CONTRACT_NAME_STX,
   CONTRACT_NAME_PLAID,
   CONTRACT_NAME_PLAID_STX,
+  CONTRACT_NAME_THING,
+  CONTRACT_NAME_PLAID_THING,
+  CONTRACT_NAME_TOKENSOFT,
+  CONTRACT_NAME_TOKENSOFT_STX,
 
   SWAPR_SK,
   SWAPR_STX,
@@ -51,8 +56,9 @@ async function deployContract(contract_name, contract_file) {
   // TODO(psq): SIP-010 trait should use SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-10-ft-standard instead (custom match for mainnet?)
 
   const codeBody = body
-    .replaceAll('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.sip-010', `${SWAPR_STX}.${CONTRACT_NAME_SIP010}`)  // minting
+    .replaceAll('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.sip-010', `${SWAPR_STX}.${CONTRACT_NAME_SIP010_TRAIT}`)  // minting
     .replaceAll('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.swapr-trait', `${SWAPR_STX}.${CONTRACT_NAME_SWAPR_TRAIT}`)  // minting
+    .replaceAll('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.restricted-token-trait', `${SWAPR_STX}.${CONTRACT_NAME_RESTRICTED_TOKEN_TRAIT}`)  // minting
     .replaceAll('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.swapr', `${SWAPR_STX}.${CONTRACT_NAME_SWAPR}`)  // minting
     .replaceAll('ST000000000000000000002AMW42H', SWAPR_STX)
     .replaceAll('ST20ATRN26N9P05V2F1RHFRV24X8C8M3W54E427B2', SWAPR_STX)
@@ -147,14 +153,18 @@ async function processing(tx, count) {
 
 // TODO(psq): figure out nonces so all contracts can deployed in a batch from nonce...nonce+5
 
-await getContractInfo(CONTRACT_NAME_SIP010)
+await getContractInfo(CONTRACT_NAME_SIP010_TRAIT)
 
-if (!await getContractInfo(CONTRACT_NAME_SIP010)) {
-  await deployContract(CONTRACT_NAME_SIP010, './clarinet/contracts/sip-010.clar')
+if (!await getContractInfo(CONTRACT_NAME_SIP010_TRAIT)) {
+  await deployContract(CONTRACT_NAME_SIP010_TRAIT, './clarinet/contracts/sip-010.clar')
 }
 if (!await getContractInfo(CONTRACT_NAME_SWAPR_TRAIT)) {
   await deployContract(CONTRACT_NAME_SWAPR_TRAIT, './clarinet/contracts/swapr-trait.clar')
 }
+if (!await getContractInfo(CONTRACT_NAME_RESTRICTED_TOKEN_TRAIT)) {
+  await deployContract(CONTRACT_NAME_RESTRICTED_TOKEN_TRAIT, './clarinet/contracts/restricted-token-trait.clar')
+}
+
 if (!await getContractInfo(CONTRACT_NAME_SWAPR)) {
   await deployContract(CONTRACT_NAME_SWAPR, './clarinet/contracts/swapr.clar')
 }
@@ -206,7 +216,7 @@ const result_pair_3 = await createPair(
   `${CONTRACT_NAME_STX}`,
   `${CONTRACT_NAME_TOKENSOFT_STX}`,
   'xBTC-STX',
-   2_000_000_000_000,    // 20 BTC
+   2_000_000_000,    // 20 BTC
    1_200_000_000_000,   // 1_200_000 STX
 )
 console.log("done")
