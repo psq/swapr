@@ -156,41 +156,53 @@ async function processing(tx, count) {
 await getContractInfo(CONTRACT_NAME_SIP010_TRAIT)
 
 if (!await getContractInfo(CONTRACT_NAME_SIP010_TRAIT)) {
-  await deployContract(CONTRACT_NAME_SIP010_TRAIT, './clarinet/contracts/sip-010.clar')
+  await deployContract(CONTRACT_NAME_SIP010_TRAIT, './clarinet/contracts/trait-sip-010.clar')
 }
 if (!await getContractInfo(CONTRACT_NAME_SWAPR_TRAIT)) {
-  await deployContract(CONTRACT_NAME_SWAPR_TRAIT, './clarinet/contracts/swapr-trait.clar')
+  await deployContract(CONTRACT_NAME_SWAPR_TRAIT, './clarinet/contracts/trait-swapr.clar')
 }
 if (!await getContractInfo(CONTRACT_NAME_RESTRICTED_TOKEN_TRAIT)) {
-  await deployContract(CONTRACT_NAME_RESTRICTED_TOKEN_TRAIT, './clarinet/contracts/restricted-token-trait.clar')
+  await deployContract(CONTRACT_NAME_RESTRICTED_TOKEN_TRAIT, './clarinet/contracts/trait-restricted-token.clar')
 }
 
 if (!await getContractInfo(CONTRACT_NAME_SWAPR)) {
-  await deployContract(CONTRACT_NAME_SWAPR, './clarinet/contracts/swapr.clar')
+  await deployContract(CONTRACT_NAME_SWAPR, './clarinet/contracts/main-swapr.clar')
 }
 if (!await getContractInfo(CONTRACT_NAME_STX)) {
-  await deployContract(CONTRACT_NAME_STX, './clarinet/contracts/stx-token.clar')
+  await deployContract(CONTRACT_NAME_STX, './clarinet/contracts/token-stx.clar')
 }
 if (!await getContractInfo(CONTRACT_NAME_PLAID)) {
-  await deployContract(CONTRACT_NAME_PLAID, './clarinet/contracts/plaid-token.clar')
+  await deployContract(CONTRACT_NAME_PLAID, './clarinet/contracts/token-plaid.clar')
 }
 if (!await getContractInfo(CONTRACT_NAME_PLAID_STX)) {
-  await deployContract(CONTRACT_NAME_PLAID_STX, './clarinet/contracts/plaid-stx-token.clar')
+  await deployContract(CONTRACT_NAME_PLAID_STX, './clarinet/contracts/swapr-token-plaid-stx.clar')
 }
 
 
 if (!await getContractInfo(CONTRACT_NAME_THING)) {
-  await deployContract(CONTRACT_NAME_THING, './clarinet/contracts/thing-token.clar')
+  await deployContract(CONTRACT_NAME_THING, './clarinet/contracts/token-thing.clar')
 }
 if (!await getContractInfo(CONTRACT_NAME_PLAID_THING)) {
-  await deployContract(CONTRACT_NAME_PLAID_THING, './clarinet/contracts/plaid-thing-token.clar')
+  await deployContract(CONTRACT_NAME_PLAID_THING, './clarinet/contracts/swapr-token-plaid-thing.clar')
 }
 if (!await getContractInfo(CONTRACT_NAME_TOKENSOFT)) {
-  await deployContract(CONTRACT_NAME_TOKENSOFT, './clarinet/contracts/tokensoft-token.clar')
+  await deployContract(CONTRACT_NAME_TOKENSOFT, './clarinet/contracts/token-tokensoft.clar')
 }
 if (!await getContractInfo(CONTRACT_NAME_TOKENSOFT_STX)) {
-  await deployContract(CONTRACT_NAME_TOKENSOFT_STX, './clarinet/contracts/tokensoft-stx-token.clar')
+  await deployContract(CONTRACT_NAME_TOKENSOFT_STX, './clarinet/contracts/swapr-token-tokensoft-stx.clar')
 }
+
+if (!await getContractInfo(CONTRACT_NAME_MICRO_NTHNG)) {
+  await deployContract(CONTRACT_NAME_MICRO_NTHNG, './clarinet/contracts/token-micro-nthng.clar')
+}
+if (!await getContractInfo(CONTRACT_NAME_WRAPPED_NOTHING)) {
+  await deployContract(CONTRACT_NAME_WRAPPED_NOTHING, './clarinet/contracts/token-wrapped-nothing.clar')
+}
+if (!await getContractInfo(CONTRACT_NAME_PLAID_WMNO)) {
+  await deployContract(CONTRACT_NAME_PLAID_WMNO, './clarinet/contracts/swapr-token-plaid-wrapped-nothing.clar')
+}
+
+
 
 // create plaid-stx pair
 const result_pair_1 = await createPair(
@@ -219,5 +231,14 @@ const result_pair_3 = await createPair(
    2_000_000_000,    // 20 BTC
    1_200_000_000_000,   // 1_200_000 STX
 )
+const result_pair_4 = await createPair(
+  `${CONTRACT_NAME_PLAID}`,
+  `${CONTRACT_NAME_WRAPPED_NOTHING}`,
+  `${CONTRACT_NAME_PLAID_WMNO}`,
+  'Plaid-WMNO',
+   2_000_000_000,    // 20 BTC
+   1_200_000_000_000,   // 1_200_000 STX
+)
+
 console.log("done")
 // create a second pair?

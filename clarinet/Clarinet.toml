@@ -2,45 +2,57 @@
 name = "swapr.clarinet"
 
 [contracts.sip-010]
-path = "contracts/sip-010.clar"
+path = "contracts/trait-sip-010.clar"
 depends_on = []
 
 [contracts.swapr-trait]
-path = "contracts/swapr-trait.clar"
+path = "contracts/trait-swapr.clar"
 depends_on = []
 
+[contracts.micro-nthng]
+path = "contracts/token-micro-nthng.clar"
+depends_on = []
+
+[contracts.wrapped-nothing]
+path = "contracts/token-wrapped-nothing.clar"
+depends_on = ["sip-010", "micro-nthng"]
+
 [contracts.plaid-token]
-path = "contracts/plaid-token.clar"
+path = "contracts/token-plaid.clar"
 depends_on = ["sip-010"]
 
 [contracts.stx-token]
-path = "contracts/stx-token.clar"
+path = "contracts/token-stx.clar"
 depends_on = ["sip-010"]
 
 [contracts.swapr]
-path = "contracts/swapr.clar"
+path = "contracts/main-swapr.clar"
 depends_on = ["sip-010", "swapr-trait"]
 
 [contracts.plaid-stx-token]
-path = "contracts/plaid-stx-token.clar"
+path = "contracts/swapr-token-plaid-stx.clar"
 depends_on = ["swapr-trait", "swapr"]
 
 [contracts.restricted-token-trait]
-path = "contracts/restricted-token-trait.clar"
+path = "contracts/trait-restricted-token.clar"
 depends_on = []
 
 [contracts.thing-token]
-path = "contracts/thing-token.clar"
+path = "contracts/token-thing.clar"
 depends_on = ["sip-010"]
 
 [contracts.plaid-thing-token]
-path = "contracts/plaid-thing-token.clar"
+path = "contracts/swapr-token-plaid-thing.clar"
 depends_on = ["swapr-trait", "swapr"]
 
 [contracts.tokensoft-token]
-path = "contracts/tokensoft-token.clar"
+path = "contracts/token-tokensoft.clar"
 depends_on = ["sip-010", "restricted-token-trait"]
 
 [contracts.tokensoft-stx-token]
-path = "contracts/tokensoft-stx-token.clar"
+path = "contracts/swapr-token-tokensoft-stx.clar"
+depends_on = ["swapr-trait", "swapr"]
+
+[contracts.plaid-wrapped-nothing-token]
+path = "contracts/swapr-token-plaid-wrapped-nothing.clar"
 depends_on = ["swapr-trait", "swapr"]
