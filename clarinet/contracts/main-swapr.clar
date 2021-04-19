@@ -116,7 +116,7 @@
 
     (map-set pairs-data-map { token-x: token-x, token-y: token-y } pair-updated)
     (try! (contract-call? token-swapr-trait mint recipient-address new-shares))
-    (print { object: "position", action: "add-to-position", data: pair-updated })
+    (print { object: "pair", action: "liquidity-added", data: pair-updated })
     (ok true)
   )
 )
@@ -205,7 +205,7 @@
     (map-set pairs-data-map { token-x: token-x, token-y: token-y } pair-updated)
     ;; TODO(psq): use burn
     (unwrap-panic (contract-call? token-swapr-trait transfer withdrawal tx-sender contract-address))  ;; transfer back to swapr, wish there was a burn instead...
-    (print { object: "pair", action: "reduce-position", data: pair-updated })
+    (print { object: "pair", action: "liquidity-removed", data: pair-updated })
     (ok (list withdrawal-x withdrawal-y))
   )
 )
