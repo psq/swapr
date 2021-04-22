@@ -52,24 +52,34 @@
 
 
 (define-read-only (get-name (token-x-trait <sip-010-token>) (token-y-trait <sip-010-token>))
-  (let ((token-x (contract-of token-x-trait))
-        (token-y (contract-of token-y-trait))
-        (pair (unwrap! (map-get? pairs-data-map { token-x: token-x, token-y: token-y }) invalid-pair-err)))
+  (let 
+    (
+      (token-x (contract-of token-x-trait))
+      (token-y (contract-of token-y-trait))
+      (pair (unwrap! (map-get? pairs-data-map { token-x: token-x, token-y: token-y }) invalid-pair-err))
+    )
     (ok (get name pair))
   )
 )
 
 (define-public (get-symbol (token-x-trait <sip-010-token>) (token-y-trait <sip-010-token>))
-  (ok (concat 
-    (unwrap-panic (as-max-len? (unwrap-panic (contract-call? token-x-trait get-symbol)) u15)) 
-    (concat "-" 
-    (unwrap-panic (as-max-len? (unwrap-panic (contract-call? token-y-trait get-symbol)) u15)))))
+  (ok 
+    (concat 
+      (unwrap-panic (as-max-len? (unwrap-panic (contract-call? token-x-trait get-symbol)) u15)) 
+      (concat "-" 
+        (unwrap-panic (as-max-len? (unwrap-panic (contract-call? token-y-trait get-symbol)) u15))
+      )
+    )
+  )
 )
 
 (define-read-only (get-total-supply (token-x-trait <sip-010-token>) (token-y-trait <sip-010-token>))
-  (let ((token-x (contract-of token-x-trait))
-        (token-y (contract-of token-y-trait))
-        (pair (unwrap! (map-get? pairs-data-map { token-x: token-x, token-y: token-y }) invalid-pair-err)))
+  (let
+    (
+      (token-x (contract-of token-x-trait))
+      (token-y (contract-of token-y-trait))
+      (pair (unwrap! (map-get? pairs-data-map { token-x: token-x, token-y: token-y }) invalid-pair-err))
+    )
     (ok (get shares-total pair))
   )
 )
@@ -81,9 +91,12 @@
 
 ;; get overall balances for the pair
 (define-public (get-balances (token-x-trait <sip-010-token>) (token-y-trait <sip-010-token>))
-  (let ((token-x (contract-of token-x-trait)) 
-        (token-y (contract-of token-y-trait))
-        (pair (unwrap! (map-get? pairs-data-map { token-x: token-x, token-y: token-y }) invalid-pair-err)))
+  (let 
+    (
+      (token-x (contract-of token-x-trait)) 
+      (token-y (contract-of token-y-trait))
+      (pair (unwrap! (map-get? pairs-data-map { token-x: token-x, token-y: token-y }) invalid-pair-err))
+    )
     (ok (list (get balance-x pair) (get balance-y pair)))
   )
 )
@@ -92,27 +105,33 @@
 ;; (define-constant x-token 'SP2NC4YKZWM2YMCJV851VF278H9J50ZSNM33P3JM1.my-token)
 ;; (define-constant y-token 'SP1QR3RAGH3GEME9WV7XB0TZCX6D5MNDQP97D35EH.my-token)
 (define-public (add-to-position (token-x-trait <sip-010-token>) (token-y-trait <sip-010-token>) (token-swapr-trait <swapr-token>) (x uint) (y uint))
-  (let ((token-x (contract-of token-x-trait)) 
-        (token-y (contract-of token-y-trait))
-        (pair (unwrap-panic (map-get? pairs-data-map { token-x: token-x, token-y: token-y })))
-        (contract-address (as-contract tx-sender)) 
-        (recipient-address tx-sender)
-        (balance-x (get balance-x pair))
-        (balance-y (get balance-y pair))
-        (new-shares (if (is-eq (get shares-total pair) u0)
+  (let 
+    (
+      (token-x (contract-of token-x-trait)) 
+      (token-y (contract-of token-y-trait))
+      (pair (unwrap-panic (map-get? pairs-data-map { token-x: token-x, token-y: token-y })))
+      (contract-address (as-contract tx-sender)) 
+      (recipient-address tx-sender)
+      (balance-x (get balance-x pair))
+      (balance-y (get balance-y pair))
+      (new-shares 
+        (if (is-eq (get shares-total pair) u0)
           (sqrti (* x y))
-          (/ (* x (get shares-total pair)) balance-x)))
-        (pair-updated (merge pair {
-          shares-total: (+ new-shares (get shares-total pair)),
-          balance-x: (+ balance-x x),
-          balance-y: (+ balance-y y)
-        })))
+          (/ (* x (get shares-total pair)) balance-x))
+        )
+      (pair-updated (merge pair {
+        shares-total: (+ new-shares (get shares-total pair)),
+        balance-x: (+ balance-x x),
+        balance-y: (+ balance-y y)
+      }))
+    )
       ;; TODO(psq) check if x or y is 0, to calculate proper exchange rate unless shares-total is 0, which would be an error
     (asserts! 
       (and ;; TODO(psq): check that the amount transfered in matches the amount requested
         (is-ok (contract-call? token-x-trait transfer x tx-sender contract-address))
         (is-ok (contract-call? token-y-trait transfer y tx-sender contract-address)))
-      transfer-failed-err)
+      transfer-failed-err
+    )
 
     (map-set pairs-data-map { token-x: token-x, token-y: token-y } pair-updated)
     (try! (contract-call? token-swapr-trait mint recipient-address new-shares))
@@ -140,27 +159,31 @@
 (define-public (create-pair (token-x-trait <sip-010-token>) (token-y-trait <sip-010-token>) (token-swapr-trait <swapr-token>) (pair-name (string-ascii 32)) (x uint) (y uint))
   ;; TOOD(psq): add creation checks, then create map before proceeding to add-to-position
   ;; check neither x,y or y,x exists`
-  (let ((name-x (unwrap-panic (contract-call? token-x-trait get-name))) 
-        (name-y (unwrap-panic (contract-call? token-y-trait get-name)))
-        (token-x (contract-of token-x-trait)) 
-        (token-y (contract-of token-y-trait)) 
-        (pair-id (+ (var-get pair-count) u1))
-        (pair-data {
-          shares-total: u0,
-          balance-x: u0,
-          balance-y: u0,
-          fee-balance-x: u0,
-          fee-balance-y: u0,
-          fee-to-address: none,
-          swapr-token: (contract-of token-swapr-trait),
-          name: pair-name,
-        }))
-
+  (let
+    (
+      (name-x (unwrap-panic (contract-call? token-x-trait get-name))) 
+      (name-y (unwrap-panic (contract-call? token-y-trait get-name)))
+      (token-x (contract-of token-x-trait)) 
+      (token-y (contract-of token-y-trait)) 
+      (pair-id (+ (var-get pair-count) u1))
+      (pair-data {
+        shares-total: u0,
+        balance-x: u0,
+        balance-y: u0,
+        fee-balance-x: u0,
+        fee-balance-y: u0,
+        fee-to-address: none,
+        swapr-token: (contract-of token-swapr-trait),
+        name: pair-name,
+      })
+    )
     (asserts! 
       (and 
         (is-none (map-get? pairs-data-map { token-x: token-x, token-y: token-y }))
-        (is-none (map-get? pairs-data-map { token-x: token-y, token-y: token-x })))
-      pair-already-exists-err)
+        (is-none (map-get? pairs-data-map { token-x: token-y, token-y: token-x }))
+      )
+      pair-already-exists-err
+    )
 
     (map-set pairs-data-map { token-x: token-x, token-y: token-y } pair-data)
       
@@ -176,30 +199,38 @@
 ;; ;; reduce the amount of liquidity the sender provides to the pool
 ;; ;; to close, use u100
 (define-public (reduce-position (token-x-trait <sip-010-token>) (token-y-trait <sip-010-token>) (token-swapr-trait <swapr-token>) (percent uint))
-  (let ((token-x (contract-of token-x-trait)) 
-       (token-y (contract-of token-y-trait))
-       (pair (unwrap! (map-get? pairs-data-map { token-x: token-x, token-y: token-y }) invalid-pair-err))
-       (balance-x (get balance-x pair))
-       (balance-y (get balance-y pair))
-       (shares (unwrap-panic (contract-call? token-swapr-trait get-balance-of tx-sender))) 
-       (shares-total (get shares-total pair))
-       (contract-address (as-contract tx-sender))
-       (sender tx-sender)
-       (withdrawal (/ (* shares percent) u100))
-       (withdrawal-x (/ (* withdrawal balance-x) shares-total)) 
-       (withdrawal-y (/ (* withdrawal balance-y) shares-total))
-       (pair-updated (merge pair {
-          shares-total: (- shares-total withdrawal),
-          balance-x: (- (get balance-x pair) withdrawal-x),
-          balance-y: (- (get balance-y pair) withdrawal-y)
-        })))
+  (let
+    (
+      (token-x (contract-of token-x-trait)) 
+      (token-y (contract-of token-y-trait))
+      (pair (unwrap! (map-get? pairs-data-map { token-x: token-x, token-y: token-y }) invalid-pair-err))
+      (balance-x (get balance-x pair))
+      (balance-y (get balance-y pair))
+      (shares (unwrap-panic (contract-call? token-swapr-trait get-balance-of tx-sender))) 
+      (shares-total (get shares-total pair))
+      (contract-address (as-contract tx-sender))
+      (sender tx-sender)
+      (withdrawal (/ (* shares percent) u100))
+      (withdrawal-x (/ (* withdrawal balance-x) shares-total)) 
+      (withdrawal-y (/ (* withdrawal balance-y) shares-total))
+      (pair-updated 
+        (merge pair 
+          {
+            shares-total: (- shares-total withdrawal),
+            balance-x: (- (get balance-x pair) withdrawal-x),
+            balance-y: (- (get balance-y pair) withdrawal-y)
+          }
+        )
+      )
+    )
 
     (asserts!
       (and
         (<= percent u100)
         (is-ok (as-contract (contract-call? token-x-trait transfer withdrawal-x contract-address sender)))
         (is-ok (as-contract (contract-call? token-y-trait transfer withdrawal-y contract-address sender))))
-      transfer-failed-err)
+      transfer-failed-err
+    )
     
     ;; (unwrap-panic (decrease-shares token-x token-y tx-sender withdrawal)) ;; should never fail, you know...
     (map-set pairs-data-map { token-x: token-x, token-y: token-y } pair-updated)
@@ -217,22 +248,29 @@
   ;; calculate fee on dx
   ;; transfer
   ;; update balances
-  (let ((token-x (contract-of token-x-trait))
-        (token-y (contract-of token-y-trait))
-        (pair (unwrap! (map-get? pairs-data-map { token-x: token-x, token-y: token-y }) invalid-pair-err)) 
-        (balance-x (get balance-x pair)) 
-        (balance-y (get balance-y pair))
-        (contract-address (as-contract tx-sender))
-        (sender tx-sender)
-        (dy (/ (* u997 balance-y dx) (+ (* u1000 balance-x) (* u997 dx)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
-        (fee (/ (* u5 dx) u10000)) ;; 5 bp
-        (pair-updated (merge pair {
-          balance-x: (+ (get balance-x pair) dx),
-          balance-y: (- (get balance-y pair) dy),
-          fee-balance-x: (if (is-some (get fee-to-address pair))  ;; only collect fee when fee-to-address is set
-            (+ fee (get fee-balance-x pair))
-            (get fee-balance-x pair))
-        })))
+  (let
+    (
+      (token-x (contract-of token-x-trait))
+      (token-y (contract-of token-y-trait))
+      (pair (unwrap! (map-get? pairs-data-map { token-x: token-x, token-y: token-y }) invalid-pair-err)) 
+      (balance-x (get balance-x pair)) 
+      (balance-y (get balance-y pair))
+      (contract-address (as-contract tx-sender))
+      (sender tx-sender)
+      (dy (/ (* u997 balance-y dx) (+ (* u1000 balance-x) (* u997 dx)))) ;; overall fee is 30 bp, either all for the pool, or 25 bp for pool and 5 bp for operator
+      (fee (/ (* u5 dx) u10000)) ;; 5 bp
+      (pair-updated 
+        (merge pair 
+          {
+            balance-x: (+ (get balance-x pair) dx),
+            balance-y: (- (get balance-y pair) dy),
+            fee-balance-x: (if (is-some (get fee-to-address pair))  ;; only collect fee when fee-to-address is set
+              (+ fee (get fee-balance-x pair))
+              (get fee-balance-x pair))
+          }
+        )
+      )
+    )
 
     (asserts! (< min-dy dy) too-much-slippage-err)
 
@@ -241,7 +279,8 @@
         ;; TODO(psq): check that the amount transfered in matches the amount requested
         (is-ok (contract-call? token-x-trait transfer dx sender contract-address))
         (is-ok (as-contract (contract-call? token-y-trait transfer dy contract-address sender))))
-      transfer-failed-err)
+      transfer-failed-err
+    )
 
     (map-set pairs-data-map { token-x: token-x, token-y: token-y } pair-updated)
     (print { object: "pair", action: "swap-x-for-y", data: pair-updated })
@@ -350,13 +389,16 @@
 
 ;; ;; send the collected fees the fee-to-address
 (define-public (collect-fees (token-x-trait <sip-010-token>) (token-y-trait <sip-010-token>))
-  (let ((token-x (contract-of token-x-trait)) 
-        (token-y (contract-of token-y-trait))
-        (contract-address (as-contract tx-sender))
-        (pair (unwrap! (map-get? pairs-data-map { token-x: token-x, token-y: token-y }) invalid-pair-err))
-        (address (unwrap! (get fee-to-address pair) no-fee-to-address-err))
-        (fee-x (get fee-balance-x pair))
-        (fee-y (get fee-balance-y pair)))
+  (let
+    (
+      (token-x (contract-of token-x-trait)) 
+      (token-y (contract-of token-y-trait))
+      (contract-address (as-contract tx-sender))
+      (pair (unwrap! (map-get? pairs-data-map { token-x: token-x, token-y: token-y }) invalid-pair-err))
+      (address (unwrap! (get fee-to-address pair) no-fee-to-address-err))
+      (fee-x (get fee-balance-x pair))
+      (fee-y (get fee-balance-y pair))
+    )
   
     (asserts!
       (or
