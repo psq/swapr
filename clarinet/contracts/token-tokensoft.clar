@@ -104,7 +104,7 @@
 ;; --------------------------------------------------------------------------
 
 ;; Variable for URI storage
-(define-data-var uri (string-utf8 256) u"")
+(define-data-var uri (string-utf8 256) u"https://swapr.finance/tokens/token-soft-xbtc.json")
 
 ;; Public getter for the URI
 (define-read-only (get-token-uri)
@@ -210,5 +210,6 @@
 
 ;; TODO(psq): remove for mainnet, how???
 (initialize "xBTC" "xBTC" u8 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE)
-(ft-mint? tokensoft-token u5000000000000 'ST2SVRCJJD90TER037VCSAFA781HQTCPFK9YRA6J5)
+(ft-mint? tokensoft-token u2000000000 'ST2SVRCJJD90TER037VCSAFA781HQTCPFK9YRA6J5)
+(ft-mint? tokensoft-token u1500000000 'ST31HHVBKYCYQQJ5AQ25ZHA6W2A548ZADDQ6S16GP)
 

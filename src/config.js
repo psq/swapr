@@ -16,11 +16,16 @@ export const CONTRACT_NAME_THING = process.env.CONTRACT_NAME_THING
 export const CONTRACT_NAME_PLAID_THING = process.env.CONTRACT_NAME_PLAID_THING
 export const CONTRACT_NAME_TOKENSOFT = process.env.CONTRACT_NAME_TOKENSOFT
 export const CONTRACT_NAME_TOKENSOFT_STX = process.env.CONTRACT_NAME_TOKENSOFT_STX
+export const CONTRACT_NAME_MICRO_NTHNG = process.env.CONTRACT_NAME_MICRO_NTHNG
+export const CONTRACT_NAME_WRAPPED_NOTHING = process.env.CONTRACT_NAME_WRAPPED_NOTHING
+export const CONTRACT_NAME_PLAID_WMNO = process.env.CONTRACT_NAME_PLAID_WMNO
 
 
 export const SWAPR_PK = process.env.SWAPR_PK
 export const SWAPR_SK = process.env.SWAPR_SK
 export const SWAPR_STX = process.env.SWAPR_STX
 
-export const USER_STX = process.env.USER_STX
-export const USER_SK = process.env.USER_SK
+export const USER1_STX = process.env.USER1_STX
+export const USER1_SK = process.env.USER1_SK
+export const USER2_STX = process.env.USER2_STX
+export const USER2_SK = process.env.USER2_SK

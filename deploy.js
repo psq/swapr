@@ -34,12 +34,15 @@ import {
   CONTRACT_NAME_PLAID_THING,
   CONTRACT_NAME_TOKENSOFT,
   CONTRACT_NAME_TOKENSOFT_STX,
+  CONTRACT_NAME_MICRO_NTHNG,
+  CONTRACT_NAME_WRAPPED_NOTHING,
+  CONTRACT_NAME_PLAID_WMNO,
 
   SWAPR_SK,
   SWAPR_STX,
 
-  USER_SK,
-  USER_STX,
+  USER1_SK,
+  USER2_SK,
 } from './src/config.js'
 
 console.log("deploying swapr with", SWAPR_STX, "on", MODE)
@@ -62,6 +65,7 @@ async function deployContract(contract_name, contract_file) {
     .replaceAll('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.swapr', `${SWAPR_STX}.${CONTRACT_NAME_SWAPR}`)  // minting
     .replaceAll('ST000000000000000000002AMW42H', SWAPR_STX)
     .replaceAll('ST20ATRN26N9P05V2F1RHFRV24X8C8M3W54E427B2', SWAPR_STX)
+    .replaceAll('.micro-nthng', CONTRACT_NAME_MICRO_NTHNG)
 
   console.log("deploy", contract_name)
   // console.log(codeBody)
@@ -91,7 +95,7 @@ async function deployContract(contract_name, contract_file) {
   return result
 }
 
-async function createPair(token_1, token_2, token_1_2, name, amount_1, amount_2) {
+async function createPair(token_1, token_2, token_1_2, name, amount_1, amount_2, user_sk) {
   console.log("createPair", token_1, token_2, token_1_2, name, amount_1, amount_2)
   // const fee = new BigNum(311)
   const addr = SWAPR_STX
@@ -100,7 +104,7 @@ async function createPair(token_1, token_2, token_1_2, name, amount_1, amount_2)
     contractName: CONTRACT_NAME_SWAPR,
     functionName: 'create-pair',
     functionArgs: [contractPrincipalCV(addr, token_1), contractPrincipalCV(addr, token_2), contractPrincipalCV(addr, token_1_2), stringAsciiCV(name), uintCV(amount_1), uintCV(amount_2)],
-    senderKey: USER_SK,
+    senderKey: user_sk,
     network,
     postConditionMode: PostConditionMode.Allow,
     postConditions: [
@@ -118,6 +122,36 @@ async function createPair(token_1, token_2, token_1_2, name, amount_1, amount_2)
   const processed = await processing(result, 0)
   if (!processed) {
     throw new Error(`failed to execute create-pair`)
+  }
+}
+
+async function addToPosition(token_1, token_2, token_1_2, name, amount_1, amount_2, user_sk) {
+  console.log("addToPosition", token_1, token_2, token_1_2, name, amount_1, amount_2)
+  // const fee = new BigNum(311)
+  const addr = SWAPR_STX
+  const transaction = await makeContractCall({
+    contractAddress: addr,
+    contractName: CONTRACT_NAME_SWAPR,
+    functionName: 'add-to-position',
+    functionArgs: [contractPrincipalCV(addr, token_1), contractPrincipalCV(addr, token_2), contractPrincipalCV(addr, token_1_2), stringAsciiCV(name), uintCV(amount_1), uintCV(amount_2)],
+    senderKey: user_sk,
+    network,
+    postConditionMode: PostConditionMode.Allow,
+    postConditions: [
+    ],
+  })
+  console.log("transaction", transaction.payload)
+  const serialized = transaction.serialize().toString('hex')
+  console.log("serialized", serialized)
+  const result = await broadcastTransaction(transaction, network)
+  console.log("result", result)
+  if (result.error) {
+    console.log(result.reason)
+    throw new Error(`failed to add to position ${token_1} - ${token_2}`)
+  }
+  const processed = await processing(result, 0)
+  if (!processed) {
+    throw new Error(`failed to execute add-to-position`)
   }
 }
 
@@ -212,6 +246,7 @@ const result_pair_1 = await createPair(
   'Plaid-STX',
    25_000_000_000_000,
    500_000_000_000,
+   USER1_SK,
 )
 
 const result_pair_2 = await createPair(
@@ -221,6 +256,7 @@ const result_pair_2 = await createPair(
   'Plaid-Thing',
    100_000_000_000,
    200_000_000_000,
+   USER1_SK,
 )
 
 const result_pair_3 = await createPair(
@@ -230,7 +266,9 @@ const result_pair_3 = await createPair(
   'xBTC-STX',
    2_000_000_000,    // 20 BTC
    1_200_000_000_000,   // 1_200_000 STX
+   USER1_SK,
 )
+
 const result_pair_4 = await createPair(
   `${CONTRACT_NAME_PLAID}`,
   `${CONTRACT_NAME_WRAPPED_NOTHING}`,
@@ -238,7 +276,19 @@ const result_pair_4 = await createPair(
   'Plaid-WMNO',
    2_000_000_000,    // 20 BTC
    1_200_000_000_000,   // 1_200_000 STX
+   USER1_SK,
 )
+
+const result_pair_5 = await addToPosition(
+  `${CONTRACT_NAME_TOKENSOFT}`,
+  `${CONTRACT_NAME_STX}`,
+  `${CONTRACT_NAME_TOKENSOFT_STX}`,
+  'xBTC-STX',
+   1_000_000_000,    // 10 BTC
+   600_000_000_000,  // 600_000 STX
+   USER2_SK,
+)
+
 
 console.log("done")
 // create a second pair?

@@ -1,5 +1,5 @@
-;; this is an SRC20 method with an additional mint function
-;; as Clarity does not support "includes", copy the needed funcitons, and add new ones
+;; this is an SIP-010 method with an additional functions used by swapr
+;; as Clarity does not support "includes", copy the needed functions, and add new ones
 
 (define-trait swapr-trait
   (
@@ -28,5 +28,18 @@
 
     ;; mint function only swapr contract can call
     (mint (principal uint) (response bool uint))
+
+    ;; burn function only swapr contract can call
+    (burn (principal uint) (response bool uint))
+
+    ;;
+    (get-data (principal) (response {
+      name: (string-ascii 32),
+      symbol: (string-ascii 32),
+      decimals: uint,
+      uri: (optional (string-utf8 256)),
+      supply: uint,
+      balance: uint,
+    } uint))
   )
 )
