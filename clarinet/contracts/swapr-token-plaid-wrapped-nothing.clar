@@ -15,7 +15,7 @@
 )
 
 (define-read-only (get-name)
-  (ok "Plaid STX swapr")
+  (ok "Plaid Nothing swapr")
 )
 
 (define-read-only (get-symbol)

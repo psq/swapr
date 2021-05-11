@@ -131,12 +131,18 @@
       (balance-y (get balance-y pair))
       (new-shares
         (if (is-eq (get shares-total pair) u0)
-          (sqrti (* x y))
-          (/ (* x (get shares-total pair)) balance-x))
+          (sqrti (* x y))  ;; burn a fraction of initial lp token to avoid attack as described in WP https://uniswap.org/whitepaper.pdf
+          (/ (* x (get shares-total pair)) balance-x)
         )
+      )
       ;; TODO(psq): need to calculate y based on x, and only transfer the correct amount
       ;; without this, people could game the pool by only providing x!!!  not nice...
-      (new-y (/ (* balance-x balance-y) x))
+      (new-y
+        (if (is-eq (get shares-total pair) u0)
+          y
+          (/ (* x balance-y) balance-x)
+        )
+      )
       (pair-updated (merge pair {
         shares-total: (+ new-shares (get shares-total pair)),
         balance-x: (+ balance-x x),

@@ -15,7 +15,7 @@
 )
 
 (define-read-only (get-name)
-  (ok "xBTC Thing swapr")
+  (ok "xBTC STX swapr")
 )
 
 (define-read-only (get-symbol)

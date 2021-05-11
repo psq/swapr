@@ -65,7 +65,7 @@ async function deployContract(contract_name, contract_file) {
     .replaceAll('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.swapr', `${SWAPR_STX}.${CONTRACT_NAME_SWAPR}`)  // minting
     .replaceAll('ST000000000000000000002AMW42H', SWAPR_STX)
     .replaceAll('ST20ATRN26N9P05V2F1RHFRV24X8C8M3W54E427B2', SWAPR_STX)
-    .replaceAll('.micro-nthng', CONTRACT_NAME_MICRO_NTHNG)
+    .replaceAll('.micro-nthng', `.${CONTRACT_NAME_MICRO_NTHNG}`)
 
   console.log("deploy", contract_name)
   // console.log(codeBody)
@@ -125,15 +125,15 @@ async function createPair(token_1, token_2, token_1_2, name, amount_1, amount_2,
   }
 }
 
-async function addToPosition(token_1, token_2, token_1_2, name, amount_1, amount_2, user_sk) {
-  console.log("addToPosition", token_1, token_2, token_1_2, name, amount_1, amount_2)
+async function addToPosition(token_1, token_2, token_1_2, amount_1, amount_2, user_sk) {
+  console.log("addToPosition", token_1, token_2, token_1_2, amount_1, amount_2)
   // const fee = new BigNum(311)
   const addr = SWAPR_STX
   const transaction = await makeContractCall({
     contractAddress: addr,
     contractName: CONTRACT_NAME_SWAPR,
     functionName: 'add-to-position',
-    functionArgs: [contractPrincipalCV(addr, token_1), contractPrincipalCV(addr, token_2), contractPrincipalCV(addr, token_1_2), stringAsciiCV(name), uintCV(amount_1), uintCV(amount_2)],
+    functionArgs: [contractPrincipalCV(addr, token_1), contractPrincipalCV(addr, token_2), contractPrincipalCV(addr, token_1_2), uintCV(amount_1), uintCV(amount_2)],
     senderKey: user_sk,
     network,
     postConditionMode: PostConditionMode.Allow,
@@ -283,12 +283,11 @@ const result_pair_5 = await addToPosition(
   `${CONTRACT_NAME_TOKENSOFT}`,
   `${CONTRACT_NAME_STX}`,
   `${CONTRACT_NAME_TOKENSOFT_STX}`,
-  'xBTC-STX',
    1_000_000_000,    // 10 BTC
    600_000_000_000,  // 600_000 STX
    USER2_SK,
 )
-
+2_400_000_000_000
 
 console.log("done")
 // create a second pair?

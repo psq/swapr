@@ -7,6 +7,7 @@ Clarinet.test({
   name: "Ensure that <...> - swapr",
   async fn(chain, accounts) {
     const wallet_1 = accounts.get("wallet_1")
+    const wallet_2 = accounts.get("wallet_2")
 
     const asset_map = chain.getAssetsMaps()
     console.log("asset_map", asset_map)
@@ -25,7 +26,6 @@ Clarinet.test({
     ])
     assertEquals(block.receipts.length, 1)
     assertEquals(block.height, 2)
-
 
 
 
@@ -113,6 +113,40 @@ Clarinet.test({
     swap_result_3[0].expectUint(19940)
     swap_result_3[1].expectUint(30000)
 
+
+    const result_pair1_get_balances_3 = chain.callReadOnlyFn('swapr', 'get-balances', [types.principal(pair1['token-x']), types.principal(pair1['token-y'])], wallet_1.address).result
+    const pair1_balances_3 = result_pair1_get_balances_3.expectOk().expectList()
+    pair1_balances_3[0].expectUint(9990060)
+    pair1_balances_3[1].expectUint(15015060)
+
+    block = chain.mineBlock([
+
+      Tx.contractCall('swapr', 'add-to-position', [
+        types.principal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.plaid-token'),
+        types.principal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.stx-token'),
+        types.principal('ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.plaid-stx-token'),
+        types.uint(5000000),
+        types.uint(7500000),
+      ], wallet_2.address),
+
+    ])
+    assertEquals(block.receipts.length, 1)
+    assertEquals(block.height, 5)
+
+    const result_plaid_stx_token_balance_wallet1 = chain.callReadOnlyFn('plaid-stx-token', 'get-balance-of', [types.principal(wallet_1.address)], wallet_1.address).result
+    const result_plaid_stx_token_balance_wallet2 = chain.callReadOnlyFn('plaid-stx-token', 'get-balance-of', [types.principal(wallet_2.address)], wallet_2.address).result
+    console.log("result_plaid_stx_token_balance_wallet1", result_plaid_stx_token_balance_wallet1)
+    console.log("result_plaid_stx_token_balance_wallet2", result_plaid_stx_token_balance_wallet2)
+    const result_pair1_get_balances_4 = chain.callReadOnlyFn('swapr', 'get-balances', [types.principal(pair1['token-x']), types.principal(pair1['token-y'])], wallet_1.address).result
+    console.log("result_pair1_get_balances_4", result_pair1_get_balances_4)
+    const pair1_balances_4 = result_pair1_get_balances_4.expectOk().expectList()
+    pair1_balances_4[0].expectUint(5000000 + 9990060)
+    pair1_balances_4[1].expectUint(Math.floor(5000000 * 15015060 / 9990060) + 15015060)  //(/ (* x balance-y) balance-x)
+
+
+
+// result_pair1_get_balances_4 (ok [u14990060, u22530059])
+    assertEquals()
 
   },
 })
