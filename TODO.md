@@ -4,5 +4,7 @@
 - reward add
 - reward claim
 - voting to allocate rewards?
-
-
+- add asset manager hooks to move funds in/out to get yield, with the right incentive for people/bots to do so before it is needed (post launch for real asset managers), see balancer v2
+- uncollaterized flash loans with fee (0.09-0.5% fee), but prevent transaction with pools during loans (which should be easily doable as there is no reentrancy)
+- customizable fee (at creation?  at any time, and fee allocation to LP vs special address for governance)
+- allow off balance pools for token distribution (90/10 for example, 90 in token, 10 in base, either stable or stx) => requires 1/10th of the capital

@@ -4,7 +4,7 @@ name = "Development"
 [accounts.deployer]
 # ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE
 mnemonic = "fetch outside black test wash cover just actual execute nice door want airport betray quantum stamp fish act pen trust portion fatigue scissors vague"
-balance = 1_000_000_000_000
+balance = 10_000_000_000_000
 
 [accounts.wallet_1]
 # ST2SVRCJJD90TER037VCSAFA781HQTCPFK9YRA6J5

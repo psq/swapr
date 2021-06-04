@@ -1,2 +1,2 @@
 #V2
-(define-constant BUFF_TO_UINT8(range 0x00 0xff))
+ (contract-call? 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.flash-loan-client loan1)

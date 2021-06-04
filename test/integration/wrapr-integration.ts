@@ -86,7 +86,7 @@ describe("wrapr scenario", async () => {
     assert.equal(balance_alice_0.toString(), '80000')
     assert.equal(balance_bob_0.toString(), '0')
 
-    const tx_tranfer = await wraprTXClient.transfer(keys_bob, 50000, { keys_sender: keys_alice})
+    const tx_transfer = await wraprTXClient.transfer(keys_bob, 50000, { keys_sender: keys_alice})
 
     const tx_unwrap_bob = await wraprTXClient.unwrap(20000, { keys_sender: keys_bob })
 

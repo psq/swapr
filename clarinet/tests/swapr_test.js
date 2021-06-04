@@ -146,7 +146,8 @@ Clarinet.test({
 
 
 // result_pair1_get_balances_4 (ok [u14990060, u22530059])
-    assertEquals()
+    // assertEquals()
+    // TODO(psq): need multiple tests adding a bunch of liquidity, then try to withdraw everything is different order (biggests first, smallests first, ...)
 
   },
 })

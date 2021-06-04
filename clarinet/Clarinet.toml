@@ -1,25 +1,33 @@
 [project]
 name = "swapr.clarinet"
 
-[contracts.sip-010]
-path = "contracts/trait-sip-010.clar"
-depends_on = []
-
-[contracts.swapr-trait]
-path = "contracts/trait-swapr.clar"
-depends_on = []
-
 [contracts.micro-nthng]
 path = "contracts/token-micro-nthng.clar"
 depends_on = []
 
-[contracts.wrapped-nothing]
-path = "contracts/token-wrapped-nothing.clar"
-depends_on = ["sip-010", "micro-nthng"]
+[contracts.plaid-stx-token]
+path = "contracts/swapr-token-plaid-stx.clar"
+depends_on = ["swapr-trait", "swapr"]
+
+[contracts.plaid-thing-token]
+path = "contracts/swapr-token-plaid-thing.clar"
+depends_on = ["swapr-trait", "swapr"]
 
 [contracts.plaid-token]
 path = "contracts/token-plaid.clar"
 depends_on = ["sip-010"]
+
+[contracts.plaid-wrapped-nothing-token]
+path = "contracts/swapr-token-plaid-wrapped-nothing.clar"
+depends_on = ["swapr-trait", "swapr"]
+
+[contracts.restricted-token-trait]
+path = "contracts/trait-restricted-token.clar"
+depends_on = []
+
+[contracts.sip-010]
+path = "contracts/trait-sip-010.clar"
+depends_on = []
 
 [contracts.stx-token]
 path = "contracts/token-stx.clar"
@@ -29,30 +37,43 @@ depends_on = ["sip-010"]
 path = "contracts/main-swapr.clar"
 depends_on = ["sip-010", "swapr-trait"]
 
-[contracts.plaid-stx-token]
-path = "contracts/swapr-token-plaid-stx.clar"
-depends_on = ["swapr-trait", "swapr"]
-
-[contracts.restricted-token-trait]
-path = "contracts/trait-restricted-token.clar"
+[contracts.swapr-trait]
+path = "contracts/trait-swapr.clar"
 depends_on = []
 
 [contracts.thing-token]
 path = "contracts/token-thing.clar"
 depends_on = ["sip-010"]
 
-[contracts.plaid-thing-token]
-path = "contracts/swapr-token-plaid-thing.clar"
+[contracts.tokensoft-stx-token]
+path = "contracts/swapr-token-tokensoft-stx.clar"
 depends_on = ["swapr-trait", "swapr"]
 
 [contracts.tokensoft-token]
 path = "contracts/token-tokensoft.clar"
 depends_on = ["sip-010", "restricted-token-trait"]
 
-[contracts.tokensoft-stx-token]
-path = "contracts/swapr-token-tokensoft-stx.clar"
-depends_on = ["swapr-trait", "swapr"]
+[contracts.wrapped-nothing]
+path = "contracts/token-wrapped-nothing.clar"
+depends_on = ["sip-010", "micro-nthng"]
 
-[contracts.plaid-wrapped-nothing-token]
-path = "contracts/swapr-token-plaid-wrapped-nothing.clar"
-depends_on = ["swapr-trait", "swapr"]
+
+[contracts.flash-loan-trait]
+path = "contracts/trait-flash-loan.clar"
+depends_on = []
+
+[contracts.flash-loan]
+path = "contracts/flash-loan.clar"
+depends_on = ["flash-loan-trait", "stx-token", "plaid-token", "thing-token", "tokensoft-token", "wrapped-nothing", "sip-010"]
+
+[contracts.flash-loan-impl]
+path = "contracts/flash-loan-impl.clar"
+depends_on = ["flash-loan-trait"]
+
+[contracts.flash-loan-client]
+path = "contracts/flash-loan-client.clar"
+depends_on = ["flash-loan-impl", "flash-loan"]
+
+[contracts.rewards]
+path = "contracts/rewards.clar"
+depends_on = ["sip-010"]
