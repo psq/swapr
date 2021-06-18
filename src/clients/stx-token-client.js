@@ -1,23 +1,23 @@
-import clarity from '@blockstack/clarity'
+const clarity = require('@blockstack/clarity')
 
 const { Client, Provider, Receipt, Result } = clarity
 
-import {
+const {
   TransferError,
-} from '../errors.js'
+} = require('../errors.js')
 
-import {
+const {
   parse,
   unwrapXYList,
   unwrapSome,
   unwrapOK,
-} from '../utils.js'
+} = require('../utils.js')
 
-export class STXTokenClient extends Client {
+class STXTokenClient extends Client {
   constructor(provider) {
     super(
       'SP3MT6QYRJ51YDNEEHCKA0232QHQCWSW4N5S8M370.stx-token',
-      './clarinet/contracts/stx-token',
+      './clarinet/contracts/token-stx.clar',
       provider
     );
   }
@@ -65,15 +65,15 @@ export class STXTokenClient extends Client {
     throw new TransferError()
   }
 
-  async balanceOf(owner) {
+  async getBalanceOf(owner) {
     const query = this.createQuery({
       method: {
-        name: 'balance-of',
+        name: 'get-balance-of',
         args: [`'${owner}`],
       },
     })
     const receipt = await this.submitQuery(query)
-    console.log("receipt", receipt)
+    // console.log("receipt", receipt)
     return Result.unwrapUInt(receipt)
   }
 
@@ -89,4 +89,8 @@ export class STXTokenClient extends Client {
     return Result.unwrapUInt(receipt)
   }
 
+}
+
+module.exports = {
+  STXTokenClient,
 }

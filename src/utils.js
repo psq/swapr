@@ -1,12 +1,12 @@
-import {
+const {
   ClarityParseError,
   NoLiquidityError,
   NotOwnerError,
   NotOKErr,
   NotSomeErr,
-} from './errors.js'
+} = require('./errors.js')
 
-export function parse(value) {
+function parse(value) {
   let index = 0
   function sub() {
     const keywords = []
@@ -38,12 +38,12 @@ export function parse(value) {
   return sub()[0]
 }
 
-export function unwrapList(tree) {
+function unwrapList(tree) {
   // console.log("unwrapList", tree)
   return tree
 }
 
-export function unwrapXYList(tree) {
+function unwrapXYList(tree) {
   // console.log("unwrapXYList", tree)
   return {
     x: parseInt(tree[0].substring(1)),
@@ -51,7 +51,7 @@ export function unwrapXYList(tree) {
   }
 }
 
-export function unwrapSome(tree) {
+function unwrapSome(tree) {
   // console.log("unwrapSome", tree)
   if (tree[0] === 'some') {
     return tree[1]
@@ -60,7 +60,7 @@ export function unwrapSome(tree) {
   }
 }
 
-export function unwrapOK(tree) {
+function unwrapOK(tree) {
   // console.log("unwrapOK", tree)
   if (tree[0] === 'ok') {
     return tree[1]
@@ -69,7 +69,16 @@ export function unwrapOK(tree) {
   }
 }
 
-export function replaceString(body, original, replacement) {
+function replaceString(body, original, replacement) {
   const regexp = new RegExp(original, 'g')  // limited to principal and contract names with . and - should work
   return body.replace(regexp, replacement)
+}
+
+module.exports = {
+  parse,
+  unwrapList,
+  unwrapXYList,
+  unwrapSome,
+  unwrapOK,
+  replaceString,
 }

@@ -1,23 +1,23 @@
-import * as os from 'os'
-import * as path from 'path'
+const os = require('os')
+const path = require('path')
 
-import clarity from '@blockstack/clarity'
-import provider from '@blockstack/clarity/lib/core/provider.js'
-import clarityBin from '@blockstack/clarity/lib/providers/clarityBin/index.js'
+const clarity = require('@blockstack/clarity')
+const provider = require('@blockstack/clarity/lib/core/provider.js')
+const clarityBin = require('@blockstack/clarity/lib/providers/clarityBin/index.js')
 
 const { NativeClarityBinProvider } = clarity
 const { ProviderConstructor } = provider
-import { getDefaultBinaryFilePath } from '@blockstack/clarity-native-bin'
+const { getDefaultBinaryFilePath } = require('@blockstack/clarity-native-bin')
 
 const { InitialAllocation } = clarityBin
 
-export function getTempFilePath(fileNameTemplate) {
+function getTempFilePath(fileNameTemplate) {
   const uniqueID = `${(Date.now() / 1000) | 0}-${Math.random().toString(36).substr(2, 6)}`
   const fileName = fileNameTemplate.replace('{uniqueID}', uniqueID)
   return path.join(os.tmpdir(), fileName)
 }
 
-export function providerWithInitialAllocations(allocations) {
+function providerWithInitialAllocations(allocations) {
   const nativeBinFile = getDefaultBinaryFilePath()
   const tempDbPath = getTempFilePath('blockstack-local-{uniqueID}.db')
 
@@ -26,4 +26,9 @@ export function providerWithInitialAllocations(allocations) {
       NativeClarityBinProvider.create(allocations, tempDbPath, nativeBinFile),
   }
   return providerConstructor
+}
+
+module.exports = {
+  getTempFilePath,
+  providerWithInitialAllocations,
 }
