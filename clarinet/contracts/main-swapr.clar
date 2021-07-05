@@ -1,6 +1,8 @@
 (use-trait sip-010-token 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.sip-010.ft-trait)
 (use-trait swapr-token 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.swapr-trait.swapr-trait)
+(use-trait flash-loan 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.flash-loan-trait.flash-loan-trait)
 
+;; TODO(psq): this should be a var instead?
 (define-constant contract-owner 'ST20ATRN26N9P05V2F1RHFRV24X8C8M3W54E427B2)
 (define-constant no-liquidity-err (err u61))
 ;; (define-constant transfer-failed-err (err u62))
@@ -18,11 +20,18 @@
 (define-constant value-out-of-range-err (err u74))
 (define-constant no-fee-x-err (err u75))
 (define-constant no-fee-y-err (err u76))
+(define-constant not-enough-fund-err (err u77))
+(define-constant fee-mismatch-err (err u78))
+
 
 ;; for future use, or debug
 (define-constant e10-err (err u20))
 (define-constant e11-err (err u21))
 (define-constant e12-err (err u22))
+
+;; TODO(psq): need setters/getters so DAO can set?
+(define-data-var loan-fee-num uint u10)
+(define-data-var loan-fee-den uint u1000)
 
 (define-map pairs-map
   { pair-id: uint }
@@ -43,7 +52,7 @@
     balance-y: uint,
     fee-balance-x: uint,
     fee-balance-y: uint,
-    fee-to-address: (optional principal),
+    fee-to-address: (optional principal),  ;; TODO(psq): no longer needed per pair, treasury collects for all pairs?
     swapr-token: principal,
     name: (string-ascii 32),
   }
@@ -54,6 +63,17 @@
 
 ;; (define-data-var pairs-list (list 2000 uint) (list))
 (define-data-var pair-count uint u0)
+
+;; there can not be any tokens outside those involved in a pair (either as swapping fee or as flash loan fee, to be partly distributed to swapr holders, or kept in treasury)
+(define-map treasury-amounts
+  {
+    token: principal,
+  }
+  {
+    amount: uint,
+  }
+)
+
 
 
 (define-read-only (get-name (token-x-trait <sip-010-token>) (token-y-trait <sip-010-token>))
@@ -155,6 +175,11 @@
 
     (map-set pairs-data-map { token-x: token-x, token-y: token-y } pair-updated)
     (try! (contract-call? token-swapr-trait mint recipient-address new-shares))
+
+
+    ;; call reward contract `(add-rewards pair tx-sender new-shares)`
+
+
     (print { object: "pair", action: "liquidity-added", data: pair-updated })
     (ok true)
   )
@@ -254,10 +279,43 @@
     ;; (unwrap-panic (contract-call? token-swapr-trait transfer withdrawal tx-sender contract-address))  ;; transfer back to swapr, wish there was a burn instead...
     (try! (contract-call? token-swapr-trait burn tx-sender withdrawal))
 
+
+    ;; call reward contract `(cancel-rewards pair tx-sender)` and `(add-rewards pair tx-sender (- shares withdrawal))`
+
+
     (print { object: "pair", action: "liquidity-removed", data: pair-updated })
     (ok (list withdrawal-x withdrawal-y))
   )
 )
+
+
+(define-public (flash-loan (loan-id uint) (loan-user <flash-loan>) (loan-amount uint) (token <sip-010-token>))
+
+  (let
+    (
+      (token-contract (contract-of token))
+      ;; figure out balance in token
+      (treasury-amount (default-to { amount: u0 } (mag-get? treasury-amounts { token: token-contract })))
+      ;; fee estimate
+      (loan-fee-num (var-get loan-fee-num))
+      (loan-fee-den (var-get loan-fee-den))
+      (fee (/ (* loan-amount loan-fee-num) loan-fee-den))
+      (max-loan (contract-call? token get-balance-of (as-contract tx-sender)))
+    )
+
+    ;; check loan amount is available
+    (asserts! (< loan-amount max-loan) not-enough-fund-err)
+
+    ;; execute flash loan and check fee matches
+    ;; TODO(psq): need to do the transfer from here, as that's where the balance is!
+    (assert! (eq fee (unwrap! (contract-call? .flash-loanloan u1 loan-user loan-amount token loan-fee-num loan-fee-den) fee-mismatch-err)))
+
+    ;; credit treasury (since mixed pair, so can't fully credit pair, or make loan on a pair?)
+    (map-set treasury-amounts { token: token-contract } { amount: (+ (get amount treasury-amount) fee)})
+    (ok true)
+  )
+)
+
 
 ;; exchange known dx of x-token for whatever dy of y-token based on current liquidity, returns (dx dy)
 ;; the swap will not happen if can't get at least min-dy back
@@ -339,7 +397,8 @@
   )
 )
 
-;; ;; activate the contract fee for swaps by setting the collection address, restricted to contract owner
+;; TODO(psq): this should be on by default, and collected into treasury-amounts, claimable by the treasusry/owner
+;; activate the contract fee for swaps by setting the collection address, restricted to contract owner
 (define-public (set-fee-to-address (token-x principal) (token-y principal) (address principal))
   (let ((pair (unwrap! (map-get? pairs-data-map { token-x: token-x, token-y: token-y }) invalid-pair-err)))
 
@@ -361,8 +420,9 @@
   )
 )
 
-;; ;; clear the contract fee addres
-;; ;; TODO(psq): if there are any collected fees, prevent this from happening, as the fees can no longer be collect with `collect-fees`
+;; TODO(psq): remove, as treasure always collects?
+;; clear the contract fee addres
+;; TODO(psq): if there are any collected fees, prevent this from happening, as the fees can no longer be collect with `collect-fees`
 (define-public (reset-fee-to-address (token-x principal) (token-y principal))
   (let ((pair (unwrap! (map-get? pairs-data-map { token-x: token-x, token-y: token-y }) invalid-pair-err)))
 
@@ -384,21 +444,22 @@
   )
 )
 
-;; ;; get the current address used to collect a fee
+;; get the current address used to collect a fee
 (define-read-only (get-fee-to-address (token-x principal) (token-y principal))
   (let ((pair (unwrap! (map-get? pairs-data-map { token-x: token-x, token-y: token-y }) invalid-pair-err)))
     (ok (get fee-to-address pair))
   )
 )
 
-;; ;; get the amount of fees charged on x-token and y-token exchanges that have not been collected yet
+;; get the amount of fees charged on x-token and y-token exchanges that have not been collected yet
 (define-read-only (get-fees (token-x principal) (token-y principal))
   (let ((pair (unwrap! (map-get? pairs-data-map { token-x: token-x, token-y: token-y }) invalid-pair-err)))
     (ok (list (get fee-balance-x pair) (get fee-balance-y pair)))
   )
 )
 
-;; ;; send the collected fees the fee-to-address
+;; TODO(psq): collect per token instead of per pair now
+;; send the collected fees the fee-to-address
 (define-public (collect-fees (token-x-trait <sip-010-token>) (token-y-trait <sip-010-token>))
   (let
     (

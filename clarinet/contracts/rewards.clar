@@ -71,21 +71,24 @@
   }
 )
 
+;; TODO(psq): unfortunately, can't find a solution that could not be abused by
+;; either doing lots of (wash) trades, or creating multiple address, so no rewards
+;; for users
 
 ;; a swapper only gets rewarded for a cycle where an exchange happened
 ;; an LP gets increasingly rewarded for supplying liquidity longer
 ;; TODO(psq): can only claim on current, maybe don't store more?
 ;; TODO(psq): needs to be per pair per cycle
-(define-map rewards-user
-  {
-    recipient : principal,
-    cycle: uint,
-    pair: (string-ascii 32),
-  }
-  {
-    shares: uint,
-  }
-)
+;; (define-map rewards-user
+;;   {
+;;     recipient : principal,
+;;     cycle: uint,
+;;     pair: (string-ascii 32),
+;;   }
+;;   {
+;;     shares: uint,
+;;   }
+;; )
 
 ;; TODO(psq):  can only claim on current, maybe don't store more?
 ;; TODO(psq): needs to be per pair per cycle
@@ -271,11 +274,12 @@
       (provider-shares-opt (map-get? rewards-provider { recipient: owner, cycle: cycle, pair: pair }))
       (provider-shares (if (is-some provider-shares-opt) (get shares (unwrap-panic provider-shares-opt)) (get shares (default-to { shares: u0 } (map-get? rewards-provider { recipient: owner, cycle: u0, pair: pair })))))
 
-      (user-shares-opt (map-get? rewards-user { recipient: owner, cycle: cycle, pair: pair }))
-      (user-shares (if (is-some user-shares-opt) (get shares (unwrap-panic user-shares-opt)) (get shares (default-to { shares: u0 }  (map-get? rewards-user { recipient: owner, cycle: u0, pair: pair })))))
+      ;; (user-shares-opt (map-get? rewards-user { recipient: owner, cycle: cycle, pair: pair }))
+      ;; (user-shares (if (is-some user-shares-opt) (get shares (unwrap-panic user-shares-opt)) (get shares (default-to { shares: u0 }  (map-get? rewards-user { recipient: owner, cycle: u0, pair: pair })))))
     )
 
-    (list (+ provider-shares user-shares) total-shares)
+    ;; (list (+ provider-shares user-shares) total-shares)
+    (list provider-shares total-shares)
   )
 )
 

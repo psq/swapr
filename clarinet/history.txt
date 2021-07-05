@@ -1,2 +1,5 @@
 #V2
- (contract-call? 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.flash-loan-client loan1)
+(stx-get-balance tx-sender)
+(stx-transfer? u10 tx-sender 'ST20ATRN26N9P05V2F1RHFRV24X8C8M3W54E427B2)
+(stx-transfer? u10 (print tx-sender) 'ST20ATRN26N9P05V2F1RHFRV24X8C8M3W54E427B2)
+::version

@@ -6,18 +6,19 @@
 (define-constant loan-err (err u102))
 (define-constant repay-err (err u103))
 
-(define-data-var loan-fee-num uint u5)
-(define-data-var loan-fee-den uint u1000)
 
-
-(define-public (loan (loan-id uint) (loan-user <flash-loan>) (loan-amount uint) (token <sip-010-token>))
+(define-public (loan (loan-id uint) (loan-user <flash-loan>) (loan-amount uint) (token <sip-010-token>) (loan-fee-num uint) (loan-fee-den uint))
   (begin
     ;; TODO(psq): check amount is valid
     ;; TODO(psq): prevent any other things that make sense (like using the pair the money comes from)
     ;; transfer
     (unwrap! (as-contract (contract-call? token transfer loan-amount tx-sender (contract-of loan-user))) funding-err)
     ;; record balance
-    (let ((balance (stx-get-balance (as-contract tx-sender))) (fee (/ (* loan-amount (var-get loan-fee-num)) (var-get loan-fee-den))))  ;; 50 basis point
+    (let
+      (
+        (balance (stx-get-balance (as-contract tx-sender)))
+        (fee (/ (* loan-amount loan-fee-num) loan-fee-den))  ;; 50 basis point
+      )
 
       ;; call the flash loand operation
       (unwrap! (contract-call? loan-user use-loan loan-id (as-contract tx-sender) loan-amount fee) loan-err)
@@ -26,7 +27,7 @@
       (print "unwinding")
       (print { amount: loan-amount, balance: balance, fee: fee, new-balance: (stx-get-balance (as-contract tx-sender)) })
       (asserts! (>= (unwrap! (contract-call? token get-balance-of (as-contract tx-sender)) repay-err) (+ balance loan-amount fee)) balance-and-fee-not-returned-err)
-      (ok u0)
+      (ok fee)
     )
   )
 )
